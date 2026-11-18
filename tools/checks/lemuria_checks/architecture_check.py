@@ -23,7 +23,7 @@ _HEADER_GROUPS = {
     "classic": re.compile(r"^lemuria/classic/", re.IGNORECASE),
     "platform": re.compile(r"^lemuria/platform/", re.IGNORECASE),
     "game": re.compile(r"^demo(_|[a-z0-9]*/)", re.IGNORECASE),
-    "sdl": re.compile(r"^SDL3?(/|\.h$)|^SDL_", re.IGNORECASE),
+    "sdl": re.compile(r"^SDL3?(_net)?(/|\.h$)|^SDL_", re.IGNORECASE),
     "os": re.compile(
         r"^(windows\.h|winsock2?\.h|ws2tcpip\.h|winuser\.h|d3d\d*\.h|dxgi\d*\.h|io\.h|direct\.h|process\.h"
         r"|unistd\.h|pthread\.h|dlfcn\.h|fcntl\.h|poll\.h|netdb\.h|sys/.*|arpa/.*|netinet/.*|linux/.*|android/.*)$",
@@ -35,7 +35,7 @@ _TARGET_GROUPS = {
     "classic": re.compile(r"\blemuria_classic\b"),
     "platform": re.compile(r"\blemuria_platform_sdl\b"),
     "game": re.compile(r"\bdemo_(protocol|client)\b"),
-    "sdl": re.compile(r"\bSDL3::"),
+    "sdl": re.compile(r"\bSDL3(_net)?::"),
 }
 
 _REASONS = {
@@ -56,7 +56,8 @@ _PARTS: tuple[tuple[str, frozenset[str]], ...] = (
     ("Frameworks/", frozenset({"platform", "game", "sdl", "os"})),
     ("tests/architecture/custom_framework/", frozenset({"classic", "platform", "game", "sdl", "os"})),
     ("Samples/DemoGame/Source/Protocol/", frozenset({"classic", "platform", "sdl", "os"})),
-    ("Samples/DemoGame/Source/TestServer/", frozenset({"classic", "platform", "sdl", "os"})),
+    # The test server needs TCP and a real clock, and only the platform layer offers them (docs/adr/0018-*.md).
+    ("Samples/DemoGame/Source/TestServer/", frozenset({"classic", "sdl", "os"})),
     ("Samples/", frozenset({"sdl", "os"})),
     ("tests/", frozenset({"sdl", "os"})),
 )

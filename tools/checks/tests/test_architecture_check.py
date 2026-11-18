@@ -60,6 +60,46 @@ class ArchitectureCheckTests(TempRepositoryTest):
             with self.subTest(folder=folder):
                 self.refused(f"{folder}/Private/A.cpp", '#include "Lemuria/Classic/X.hpp"\n', "INV-02")
 
+    def test_the_test_server_can_use_the_platform_layer(self) -> None:
+        self.write(f"{TEST_SERVER}/Private/Main.cpp", '#include "Lemuria/Platform/TcpListener.hpp"\n')
+        self.write(f"{TEST_SERVER}/CMakeLists.txt", "lemuria_add_program(test_server DEPS lemuria_platform_sdl)\n")
+        self.assertEqual(architecture_check.run(self.root), [])
+
+    def test_the_test_server_still_cannot_use_classic_sdl_or_the_operating_system(self) -> None:
+        cases = (
+            ('#include "Lemuria/Classic/X.hpp"\n', "INV-02"),
+            ("#include <SDL3/SDL.h>\n", "INV-09"),
+            ("#include <SDL3_net/SDL_net.h>\n", "INV-09"),
+            ("#include <winsock2.h>\n", "INV-09"),
+            ("#include <sys/socket.h>\n", "INV-09"),
+        )
+        for content, expected in cases:
+            with self.subTest(content=content):
+                self.refused(f"{TEST_SERVER}/Private/Main.cpp", content, expected)
+
+    def test_the_test_server_still_cannot_link_classic_or_sdl(self) -> None:
+        cases = (("lemuria_classic", "INV-02"), ("SDL3::SDL3", "INV-09"), ("SDL3_net::SDL3_net", "INV-09"))
+        for target, expected in cases:
+            with self.subTest(target=target):
+                self.refused(f"{TEST_SERVER}/CMakeLists.txt", f"lemuria_add_program(a DEPS {target})\n", expected)
+
+    def test_the_game_protocol_still_cannot_use_the_platform_layer(self) -> None:
+        self.refused(f"{PROTOCOL}/Private/A.cpp", '#include "Lemuria/Platform/X.hpp"\n', "INV-02")
+
+    def test_sdl_net_is_refused_outside_the_platform_layer(self) -> None:
+        for path in (f"{CORE}/Private/A.cpp", f"{CLASSIC}/Private/A.cpp", f"{CLIENT}/Private/Main.cpp",
+                     f"{PLATFORM}/Public/Lemuria/Platform/A.hpp", f"{PLATFORM}/Tests/ATest.cpp"):
+            with self.subTest(path=path):
+                self.refused(path, "#include <SDL3_net/SDL_net.h>\n", "INV-09")
+
+    def test_the_tests_of_the_platform_layer_cannot_link_sdl_net(self) -> None:
+        self.refused(f"{PLATFORM}/Tests/CMakeLists.txt", "lemuria_add_tests(a DEPS SDL3_net::SDL3_net)\n", "INV-09")
+
+    def test_the_platform_layer_can_use_sdl_net(self) -> None:
+        self.write(f"{PLATFORM}/Private/A.cpp", "#include <SDL3_net/SDL_net.h>\n")
+        self.write(f"{PLATFORM}/CMakeLists.txt", "lemuria_add_library(a PRIVATE_DEPS SDL3_net::SDL3_net)\n")
+        self.assertEqual(architecture_check.run(self.root), [])
+
     def test_sdl_is_refused_outside_the_platform_layer(self) -> None:
         for path in (f"{CORE}/Private/A.cpp", f"{CLASSIC}/Private/A.cpp", f"{CORE}/Tests/ATest.cpp",
                      f"{TEST_SERVER}/Private/Main.cpp", "tests/architecture/ATest.cpp"):
