@@ -57,7 +57,7 @@ As cores de magia são as mais vivas da tela. Se o cenário usar essas cores, os
 
 - **Luz geral baixa:** nada fica totalmente preto, e o desenho do chão continua visível na sombra.
 - **Manchas de sombra grandes e suaves:** elas cobrem boa parte do chão e quebram a repetição dos blocos. Pintadas no mapa, custam quase nada e funcionam em GPU integrada.
-- **Luzes de fogo:** alcançam poucos blocos, perdem força aos poucos e tremulam de leve. O tremor usa o tempo injetado (INV-05).
+- **Luzes de fogo:** alcançam poucos blocos, perdem força aos poucos e tremulam de leve. O tremor usa o tempo injetado (INV-05), e o número de luzes acesas tem orçamento (INV-14).
 - **Halo só no que brilha de verdade:** fogo, magia e itens. O cenário não ganha halo.
 - **Cantos da tela um pouco mais escuros,** para levar o olhar ao centro.
 - **Neblina leve,** só para dar profundidade ao que está longe.
@@ -82,7 +82,7 @@ As cores de magia são as mais vivas da tela. Se o cenário usar essas cores, os
 - Fundo escuro com molduras discretas, para não competir com o mundo.
 - Cor forte só no que é informação: vida, energia, raridade e alertas.
 - Texto sempre legível em qualquer resolução.
-- Arte e layout são próprios e serão definidos na fatia 3.
+- Arte e layout são próprios e serão definidos na fatia 4.
 
 ## O que reprova uma imagem
 
@@ -113,7 +113,7 @@ Estas faixas transformam a aparência em algo que uma máquina consegue conferir
 - **Tom quente:** o vermelho é pelo menos 1,25 vez maior que o azul.
 - **Saturação:** `(maior canal − menor canal) / maior canal`.
 
-As faixas são um piso de qualidade, não a definição de beleza. Uma imagem pode passar nos números e ainda ser reprovada por quem olha. As faixas completas valem quando a cena já tem luz e materiais. Antes disso, a fatia diz na spec quais medidas ela já precisa cumprir.
+As faixas são um piso de qualidade, não a definição de beleza. Uma imagem pode passar nos números e ainda ser reprovada por quem olha. As faixas completas valem a partir da fatia 2 (Luz e clima). Antes disso, a spec de cada fatia diz quais medidas ela já precisa cumprir.
 
 ## Prova visual
 
@@ -146,7 +146,8 @@ Vale para toda fatia que muda o que aparece na tela.
 |---|---|
 | Fatia 0 | Câmera, paleta, tons do chão, prova visual e medidor de fluidez |
 | Fatia 1 | Personagem legível sobre o chão escuro, com sombra nos pés |
-| Fatia 2 | Equipamento e brilho de item por nível |
-| Fatia 3 | Interface própria, seguindo este guia |
-| Fatia 4 | Combate com efeitos e números legíveis |
-| Efeitos | Luzes de fogo, sombras suaves, halo e neblina: o clima completo das referências |
+| Fatia 2 | Chão pintado, manchas de sombra, luzes de fogo, neblina leve e todas as faixas de números: o clima das referências |
+| Fatia 3 | Equipamento e brilho de item por nível |
+| Fatia 4 | Interface própria, seguindo este guia |
+| Fatia 5 | Combate com efeitos e números legíveis |
+| Efeitos | Halo, distorção, partículas e sombras suaves projetadas pelos personagens: o acabamento final |
