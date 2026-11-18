@@ -3,7 +3,7 @@
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/generators/catch_generators.hpp>
 
-#include "lemuria/core/version.hpp"
+#include "Lemuria/Core/Version.hpp"
 
 using lemuria::core::engine_version;
 using lemuria::core::parse_version;

@@ -1,4 +1,4 @@
-#include "lemuria/platform/platform_info.hpp"
+#include "Lemuria/Platform/PlatformInfo.hpp"
 
 #include <cstdint>
 #include <memory>

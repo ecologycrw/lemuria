@@ -1,4 +1,4 @@
 lemuria_add_library(demo_protocol
-    SOURCES Private/protocol.cpp)
+    SOURCES Private/Protocol.cpp)
 
 add_subdirectory(Tests)

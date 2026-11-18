@@ -1,4 +1,4 @@
-#include "lemuria/core/version.hpp"
+#include "Lemuria/Core/Version.hpp"
 
 #include <charconv>
 #include <cstddef>

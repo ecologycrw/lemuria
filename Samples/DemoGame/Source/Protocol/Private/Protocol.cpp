@@ -1,4 +1,4 @@
-#include "demo_protocol/protocol.hpp"
+#include "DemoProtocol/Protocol.hpp"
 
 namespace demo_protocol {
 

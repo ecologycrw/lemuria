@@ -1,6 +1,6 @@
 """Keeps the layers apart: who may include and link what (INV-02, INV-07 and INV-09).
 
-Every C++ file is checked, including the main.cpp of the programs.
+Every C++ file is checked, including the Main.cpp of the programs.
 """
 
 from __future__ import annotations
@@ -18,10 +18,11 @@ _BLOCK_COMMENT = re.compile(r"/\*.*?\*/", re.DOTALL)
 _LINE_COMMENT = re.compile(r"//[^\n]*")
 _CMAKE_COMMENT = re.compile(r"#[^\n]*")
 
+# Letter case is ignored: on Windows, an include written with the wrong case still finds the file.
 _HEADER_GROUPS = {
-    "classic": re.compile(r"^lemuria/classic/"),
-    "platform": re.compile(r"^lemuria/platform/"),
-    "game": re.compile(r"^demo_"),
+    "classic": re.compile(r"^lemuria/classic/", re.IGNORECASE),
+    "platform": re.compile(r"^lemuria/platform/", re.IGNORECASE),
+    "game": re.compile(r"^demo(_|[a-z0-9]*/)", re.IGNORECASE),
     "sdl": re.compile(r"^SDL3?(/|\.h$)|^SDL_", re.IGNORECASE),
     "os": re.compile(
         r"^(windows\.h|winsock2?\.h|ws2tcpip\.h|winuser\.h|d3d\d*\.h|dxgi\d*\.h|io\.h|direct\.h|process\.h"

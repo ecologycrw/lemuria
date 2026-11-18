@@ -1,4 +1,4 @@
-#include "lemuria/classic/framework_info.hpp"
+#include "Lemuria/Classic/FrameworkInfo.hpp"
 
 namespace lemuria::classic {
 

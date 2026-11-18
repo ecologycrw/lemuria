@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include "demo_protocol/protocol.hpp"
-#include "lemuria/classic/framework_info.hpp"
-#include "lemuria/core/version.hpp"
-#include "lemuria/platform/platform_info.hpp"
+#include "DemoProtocol/Protocol.hpp"
+#include "Lemuria/Classic/FrameworkInfo.hpp"
+#include "Lemuria/Core/Version.hpp"
+#include "Lemuria/Platform/PlatformInfo.hpp"
 
 namespace {
 

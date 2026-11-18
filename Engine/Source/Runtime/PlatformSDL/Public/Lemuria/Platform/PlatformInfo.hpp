@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "lemuria/core/result.hpp"
-#include "lemuria/core/version.hpp"
+#include "Lemuria/Core/Result.hpp"
+#include "Lemuria/Core/Version.hpp"
 
 namespace lemuria::platform {
 

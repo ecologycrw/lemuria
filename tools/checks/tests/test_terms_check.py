@@ -15,7 +15,7 @@ class TermsCheckTests(TempRepositoryTest):
         self.assert_refused(terms_check.run(self.root), "the term 'acmegame' is not allowed")
 
     def test_a_forbidden_term_is_refused_in_any_folder_outside_the_allowed_ones(self) -> None:
-        for path in ("Samples/a.txt", "Frameworks/a.txt", "tests/a_test.cpp", "tools/a.py", "README.md", ".github/a.yml", "templates/a.md"):
+        for path in ("Samples/a.txt", "Frameworks/a.txt", "tests/ATest.cpp", "tools/a.py", "README.md", ".github/a.yml", "templates/a.md"):
             with self.subTest(path=path):
                 self.write(path, "acmegame\n")
                 self.assert_refused(terms_check.run(self.root), path)
