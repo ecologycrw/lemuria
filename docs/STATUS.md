@@ -1,7 +1,7 @@
 ---
-fase: entre-fatias
-spec-atual:
-branch: main
+fase: fatia
+spec-atual: 0000
+branch: fatia/0000-primeiros-passos
 atualizado-em: 2026-11-18
 ---
 
@@ -9,11 +9,11 @@ atualizado-em: 2026-11-18
 
 ## Agora
 
-**Preparação concluída.** O repositório tem os documentos, o guia visual, o esqueleto do código, as travas automáticas, o ambiente de IA e a `main` protegida. Nenhuma funcionalidade da engine foi construída ainda.
+**Fatia 0 (Primeiros passos) planejada e aprovada.** A [spec](../specs/0000-primeiros-passos/spec.md) e o [plano](../specs/0000-primeiros-passos/plan.md) estão na branch da fatia. Nenhuma funcionalidade da engine foi construída ainda.
 
 ## Próxima ação
 
-Abrir uma sessão nova só com o Lemuria e rodar `/planejar` para a fatia 0 (Primeiros passos).
+Rodar `/implementar` para criar a lista de tarefas e começar a etapa 1 (Fundações).
 
 ## Bloqueios
 
@@ -33,3 +33,4 @@ Nenhum.
 | 2026-11-18 | Arquivos C++ e pastas de include passam a usar `PascalCase` ([ADR 0015](adr/0015-arquivos-cpp-em-pascalcase.md)) |
 | 2026-11-18 | Guia visual e regras de prova visual definidos ([ADR 0016](adr/0016-direcao-visual-e-prova-visual.md)) |
 | 2026-11-18 | Auditoria do ambiente: guia visual e imagens aprovadas protegidos, prova visual exigida pelas checagens e licenças das bibliotecas registradas |
+| 2026-11-18 | Spec e plano da fatia 0 aprovados pelo dono, com TCP e a preparação para oferecer o GNS como opção de conexão |
