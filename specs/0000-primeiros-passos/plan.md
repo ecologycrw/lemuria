@@ -63,7 +63,9 @@ O personagem como forma simples já está registrado na [TD-0001](../../docs/TEC
 | Biblioteca | Licença | Para quê | Entra no jogo distribuído | Por que esta |
 |---|---|---|---|---|
 | `sdl3-net` 3.2.0 | Zlib | Conexões TCP | sim | É da mesma família da SDL, pequena e não depende de código separado para cada sistema |
-| `directx-dxc` | University of Illinois/NCSA; os termos do `dxil.dll`, que vem pronto no pacote, são conferidos antes da instalação (ver "Riscos") | Compilar shaders durante o build | não | Gera os dois formatos exigidos pela SDL GPU a partir de um único código-fonte |
+| `shaderc` | Apache-2.0 | Compilar shaders para SPIR-V durante o build | não | Tem licença aberta e funciona no Windows e no Linux. O DXIL, usado pelo Direct3D 12, é gerado pelo `dxc` que já vem no Windows SDK |
+
+O plano aprovado previa o `directx-dxc`. O dono aprovou a troca pelo `shaderc` em 2026-11-18, porque o pacote de Windows daquela ferramenta traz termos da Microsoft que limitam o uso ao Windows e preveem coleta de dados de uso.
 
 ### ADRs novos
 
@@ -71,7 +73,7 @@ O personagem como forma simples já está registrado na [TD-0001](../../docs/TEC
 |---|---|
 | 0017 | Contrato do adaptador de protocolo |
 | 0018 | Conexões TCP com SDL3_net, o caminho para oferecer também o GNS, e o servidor de teste usando a camada de plataforma |
-| 0019 | Shaders em HLSL, compilados no build para SPIR-V e DXIL (decisão prevista no [ADR 0006](../../docs/adr/0006-sdl3-plataforma-e-graficos.md)) |
+| 0019 | Shaders em HLSL, compilados no build para SPIR-V com o `shaderc` e para DXIL com o `dxc` do Windows SDK (decisão prevista no [ADR 0006](../../docs/adr/0006-sdl3-plataforma-e-graficos.md)) |
 | 0020 | Onde a prova visual roda, qual é a tolerância da comparação e como a TD-0005 se resolve |
 
 ### Mudanças nas travas (precisam da aprovação do dono)
@@ -137,7 +139,8 @@ Nenhuma mudança.
 | Risco | Como o plano reduz |
 |---|---|
 | A fatia é grande | As seis etapas têm entregas próprias. Se uma etapa revelar trabalho demais, a IA para e propõe dividir a fatia |
-| Os termos do `dxil.dll`, a parte do `directx-dxc` que assina os shaders para o Direct3D 12, ainda não foram conferidos | Os termos são lidos no pacote antes da instalação. O arquivo é usado só no build e não entra no jogo. Se houver impedimento, a IA para e pergunta. A alternativa é compilar só para SPIR-V, o que exigiria rever o suporte a Direct3D 12 |
+| Duas ferramentas compilam o mesmo shader e podem gerar resultados diferentes | A prova visual compara as imagens do Direct3D 12 e do Vulkan (CA-22) |
+| A versão do `dxc` depende do Windows SDK instalado, que o repositório não fixa | O build recusa com uma mensagem clara quando não encontra o `dxc`, e os shaders usam só recursos básicos |
 | Placas de vídeo diferentes geram imagens um pouco diferentes | A tolerância é medida entre Direct3D 12, Vulkan e o renderizador por software, e justificada no ADR 0020 |
 | O Windows da CI não tem placa de vídeo, e a SDL GPU não oferece um renderizador por software para o Direct3D 12 | A prova roda na CI do Linux e, no Windows, na máquina de desenvolvimento |
 | O contador de alocações pode entrar em conflito com os sanitizers | O teste roda na build normal. Se não puder rodar com sanitizers, o motivo fica registrado no ADR 0020 e no report |
