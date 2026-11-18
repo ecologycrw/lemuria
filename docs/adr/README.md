@@ -20,3 +20,6 @@ Cada ADR registra uma decisão importante, o motivo e as alternativas. Um ADR ac
 | [0014](0014-organizacao-do-repositorio.md) | Organização do repositório em Engine, Frameworks e Samples | aceita |
 | [0015](0015-arquivos-cpp-em-pascalcase.md) | Arquivos C++ e pastas de include em PascalCase | aceita |
 | [0016](0016-direcao-visual-e-prova-visual.md) | Direção visual e prova visual | aceita |
+| [0017](0017-contrato-do-adaptador.md) | Contrato do adaptador de protocolo | aceita |
+| [0018](0018-conexoes-de-rede.md) | Conexões de rede com SDL3_net e caminho para o GNS | aceita |
+| [0019](0019-shaders-em-hlsl.md) | Shaders em HLSL, compilados durante o build | aceita |
