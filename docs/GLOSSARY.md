@@ -36,10 +36,13 @@ Termos usados no projeto, em português simples.
 | **LOD** | *Level of detail*: mostrar uma versão mais simples do que está longe da câmera |
 | **`main`** | A branch principal: a versão oficial, aprovada pelo dono |
 | **Merge (squash)** | Juntar uma branch na `main`. O *squash* transforma todos os commits da branch num commit só |
+| **Módulo** | Uma peça da engine com função própria, guardada em uma pasta com o seu código e os seus testes. `Core` e `PlatformSDL` são módulos |
 | **Núcleo** | A camada mais baixa da engine (Lemuria Core): gráficos, interface, som, conteúdo e conexões. Não sabe nada de gênero ou de jogo |
 | **Orçamento** | O limite do que pode ser mostrado ao mesmo tempo, como personagens ou partículas. Quando acaba, a qualidade cai antes do FPS |
 | **PR** | *Pull Request*: o pedido para juntar uma branch na `main`. É onde o dono revisa e aprova |
+| **`Private`** | A pasta de um módulo com os detalhes internos, que os outros módulos não podem usar |
 | **Protocolo** | As mensagens que cliente e servidor trocam, e o formato delas |
+| **`Public`** | A pasta de um módulo com o que os outros módulos podem usar |
 | **Push** | Enviar os commits para o GitHub |
 | **Quadro** | Uma imagem da janela. A cada quadro o cliente lê o que chegou do servidor, move os personagens e desenha a cena |
 | **RAII** | Uma regra de C++: todo recurso tem um dono, e ele é liberado automaticamente quando o dono deixa de existir |

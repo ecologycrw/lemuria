@@ -36,13 +36,37 @@ As dependências só descem (INV-02). **O Classic não tem acesso especial ao N�
 
 ## Estrutura do repositório
 
-| Pasta | Alvos do build | Camada |
-|---|---|---|
-| `src/core/` | `lemuria_core`, `lemuria_platform_sdl` (a camada de plataforma) | Núcleo |
-| `src/framework/` | `lemuria_classic` | Classic |
-| `samples/` | `demo_protocol` (as mensagens da demonstração), `demo_client` (o jogo de demonstração) | Jogo |
-| `tools/` | `dev.py` (o comando único), `checks/` (as checagens), `test_server/` (o servidor de teste) | Ferramentas |
-| `tests/` | testes de cada módulo; `architecture/` (o framework de exemplo e os programas com erro proposital para os sanitizers) e `hooks/` (testes dos hooks do Git) | Testes |
+As três camadas ficam visíveis na raiz do repositório ([ADR 0014](adr/0014-organizacao-do-repositorio.md)). Pastas com inicial maiúscula são o produto; pastas com inicial minúscula são a infraestrutura do repositório.
+
+| Pasta | O que guarda | Alvos do build | Camada |
+|---|---|---|---|
+| `Engine/Source/Runtime/Core/` | a base da engine | `lemuria_core` | Núcleo |
+| `Engine/Source/Runtime/PlatformSDL/` | a camada de plataforma | `lemuria_platform_sdl` | Núcleo |
+| `Frameworks/Classic/` | o framework oficial, opcional | `lemuria_classic` | Classic |
+| `Samples/DemoGame/Source/Protocol/` | as mensagens da demonstração | `demo_protocol` | Jogo |
+| `Samples/DemoGame/Source/Client/` | o jogo de demonstração | `demo_client` | Jogo |
+| `Samples/DemoGame/Source/TestServer/` | o servidor de teste | `test_server` | Jogo |
+| `tools/` | `dev.py` (o comando único) e `checks/` (as checagens) | — | Ferramentas |
+| `tests/` | `architecture/` (o framework de exemplo e os programas com erro proposital para os sanitizers) e `hooks/` (testes dos hooks) | — | Testes do repositório |
+| `cmake/`, `docs/`, `templates/` | regras de build, documentos e modelos | — | Infraestrutura |
+
+Todo módulo tem o mesmo formato:
+
+```text
+Core/
+├─ Public/lemuria/core/   o que outros módulos podem usar
+├─ Private/               detalhes internos
+├─ Tests/                 os testes deste módulo
+└─ CMakeLists.txt
+```
+
+Uma pasta só nasce quando tiver uso. Quando forem necessárias, estas pastas ficam em:
+
+| Pasta | O que vai guardar |
+|---|---|
+| `Engine/Source/Programs/` | programas próprios da engine, como importadores de conteúdo |
+| `Engine/Shaders/` e `Engine/Content/` | shaders e conteúdo padrão da engine |
+| `Samples/DemoGame/Content/` e `Samples/DemoGame/Config/` | a arte e as configurações do jogo de demonstração |
 
 Regras de dependência:
 
@@ -135,7 +159,7 @@ O som fica atrás da camada de plataforma. A biblioteca é decidida na fatia que
 
 ## Servidor de teste
 
-Um programa mínimo em `tools/test_server/`, usado só nos testes e na demonstração ([ADR 0003](adr/0003-engine-so-de-cliente.md)). Ele fala o protocolo próprio da demonstração e implementa apenas o que as fatias precisam provar.
+Um programa mínimo em `Samples/DemoGame/Source/TestServer/`, usado só nos testes e na demonstração ([ADR 0003](adr/0003-engine-so-de-cliente.md)). Ele fala o protocolo próprio da demonstração e implementa apenas o que as fatias precisam provar.
 
 ## Invariantes
 
