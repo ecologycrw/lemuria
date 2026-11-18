@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.30)
 
 project(Lemuria VERSION 0.0.0 LANGUAGES CXX)
 
+# The project does not use C++20 modules (docs/adr/0001-cpp20-cmake-vcpkg.md).
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(LemuriaSanitizers)
 include(LemuriaModule)
