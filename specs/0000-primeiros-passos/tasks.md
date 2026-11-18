@@ -25,7 +25,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Etapa 3: Prova visual
 
 - [x] T13: Cena de prova e imagem em arquivo (CA-19). Verificação: teste com a etiqueta `[0000-CA-19]`, com duas imagens idênticas.
-- [ ] T14: Medição dos números da imagem em `tools/checks` (CA-20). Verificação: testes em `tools/checks/tests` e números da cena de prova dentro das faixas.
+- [x] T14: Medição dos números da imagem em `tools/checks` (CA-20). Verificação: testes em `tools/checks/tests` e números da cena de prova dentro das faixas.
 - [ ] T15: Comparação com a imagem aprovada, tolerância medida e ADR 0021 (CA-21, CA-22). Verificação: testes em `tools/checks/tests` e comparação entre Direct3D 12 e Vulkan.
 - [ ] T16: Estatísticas e medidor de fluidez (CA-23). Verificação: teste com a etiqueta `[0000-CA-23]` e medição real na cena de prova.
 - [ ] T17: Comando `py tools/dev.py visual`, com o `gpu-test` rodando também a prova visual. Verificação: o comando mostra a imagem, os números e a fluidez.
@@ -78,6 +78,21 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - **O teste detecta diferenças:** com um defeito colocado de propósito, que mudava a cena a cada geração, o teste `[0000-CA-19]` falhou. O defeito foi retirado.
 - **Números:** não foram medidos de novo, porque a cena não mudou. A ferramenta definitiva vem na T14.
 
+**T14, primeira medição com a ferramenta definitiva, com Vulkan e Direct3D 12.**
+
+| Medida | Resultado | Faixa exigida |
+|---|---|---|
+| Brilho típico da imagem (mediana) | 0,137 | 0,11 a 0,19 |
+| Parte da imagem em sombra profunda | 13,54% | 12% a 40% |
+| Parte da imagem em tons escuros | 83,96% | 78% a 93% |
+| Parte da imagem em tons quentes | 96,49% | 75% ou mais |
+| Saturação mediana | 0,622 | 0,50 a 0,80 |
+| Parte da imagem em pontos de luz | 0,35% | não exigida nesta fatia |
+
+- **Resultado:** as duas APIs gráficas deram os mesmos números, todos dentro das faixas, e iguais aos da medição provisória da T12.
+- **Ponto de atenção:** a sombra profunda está perto do limite inferior de 12%. Uma mudança no mapa ou nas cores pode reprovar a imagem.
+- **Os testes detectam erros:** 25 de 26 defeitos colocados de propósito numa cópia do código foram reprovados. O defeito restante não muda nenhum resultado, porque só troca a escolha entre dois valores iguais.
+
 ## Revisão
 
 *(preenchido pelo `/revisar`)*
@@ -85,7 +100,8 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T14. As etapas 1 e 2 e a T13 estão concluídas.
+- Próxima tarefa: T15. As etapas 1 e 2, a T13 e a T14 estão concluídas.
+- A medição roda com `py tools/checks/run.py measure-image --image arquivo.png`. O leitor de PNG fica em `tools/checks/lemuria_checks/png_reader.py` e pode ser usado pela comparação da T15.
 - O dono escolheu separar o desenho por etapas ([ADR 0020](../../docs/adr/0020-fronteira-do-desenho.md)). Nesta fatia, nenhum tipo de API gráfica pode aparecer em cabeçalhos públicos. A separação interna fica para a fatia 2 (TD-0009).
 - O cliente já aceita `--proof-image arquivo`, `--graphics-api nome` e `--frames quantidade`. A cena de prova fica em `DemoClient/ProofScene.hpp`, e `DemoClient/ProofImage.hpp` desenha essa cena numa imagem em memória.
 - `glslc` fica em `vcpkg_installed/<triplet do host>/tools/shaderc/`. A regra de compilar shaders deve ficar no `CMakeLists.txt` de `PlatformSDL`, para não mexer em `cmake/`, que é trava.
