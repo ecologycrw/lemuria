@@ -183,6 +183,9 @@ def pytests() -> None:
     environment["PYTHONDONTWRITEBYTECODE"] = "1"
     for folder in ("tools/checks/tests", "tests/hooks"):
         run([sys.executable, "-m", "unittest", "discover", "-s", folder, "-p", "test_*.py"], environment)
+    if IS_WINDOWS:
+        for script in sorted((ROOT / "tests" / "hooks").glob("*.tests.ps1")):
+            run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script)], environment)
 
 
 def gpu_test() -> None:

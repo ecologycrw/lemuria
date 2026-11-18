@@ -31,6 +31,10 @@ Tudo o que é feito de forma simples de propósito. Cada item vai para `docs/TEC
 - Bibliotecas externas novas (precisam da aprovação do dono).
 - Mudanças nos formatos de conteúdo ou no contrato do adaptador de protocolo (precisam da aprovação do dono).
 
+## Lições da central usadas
+
+Título e data de cada lição da central de conhecimento usada nesta fatia. Se nenhuma: "nenhuma".
+
 ## Riscos
 
 - O que pode dar errado e como o plano reduz esse risco.

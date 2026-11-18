@@ -12,6 +12,7 @@ from .repository import iter_files, relative
 
 NAME = "terms"
 TERMS_FILE = "tools/checks/forbidden_terms.txt"
+LOCAL_FILES = frozenset({".claude/central.local.json", ".claude/settings.local.json"})
 
 
 @dataclass(frozen=True)
@@ -47,7 +48,7 @@ def run(root: Path) -> list[Finding]:
     findings: list[Finding] = []
     for file in iter_files(root):
         where = relative(root, file)
-        if where == TERMS_FILE:
+        if where == TERMS_FILE or where in LOCAL_FILES:
             continue
         content = file.read_bytes()
         if b"\0" in content:

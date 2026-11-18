@@ -70,6 +70,18 @@ O `tools/checks` confere o que o compilador não confere:
 
 O Mull muda pedacinhos do código de lógica do Núcleo e confere se algum teste falha. Ele roda só na CI, em Linux, e por enquanto **só informa**: não bloqueia o PR ([TD-0004](../TECH_DEBT.md)).
 
+## Central de conhecimento
+
+A central é opcional e existe só no computador do dono ([ADR 0013](../adr/0013-central-de-conhecimento.md)). Para ligá-la, crie o arquivo `.claude/central.local.json`, que fica fora do Git:
+
+```json
+{ "path": "C:/caminho/para/a/central" }
+```
+
+Sem esse arquivo, a skill `/consultar-central` só avisa que a central não está disponível.
+
+Abra o Lemuria e a central em **sessões separadas**.
+
 ## Se um hook bloquear
 
 Leia a mensagem: ela diz o que corrigir. **Nunca** use `--no-verify` para pular uma checagem. Se a regra parecer errada, registre uma proposta (ver [WORKFLOW.md](../WORKFLOW.md#propostas-como-as-necessidades-aparecem)).

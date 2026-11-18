@@ -38,6 +38,10 @@ class TermsCheckTests(TempRepositoryTest):
         self.write("src/a.cpp", "// acmegames and myacmegame are other words\n")
         self.assertEqual(terms_check.run(self.root), [])
 
+    def test_files_that_stay_out_of_git_are_skipped(self) -> None:
+        self.write(".claude/central.local.json", '{"path": "C:/acmegame"}')
+        self.assertEqual(terms_check.run(self.root), [])
+
     def test_binary_files_are_skipped(self) -> None:
         (self.root / "asset.bin").write_bytes(b"\0acmegame")
         self.assertEqual(terms_check.run(self.root), [])

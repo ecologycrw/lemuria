@@ -15,7 +15,7 @@ REQUIRED_FILES = (
     "vcpkg.json", "vcpkg-configuration.json", ".clang-format", ".clang-tidy", ".editorconfig", ".gitattributes",
     ".gitignore", "docs/ARCHITECTURE.md", "docs/CONVENTIONS.md", "docs/GLOSSARY.md", "docs/PROPOSALS.md",
     "docs/ROADMAP.md", "docs/STATUS.md", "docs/TECH_DEBT.md", "docs/VISION.md", "docs/WORKFLOW.md",
-    "docs/adr/README.md",
+    "docs/adr/README.md", ".claude/settings.json",
 )
 
 _LIBRARY_AREAS = {"lemuria_core": "core", "lemuria_platform_sdl": "platform", "lemuria_classic": "classic"}
