@@ -29,6 +29,13 @@ Formato de cada entrada (o modelo completo fica em `templates/proposal.md`):
 - Prioridade sugerida: média
 - Status: aberta
 
+### P-0003: oferecer o GNS como segunda opção de conexão
+- Origem: feedback do dono, no planejamento da fatia 0
+- Tipo: fatia
+- Evidência: o dono disse "A ideia é essa, dar opção de servidores que falam TCP como você disse, mas também opção para usar o GNS". O GameNetworkingSockets (GNS) só conversa com quem também o usa, então ele entra ao lado do TCP com SDL3_net, num módulo separado e opcional. A versão 1.6.1 disponível no vcpkg usa a licença BSD-3-Clause e depende de OpenSSL e Protobuf. A fatia 0 deixa o contrato preparado, com uma conexão de teste que imita o GNS, mas não instala a biblioteca
+- Prioridade sugerida: média
+- Status: aberta
+
 ## Processadas
 
 *(nenhuma)*
