@@ -14,6 +14,8 @@
 
 | O quê | Padrão | Exemplo |
 |---|---|---|
+| Pastas do produto e módulos | `PascalCase` | `Engine/Source/Runtime/PlatformSDL` |
+| Pastas da infraestrutura | minúsculas | `tools/checks` |
 | Alvos do build | `lemuria_<área>` | `lemuria_core` |
 | Namespaces | `lemuria::<área>` | `lemuria::core` |
 | Arquivos | `snake_case`, com `.hpp` e `.cpp` | `frame_clock.hpp` |
@@ -23,7 +25,7 @@
 | Membros privados | `snake_case_` | `elapsed_` |
 | Constantes | `kPascalCase` | `kMaxBones` |
 | Macros (evitar) | `LEMURIA_MAIUSCULAS` | `LEMURIA_ASSERT` |
-| Testes | `tests/<módulo>/<arquivo>_test.cpp` | `tests/core/frame_clock_test.cpp` |
+| Testes | `<módulo>/Tests/<arquivo>_test.cpp` | `Engine/Source/Runtime/Core/Tests/frame_clock_test.cpp` |
 | Specs | `specs/NNNN-nome-em-kebab-case/` | `specs/0000-primeiros-passos/` |
 | ADRs | `docs/adr/NNNN-nome-em-kebab-case.md` | `docs/adr/0001-cpp20-cmake-vcpkg.md` |
 
@@ -91,10 +93,10 @@ A IA imita o código que já existe. Por isso, os melhores exemplos de cada padr
 
 | Para... | Siga |
 |---|---|
-| declarar uma biblioteca, um programa ou testes | `cmake/LemuriaModule.cmake`, com o exemplo em `src/core/lemuria_core/CMakeLists.txt` |
-| ler dados externos com validação e devolver erros por valor | `src/core/lemuria_core/src/version.cpp` |
-| testar uma leitura com dados inválidos | `tests/core/version_test.cpp` |
-| esconder uma biblioteca externa atrás da camada de plataforma | `src/core/lemuria_platform_sdl/src/platform_info.cpp` |
+| declarar uma biblioteca, um programa ou testes | `cmake/LemuriaModule.cmake`, com o exemplo em `Engine/Source/Runtime/Core/CMakeLists.txt` |
+| ler dados externos com validação e devolver erros por valor | `Engine/Source/Runtime/Core/Private/version.cpp` |
+| testar uma leitura com dados inválidos | `Engine/Source/Runtime/Core/Tests/version_test.cpp` |
+| esconder uma biblioteca externa atrás da camada de plataforma | `Engine/Source/Runtime/PlatformSDL/Private/platform_info.cpp` |
 
 ## Testes
 
@@ -130,6 +132,6 @@ A IA imita o código que já existe. Por isso, os melhores exemplos de cada padr
 
 - **Nada de outros jogos:** nomes de conteúdo, assets, textos, formatos de arquivo, protocolos ou código. Mapas, itens, monstros e textos são originais.
 - **Especificar, não copiar:** o Lemuria aprende com projetos de referência só por lições genéricas, escritas com palavras próprias ([ADR 0009](adr/0009-repositorio-publico-e-terceiros.md)).
-- **Menções a nomes** de jogos e servidores de terceiros só aparecem nos documentos de `docs/`, para explicar o gênero ou um exemplo de uso. Nunca em `src/`, `samples/`, `tests/` ou `tools/`, exceto na lista de termos proibidos da checagem.
+- **Menções a nomes** de jogos e servidores de terceiros só aparecem nos documentos de `docs/`, para explicar o gênero ou um exemplo de uso. Nunca em `Engine/`, `Frameworks/`, `Samples/`, `tests/` ou `tools/`, exceto na lista de termos proibidos da checagem.
 - Assets externos só com licença compatível (CC0, CC-BY com atribuição, MIT), registrada junto do asset.
 - Código de outros projetos só com licença compatível com a MIT e com atribuição.

@@ -19,6 +19,7 @@ PROTECTED_FILES = (
 )
 _DESCRIPTIONS = {"A": "criado", "D": "apagado", "R": "renomeado"}
 _TEST_MARKERS = ("TEST_CASE(", "TEMPLATE_TEST_CASE(", "SCENARIO(", "def test_")
+TEST_PATHSPECS = ("tests/", "tools/checks/tests/", ":(glob)**/Tests/**")
 
 
 def is_protected(path: str) -> bool:
@@ -45,7 +46,8 @@ def _count_tests(diff: str) -> tuple[int, int]:
 
 
 def _is_test_file(path: str) -> bool:
-    return path.startswith("tests/") and PurePosixPath(path).suffix in (".cpp", ".py")
+    is_in_tests = path.startswith("tests/") or "/Tests/" in path
+    return is_in_tests and PurePosixPath(path).suffix in (".cpp", ".py")
 
 
 def build(changes: list[tuple[str, str]], test_diff: str) -> str:
@@ -78,7 +80,7 @@ def _git(root: Path, *arguments: str) -> str | None:
 def run(root: Path, base_ref: str) -> int:
     revision_range = f"{base_ref}...HEAD"
     name_status = _git(root, "diff", "--name-status", revision_range)
-    test_diff = _git(root, "diff", "-U0", revision_range, "--", "tests/", "tools/checks/tests/")
+    test_diff = _git(root, "diff", "-U0", revision_range, "--", *TEST_PATHSPECS)
     if name_status is None or test_diff is None:
         print(f"git diff failed for '{revision_range}'.")
         return 1

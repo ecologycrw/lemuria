@@ -2,5 +2,5 @@
 mutators:
   - cxx_all
 includePaths:
-  - .*src/core/lemuria_core/.*
+  - .*Engine/Source/Runtime/Core/(Public|Private)/.*
 timeout: 10000

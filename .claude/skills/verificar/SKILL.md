@@ -19,10 +19,10 @@ Se houver uma fatia em andamento, monte também a tabela de critérios:
 
 | CA | Prova | Situação |
 |---|---|---|
-| CA-01 | teste com a etiqueta `[NNNN-CA-01]` encontrado em `tests/...` | passou |
+| CA-01 | teste com a etiqueta `[NNNN-CA-01]` encontrado em `Engine/Source/Runtime/Core/Tests/...` | passou |
 | CA-02 | verificação manual prevista no plano | pendente |
 
-Para achar as provas, procure `[NNNN-CA-` nos arquivos `.cpp` de `tests/`.
+Para achar as provas, procure `[NNNN-CA-` nos arquivos `.cpp` das pastas `Tests/` de cada módulo e de `tests/`.
 
 ## Resultado
 

@@ -6,7 +6,7 @@ from lemuria_checks import cpp_rules_check
 
 
 class CppRulesTests(TempRepositoryTest):
-    def findings_for(self, code: str, path: str = "src/core/lemuria_core/src/a.cpp") -> list:
+    def findings_for(self, code: str, path: str = "Engine/Source/Runtime/Core/Private/a.cpp") -> list:
         self.write(path, code)
         return cpp_rules_check.run(self.root)
 
@@ -42,7 +42,11 @@ class CppRulesTests(TempRepositoryTest):
 
     def test_the_platform_layer_may_read_the_system_clock(self) -> None:
         code = "auto now() { return std::chrono::steady_clock::now(); }\n"
-        self.assertEqual(self.findings_for(code, "src/core/lemuria_platform_sdl/src/a.cpp"), [])
+        self.assertEqual(self.findings_for(code, "Engine/Source/Runtime/PlatformSDL/Private/a.cpp"), [])
+
+    def test_the_tests_of_the_platform_layer_cannot_read_the_system_clock(self) -> None:
+        code = "auto now() { return std::chrono::steady_clock::now(); }\n"
+        self.assert_refused(self.findings_for(code, "Engine/Source/Runtime/PlatformSDL/Tests/a_test.cpp"), "INV-05")
 
     def test_reinterpreting_bytes_is_refused(self) -> None:
         self.assert_refused(self.findings_for("auto p = reinterpret_cast<const H*>(bytes);\n"), "INV-12")
@@ -55,7 +59,9 @@ class CppRulesTests(TempRepositoryTest):
         self.assert_refused(self.findings_for("// first\n\nint* a = new int(1);\n"), "line 3")
 
     def test_rules_also_apply_to_programs_and_tests(self) -> None:
-        for path in ("samples/demo_client/src/main.cpp", "tests/core/a_test.cpp", "tools/test_server/src/main.cpp"):
+        for path in ("Samples/DemoGame/Source/Client/Private/main.cpp", "Engine/Source/Runtime/Core/Tests/a_test.cpp",
+                     "Samples/DemoGame/Source/TestServer/Private/main.cpp", "Frameworks/Classic/Private/a.cpp",
+                     "tests/architecture/a_test.cpp"):
             with self.subTest(path=path):
                 self.assert_refused(self.findings_for("int* a = new int(1);\n", path), "'new' is forbidden")
 

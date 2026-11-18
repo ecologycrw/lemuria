@@ -37,8 +37,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 IS_WINDOWS = platform.system() == "Windows"
 SYSTEM = "windows" if IS_WINDOWS else "linux"
-TIDY_FOLDERS = ("src", "samples", "tools")
-MUTATION_TEST_PROGRAMS = ("tests/core/core_tests",)
+TIDY_FOLDERS = ("Engine", "Frameworks", "Samples")
+MUTATION_TEST_PROGRAMS = ("Engine/Source/Runtime/Core/Tests/core_tests",)
 
 
 class StepFailed(Exception):
@@ -155,7 +155,7 @@ def tidy() -> None:
     configure("dev")
     tool = find_llvm_tool("clang-tidy", environment)
     build_folder = ROOT / "build" / preset("dev")
-    files = cpp_files(TIDY_FOLDERS, sources_only=True)
+    files = [path for path in cpp_files(TIDY_FOLDERS, sources_only=True) if "/Tests/" not in path]
 
     def analyze(path: str) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
