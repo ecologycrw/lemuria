@@ -9,7 +9,7 @@ atualizado-em: 2026-11-18
 
 ## Agora
 
-**Preparação concluída com o merge do PR #1.** O repositório tem os documentos, o esqueleto do código, as travas automáticas, o ambiente de IA e a `main` protegida. Nenhuma funcionalidade da engine foi construída ainda.
+**Preparação concluída.** O repositório tem os documentos, o guia visual, o esqueleto do código, as travas automáticas, o ambiente de IA e a `main` protegida. Nenhuma funcionalidade da engine foi construída ainda.
 
 ## Próxima ação
 
@@ -32,3 +32,4 @@ Nenhum.
 | 2026-11-18 | Repositório reorganizado em `Engine`, `Frameworks` e `Samples` ([ADR 0014](adr/0014-organizacao-do-repositorio.md)) |
 | 2026-11-18 | Arquivos C++ e pastas de include passam a usar `PascalCase` ([ADR 0015](adr/0015-arquivos-cpp-em-pascalcase.md)) |
 | 2026-11-18 | Guia visual e regras de prova visual definidos ([ADR 0016](adr/0016-direcao-visual-e-prova-visual.md)) |
+| 2026-11-18 | Auditoria do ambiente: guia visual e imagens aprovadas protegidos, prova visual exigida pelas checagens e licenças das bibliotecas registradas |

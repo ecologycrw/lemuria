@@ -1,7 +1,11 @@
-"""Keeps the repository organized: required files, module layout and file names (docs/adr/0014-organizacao-do-repositorio.md)."""
+"""Keeps the repository organized: required files, module layout, file names and the licenses of the libraries.
+
+The rules come from docs/adr/0014-organizacao-do-repositorio.md and docs/adr/0009-repositorio-publico-e-terceiros.md.
+"""
 
 from __future__ import annotations
 
+import json
 import re
 from collections.abc import Iterator
 from pathlib import Path
@@ -10,13 +14,14 @@ from .findings import Finding
 from .repository import iter_files, read_text, relative
 
 NAME = "structure"
+THIRD_PARTY_FILE = "docs/THIRD_PARTY.md"
 
 REQUIRED_FILES = (
     "AGENTS.md", "CLAUDE.md", "README.md", "LICENSE", "SECURITY.md", "CMakeLists.txt", "CMakePresets.json",
     "vcpkg.json", "vcpkg-configuration.json", ".clang-format", ".clang-tidy", ".editorconfig", ".gitattributes",
     ".gitignore", "docs/ARCHITECTURE.md", "docs/CONVENTIONS.md", "docs/GLOSSARY.md", "docs/PROPOSALS.md",
-    "docs/ROADMAP.md", "docs/STATUS.md", "docs/TECH_DEBT.md", "docs/VISION.md", "docs/WORKFLOW.md",
-    "docs/adr/README.md", ".claude/settings.json",
+    "docs/ROADMAP.md", "docs/STATUS.md", "docs/TECH_DEBT.md", THIRD_PARTY_FILE, "docs/VISION.md", "docs/VISUAL.md",
+    "docs/WORKFLOW.md", "docs/adr/README.md", ".claude/settings.json",
 )
 
 _LIBRARY_AREAS = {"PlatformSDL": "Platform"}
@@ -26,6 +31,7 @@ _RETIRED_FOLDERS = frozenset({"src", "samples", "include"})
 _CPP_NAME = re.compile(r"^[A-Z][A-Za-z0-9]*\.(cpp|hpp)$")
 _MODULE_NAME = re.compile(r"^[A-Z][A-Za-z0-9]*$")
 _CODE_FOLDERS = (*_PRODUCT_FOLDERS, "tests")
+_REGISTERED_LIBRARY = re.compile(r"^\|\s*`(?P<name>[^`]+)`\s*\|(?P<license>[^|]*)\|", re.MULTILINE)
 
 
 def run(root: Path) -> list[Finding]:
@@ -37,7 +43,26 @@ def run(root: Path) -> list[Finding]:
     _check_modules(root, findings)
     _check_file_names(root, findings)
     _check_test_folders(root, findings)
+    _check_third_party(root, findings)
     return findings
+
+
+def _check_third_party(root: Path, findings: list[Finding]) -> None:
+    manifest = root / "vcpkg.json"
+    registry = root / THIRD_PARTY_FILE
+    if not manifest.is_file() or not registry.is_file():
+        return  # The missing file was already reported.
+    try:
+        dependencies = json.loads(read_text(manifest)).get("dependencies", [])
+    except json.JSONDecodeError:
+        findings.append(Finding(NAME, "vcpkg.json", "the file is not valid JSON"))
+        return
+    libraries = {item if isinstance(item, str) else item.get("name", "") for item in dependencies}
+    licenses = {match.group("name"): match.group("license").strip() for match in _REGISTERED_LIBRARY.finditer(read_text(registry))}
+    for library in sorted(library for library in libraries if not licenses.get(library)):
+        findings.append(Finding(NAME, THIRD_PARTY_FILE, f"the library '{library}' has no license registered"))
+    for library in sorted(set(licenses) - libraries):
+        findings.append(Finding(NAME, THIRD_PARTY_FILE, f"the library '{library}' is registered but is not in vcpkg.json"))
 
 
 def _check_retired_folders(root: Path, findings: list[Finding]) -> None:

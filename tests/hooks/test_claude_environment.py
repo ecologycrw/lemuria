@@ -21,8 +21,8 @@ HOOKS = ("guard-bash", "guard-central", "session-start", "stop-check")
 # Every protected path, as written in the list of AGENTS.md.
 TRAVAS = (".claude/", ".githooks/", ".github/", "cmake/", "CMakePresets.json", "vcpkg.json", "vcpkg-configuration.json",
           ".clang-format", ".clang-tidy", ".editorconfig", "AGENTS.md", "CLAUDE.md", "tools/dev.py", "tools/checks/",
-          "tests/architecture/", "tests/hooks/")
-OWNER_DOCUMENTS = ("docs/VISION.md", "docs/ROADMAP.md")
+          "tests/architecture/", "tests/hooks/", "tests/visual/approved/")
+OWNER_DOCUMENTS = ("docs/VISION.md", "docs/ROADMAP.md", "docs/VISUAL.md")
 
 
 def read(path: str) -> str:
@@ -102,6 +102,12 @@ class PermissionTests(unittest.TestCase):
             with self.subTest(rule=rule):
                 self.assertIn(rule, ask)
 
+    def test_the_daily_git_commands_of_the_skills_do_not_ask_the_owner(self) -> None:
+        allow = settings()["permissions"]["allow"]
+        for rule in ("Bash(git push)", "Bash(git switch main)", "Bash(git pull --ff-only)"):
+            with self.subTest(rule=rule):
+                self.assertIn(rule, allow)
+
     def test_the_settings_have_no_personal_paths(self) -> None:
         self.assertNotRegex(read(".claude/settings.json"), r"(?i)c:[/\\]+users|/home/")
 
@@ -109,6 +115,11 @@ class PermissionTests(unittest.TestCase):
 class LockListTests(unittest.TestCase):
     def test_agents_md_lists_every_lock(self) -> None:
         for path in TRAVAS:
+            with self.subTest(path=path):
+                self.assertIn(f"`{path}`", read("AGENTS.md"))
+
+    def test_agents_md_lists_every_document_of_the_owner(self) -> None:
+        for path in OWNER_DOCUMENTS:
             with self.subTest(path=path):
                 self.assertIn(f"`{path}`", read("AGENTS.md"))
 

@@ -61,8 +61,14 @@ function Get-GuardViolation {
         return 'Committing directly on main is forbidden. Switch to the slice branch (fatia/NNNN-name).'
     }
 
+    # A push without a branch name sends the current branch.
+    $pushesCurrentBranch = $git + 'push(\s+-\S+)*(\s+origin)?(\s+HEAD)?\s*($|[;&|])'
+    if (($CurrentBranch -eq 'main' -or $CurrentBranch -eq 'master') -and $c -match $pushesCurrentBranch) {
+        return 'Nobody pushes to main or master. Switch to the slice branch (fatia/NNNN-name).'
+    }
+
     # Protected files ("travas") must be changed with the editing tools, which ask the owner first.
-    $protected = '(\.(claude|githooks|github)([/\\\s"'']|$)|\bAGENTS\.md|\bCLAUDE\.md|\bcmake[/\\]|CMakePresets\.json|vcpkg(-configuration)?\.json|\.clang-(format|tidy)|\.editorconfig|tools[/\\]dev\.py|tools[/\\]checks|tests[/\\]architecture|tests[/\\]hooks|docs[/\\](VISION|ROADMAP)\.md)'
+    $protected = '(\.(claude|githooks|github)([/\\\s"'']|$)|\bAGENTS\.md|\bCLAUDE\.md|\bcmake[/\\]|CMakePresets\.json|vcpkg(-configuration)?\.json|\.clang-(format|tidy)|\.editorconfig|tools[/\\]dev\.py|tools[/\\]checks|tests[/\\]architecture|tests[/\\]hooks|tests[/\\]visual[/\\]approved|docs[/\\](VISION|ROADMAP|VISUAL)\.md)'
     # Not writes: discarded output, arrows in code, and e-mail addresses such as the Co-Authored-By line.
     $withoutHarmlessRedirects = $c -replace '\d?>&\d|\d?>\s*(/dev/null|\$null|nul)\b|=>|->|<[^<>\s]+@[^<>\s]+>', ' '
     $write = '(>|\bsed\s[^;&|]*-i|\btee\b|\b(rm|mv|cp|truncate|del|rmdir)\s|Set-Content|Add-Content|Out-File|Remove-Item|Move-Item|Copy-Item|New-Item|Rename-Item|' + $git + '(rm|mv|checkout|restore|apply)\b)'

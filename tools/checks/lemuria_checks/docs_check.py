@@ -5,6 +5,7 @@ The rules come from docs/WORKFLOW.md and docs/adr/0012-documentacao.md.
 
 from __future__ import annotations
 
+import itertools
 import re
 from pathlib import Path
 from urllib.parse import unquote
@@ -25,6 +26,8 @@ _ADR_FILE = re.compile(r"^(?P<number>\d{4})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$")
 _DEBT_DESTINATION = re.compile(r"^fatia (\d+|de [\w ]+|da [\w ]+)$", re.IGNORECASE)
 _PROPOSAL_HEADING = re.compile(r"^###\s+(?P<id>P-\d{4})\b")
 _PROPOSAL_STATUS = re.compile(r"^\s*[-*]\s+Status:\s*(?P<value>[\w-]+)")
+_VISUAL_PROOF_HEADING = re.compile(r"^##\s+Prova visual\s*$")
+_VISUAL_PROOF_MISSING = "needs a '## Prova visual' section: describe the proof or write that it does not apply"
 
 
 def run(root: Path) -> list[Finding]:
@@ -126,10 +129,25 @@ def _check_spec_folder(root: Path, folder: Path, findings: list[Finding]) -> Non
         findings.append(Finding(NAME, spec_where, f"acceptance criterion {duplicate} is defined more than once"))
     if status != "rascunho" and not criteria:
         findings.append(Finding(NAME, spec_where, "an approved spec needs at least one acceptance criterion (- CA-01: ...)"))
+    if status != "rascunho" and not _has_visual_proof(text):
+        findings.append(Finding(NAME, spec_where, _VISUAL_PROOF_MISSING))
 
     report = folder / "report.md"
     if status == "concluida" and report.is_file():
-        _check_criteria_proof(root, number, f"{where}/report.md", sorted(set(criteria)), read_text(report), findings)
+        report_text = read_text(report)
+        _check_criteria_proof(root, number, f"{where}/report.md", sorted(set(criteria)), report_text, findings)
+        if not _has_visual_proof(report_text):
+            findings.append(Finding(NAME, f"{where}/report.md", _VISUAL_PROOF_MISSING))
+
+
+def _has_visual_proof(text: str) -> bool:
+    """The section must exist and say something, even if only that the slice does not change the screen."""
+    lines = markdown.prose_lines(text)
+    start = next((index for index, line in enumerate(lines) if _VISUAL_PROOF_HEADING.match(line)), None)
+    if start is None:
+        return False
+    body = itertools.takewhile(lambda line: not line.lstrip().startswith("#"), lines[start + 1:])
+    return any(line.strip() for line in body)
 
 
 def _check_criteria_proof(

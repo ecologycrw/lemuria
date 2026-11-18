@@ -6,6 +6,7 @@ from lemuria_checks import docs_check
 
 STATUS = "---\nfase: preparacao\nspec-atual:\n---\n\n# Status\n"
 ADR = "---\nid: {id}\ntitulo: A decision\nstatus: {status}\nsubstituida-por: {by}\n---\n\n# ADR\n"
+VISUAL_PROOF = "\n## Prova visual\n\nNão se aplica.\n"
 
 
 class DocsCheckTests(TempRepositoryTest):
@@ -13,10 +14,14 @@ class DocsCheckTests(TempRepositoryTest):
         super().setUp()
         self.write("docs/STATUS.md", STATUS)
 
-    def spec(self, status: str, criteria: str = "- CA-01: Something works.\n", extra: tuple[str, ...] = ()) -> None:
-        self.write("specs/0001-first/spec.md", f"---\nid: 0001\ntitulo: First\nstatus: {status}\n---\n\n{criteria}")
+    def spec(self, status: str, criteria: str = "- CA-01: Something works.\n", extra: tuple[str, ...] = (),
+             visual_proof: str = VISUAL_PROOF) -> None:
+        self.write("specs/0001-first/spec.md", f"---\nid: 0001\ntitulo: First\nstatus: {status}\n---\n\n{criteria}{visual_proof}")
         for name in ("plan.md", *extra):
             self.write(f"specs/0001-first/{name}", "# File\n")
+
+    def report(self, text: str, visual_proof: str = VISUAL_PROOF) -> None:
+        self.write("specs/0001-first/report.md", f"{text}{visual_proof}")
 
     def adr(self, number: str, status: str = "aceita", by: str = "") -> None:
         name = f"{number}-decision.md"
@@ -92,17 +97,17 @@ class DocsCheckTests(TempRepositoryTest):
 
     def test_every_criterion_must_be_mentioned_in_the_report(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
-        self.write("specs/0001-first/report.md", "Nothing here.\n")
+        self.report("Nothing here.\n")
         self.assert_refused(self.run_check(), "not mentioned in the report")
 
     def test_a_criterion_without_proof_is_refused(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
-        self.write("specs/0001-first/report.md", "| CA-01 | trust me |\n")
+        self.report("| CA-01 | trust me |\n")
         self.assert_refused(self.run_check(), "has no proof")
 
     def test_a_tagged_test_is_a_proof(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
-        self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
+        self.report("| CA-01 | test |\n")
         self.write("Engine/Source/Runtime/Core/Tests/ATest.cpp", 'TEST_CASE("it works", "[0001-CA-01]") {}\n')
         self.assertEqual(self.run_check(), [])
 
@@ -110,33 +115,56 @@ class DocsCheckTests(TempRepositoryTest):
         for path in ("Frameworks/Classic/Tests/ATest.cpp", "Samples/DemoGame/Source/Protocol/Tests/ATest.cpp"):
             with self.subTest(path=path):
                 self.spec("concluida", extra=("tasks.md",))
-                self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
+                self.report("| CA-01 | test |\n")
                 self.write(path, 'TEST_CASE("it works", "[0001-CA-01]") {}\n')
                 self.assertEqual(self.run_check(), [])
                 (self.root / path).unlink()
 
     def test_a_tagged_test_of_the_repository_is_a_proof(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
-        self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
+        self.report("| CA-01 | test |\n")
         self.write("tests/architecture/ATest.cpp", 'TEST_CASE("it works", "[0001-CA-01]") {}\n')
         self.assertEqual(self.run_check(), [])
 
     def test_a_tag_outside_the_tests_is_not_a_proof(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
-        self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
+        self.report("| CA-01 | test |\n")
         self.write("Engine/Source/Runtime/Core/Private/a.cpp", '// [0001-CA-01]\n')
         self.assert_refused(self.run_check(), "has no proof")
 
     def test_a_test_of_another_slice_is_not_a_proof(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
-        self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
+        self.report("| CA-01 | test |\n")
         self.write("Engine/Source/Runtime/Core/Tests/ATest.cpp", 'TEST_CASE("it works", "[0002-CA-01]") {}\n')
         self.assert_refused(self.run_check(), "has no proof")
 
     def test_a_manual_verification_is_a_proof(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
-        self.write("specs/0001-first/report.md", "| CA-01 | verificação manual: abri a janela |\n")
+        self.report("| CA-01 | verificação manual: abri a janela |\n")
         self.assertEqual(self.run_check(), [])
+
+    def test_a_draft_spec_can_leave_the_visual_proof_for_later(self) -> None:
+        self.spec("rascunho", visual_proof="")
+        self.assertEqual(self.run_check(), [])
+
+    def test_an_approved_spec_needs_the_visual_proof_section(self) -> None:
+        for status in ("aprovada", "em-andamento", "concluida"):
+            with self.subTest(status=status):
+                self.spec(status, extra=("tasks.md",), visual_proof="")
+                self.assert_refused(self.run_check(), "spec.md: needs a '## Prova visual' section")
+
+    def test_an_empty_visual_proof_section_is_refused(self) -> None:
+        self.spec("aprovada", visual_proof="\n## Prova visual\n\n## Como o dono testa\n\nPassos.\n")
+        self.assert_refused(self.run_check(), "needs a '## Prova visual' section")
+
+    def test_a_visual_proof_section_inside_a_code_block_does_not_count(self) -> None:
+        self.spec("aprovada", visual_proof="\n```text\n## Prova visual\n\nNão se aplica.\n```\n")
+        self.assert_refused(self.run_check(), "needs a '## Prova visual' section")
+
+    def test_a_finished_report_needs_the_visual_proof_section(self) -> None:
+        self.spec("concluida", extra=("tasks.md",))
+        self.report("| CA-01 | verificação manual: abri a janela |\n", visual_proof="")
+        self.assert_refused(self.run_check(), "report.md: needs a '## Prova visual' section")
 
     def test_status_needs_a_phase(self) -> None:
         self.write("docs/STATUS.md", "---\nspec-atual:\n---\n")

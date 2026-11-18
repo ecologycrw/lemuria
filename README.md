@@ -24,6 +24,7 @@ A engine tem três camadas:
 - [Fluxo de trabalho](docs/WORKFLOW.md): como o projeto é desenvolvido
 - [Decisões (ADRs)](docs/adr/README.md): por que cada decisão foi tomada
 - [Glossário](docs/GLOSSARY.md): os termos usados no projeto
+- [Bibliotecas de terceiros](docs/THIRD_PARTY.md): as dependências e as licenças delas
 
 ## Desenvolvimento assistido por IA
 

@@ -135,3 +135,4 @@ A IA imita o código que já existe. Por isso, os melhores exemplos de cada padr
 - **Menções a nomes** de jogos e servidores de terceiros só aparecem nos documentos de `docs/`, para explicar o gênero ou um exemplo de uso. Nunca em `Engine/`, `Frameworks/`, `Samples/`, `tests/` ou `tools/`, exceto na lista de termos proibidos da checagem.
 - Assets externos só com licença compatível (CC0, CC-BY com atribuição, MIT), registrada junto do asset.
 - Código de outros projetos só com licença compatível com a MIT e com atribuição.
+- Bibliotecas externas ficam registradas, com a licença, em [THIRD_PARTY.md](THIRD_PARTY.md).

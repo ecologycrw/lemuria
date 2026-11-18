@@ -56,8 +56,8 @@ Cada fatia tem uma pasta `specs/NNNN-nome/`. A fatia N fica na pasta de número 
 - Cada spec e cada PR (o merge na `main`).
 - Novas bibliotecas externas.
 - Mudanças de arquitetura (com ADR), nos formatos de conteúdo e no contrato do adaptador de protocolo.
-- Mudanças no [ROADMAP](ROADMAP.md) e na [VISÃO](VISION.md).
-- Qualquer mudança nas **travas**: as regras dos agentes, as configurações e os hooks do Claude Code, os hooks do Git, a CI, as configurações de build e de análise, os testes de arquitetura e a ferramenta de checagens. **A IA não afrouxa as próprias garantias.**
+- Mudanças no [ROADMAP](ROADMAP.md), na [VISÃO](VISION.md) e no [guia visual](VISUAL.md).
+- Qualquer mudança nas **travas**: as regras dos agentes, as configurações e os hooks do Claude Code, os hooks do Git, a CI, as configurações de build e de análise, os testes de arquitetura, as imagens aprovadas e a ferramenta de checagens. **A IA não afrouxa as próprias garantias.**
 
 ## Git
 
