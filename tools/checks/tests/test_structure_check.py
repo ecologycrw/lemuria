@@ -13,6 +13,8 @@ class StructureCheckTests(TempRepositoryTest):
         super().setUp()
         for required in structure_check.REQUIRED_FILES:
             self.write(required, "")
+        self.write("vcpkg.json", '{"dependencies": ["catch2", {"name": "sdl3"}]}')
+        self.write(structure_check.THIRD_PARTY_FILE, "| `catch2` | BSL-1.0 | tests |\n| `sdl3` | zlib | window |\n")
         self.write("CMakeLists.txt", f"add_subdirectory({CORE})\n")
         self.write(f"{CORE}/CMakeLists.txt", "add_subdirectory(Tests)\n")
         self.write(f"{CORE}/Private/Version.cpp", "")
@@ -25,6 +27,27 @@ class StructureCheckTests(TempRepositoryTest):
     def test_a_missing_required_file_is_refused(self) -> None:
         (self.root / "docs/VISION.md").unlink()
         self.assert_refused(structure_check.run(self.root), "docs/VISION.md")
+
+    def test_the_visual_guide_and_the_license_list_are_required(self) -> None:
+        for required in ("docs/VISUAL.md", "docs/THIRD_PARTY.md"):
+            with self.subTest(required=required):
+                self.assertIn(required, structure_check.REQUIRED_FILES)
+
+    def test_a_library_without_a_registered_license_is_refused(self) -> None:
+        self.write(structure_check.THIRD_PARTY_FILE, "| `catch2` | BSL-1.0 | tests |\n")
+        self.assert_refused(structure_check.run(self.root), "the library 'sdl3' has no license registered")
+
+    def test_a_library_with_an_empty_license_is_refused(self) -> None:
+        self.write(structure_check.THIRD_PARTY_FILE, "| `catch2` | BSL-1.0 | tests |\n| `sdl3` |  | window |\n")
+        self.assert_refused(structure_check.run(self.root), "the library 'sdl3' has no license registered")
+
+    def test_a_library_that_left_the_build_must_leave_the_list(self) -> None:
+        self.write("vcpkg.json", '{"dependencies": ["catch2"]}')
+        self.assert_refused(structure_check.run(self.root), "the library 'sdl3' is registered but is not in vcpkg.json")
+
+    def test_an_invalid_library_manifest_is_refused(self) -> None:
+        self.write("vcpkg.json", "{")
+        self.assert_refused(structure_check.run(self.root), "not valid JSON")
 
     def test_a_module_must_be_named_in_pascal_case(self) -> None:
         self.write("Engine/Source/Runtime/lemuria_physics/CMakeLists.txt", "")

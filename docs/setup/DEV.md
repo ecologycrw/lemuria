@@ -60,8 +60,8 @@ O `tools/checks` confere o que o compilador não confere:
 
 | Checagem | O que recusa |
 |---|---|
-| `docs` | links quebrados, specs incompletas, critério de aceitação sem prova, ADRs fora de sequência, item provisório sem destino |
-| `structure` | arquivos obrigatórios faltando, módulos fora do padrão, nomes de arquivo errados |
+| `docs` | links quebrados, specs incompletas, critério de aceitação sem prova, seção "Prova visual" ausente, ADRs fora de sequência, item provisório sem destino |
+| `structure` | arquivos obrigatórios faltando, módulos fora do padrão, nomes de arquivo errados, biblioteca sem licença registrada |
 | `architecture` | dependência proibida entre camadas e uso do SDL ou do sistema operacional fora da camada de plataforma |
 | `cpp-rules` | `new` e `delete` soltos, funções perigosas de C, relógio e sorteio do sistema, `reinterpret_cast` |
 | `terms` | nomes de outros jogos e dos formatos de arquivo deles fora dos lugares permitidos |
