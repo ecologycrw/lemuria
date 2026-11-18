@@ -14,9 +14,9 @@
 
 | Fatia | Nome | O que entrega, do ponto de vista de quem testa |
 |---|---|---|
-| 0 | Primeiros passos | Uma janela com chão em blocos, câmera 3/4 e clicar para andar, ligada ao servidor de teste; dois clientes se veem no mesmo mapa |
-| 1 | Personagem vivo | Um personagem de verdade, importado do glTF, com animação suave em qualquer taxa de quadros |
-| 2 | Equipamento | Peças trocáveis (elmo, armadura, armas), asas e brilho de item por nível. Aqui se decide de onde vem a arte |
+| 0 | Primeiros passos | Uma janela com chão em blocos, câmera 3/4 e clicar para andar, ligada ao servidor de teste; dois clientes se veem no mesmo mapa. A engine gera a imagem de uma cena fixa para conferência e mede a fluidez ([guia visual](VISUAL.md)) |
+| 1 | Personagem vivo | Um personagem de verdade, importado do glTF, com animação suave em qualquer taxa de quadros. Aqui se decide de onde vem a arte |
+| 2 | Equipamento | Peças trocáveis (elmo, armadura, armas), asas e brilho de item por nível |
 | 3 | Interface | Janelas com RmlUi, inventário em grade e arrastar itens |
 | 4 | Caçar | Monstros, combate, números de dano, drops no chão e pegar o item |
 | 5 | Prova do OpenMU | Um adaptador de prova, num repositório privado separado: login, entrar no mapa, andar, ver outros jogadores, atacar e pegar um item. Corrige no Lemuria o que a prova revelar |
