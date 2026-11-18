@@ -1,3 +1,3 @@
 lemuria_add_tests(demo_protocol_tests
-    SOURCES protocol_test.cpp
+    SOURCES ProtocolTest.cpp
     DEPS demo_protocol)

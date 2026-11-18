@@ -13,8 +13,8 @@ class PrSummaryTests(unittest.TestCase):
                 self.assertTrue(pr_summary.is_protected(path))
 
     def test_ordinary_paths_are_not_protected(self) -> None:
-        for path in ("Engine/Source/Runtime/Core/Private/version.cpp", "docs/STATUS.md",
-                     "Engine/Source/Runtime/Core/Tests/version_test.cpp"):
+        for path in ("Engine/Source/Runtime/Core/Private/Version.cpp", "docs/STATUS.md",
+                     "Engine/Source/Runtime/Core/Tests/VersionTest.cpp"):
             with self.subTest(path=path):
                 self.assertFalse(pr_summary.is_protected(path))
 
@@ -40,13 +40,13 @@ class PrSummaryTests(unittest.TestCase):
         self.assertIn("testes foram removidos", summary)
 
     def test_deleted_test_files_are_listed(self) -> None:
-        summary = pr_summary.build([("D", "tests/architecture/a_test.cpp"), ("D", "Engine/Source/Runtime/Core/Private/a.cpp")], "")
+        summary = pr_summary.build([("D", "tests/architecture/ATest.cpp"), ("D", "Engine/Source/Runtime/Core/Private/a.cpp")], "")
         self.assertIn("Arquivos de teste apagados: 1", summary)
-        self.assertIn("`tests/architecture/a_test.cpp`", summary)
+        self.assertIn("`tests/architecture/ATest.cpp`", summary)
 
     def test_deleted_test_files_of_a_module_are_listed(self) -> None:
-        for path in ("Engine/Source/Runtime/Core/Tests/a_test.cpp", "Frameworks/Classic/Tests/a_test.cpp",
-                     "Samples/DemoGame/Source/Protocol/Tests/a_test.cpp"):
+        for path in ("Engine/Source/Runtime/Core/Tests/ATest.cpp", "Frameworks/Classic/Tests/ATest.cpp",
+                     "Samples/DemoGame/Source/Protocol/Tests/ATest.cpp"):
             with self.subTest(path=path):
                 summary = pr_summary.build([("D", path)], "")
                 self.assertIn("Arquivos de teste apagados: 1", summary)

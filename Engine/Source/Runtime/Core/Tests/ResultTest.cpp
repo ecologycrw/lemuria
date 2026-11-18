@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 
-#include "lemuria/core/result.hpp"
+#include "Lemuria/Core/Result.hpp"
 
 using lemuria::core::make_error;
 using lemuria::core::Result;

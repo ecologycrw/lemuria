@@ -18,3 +18,4 @@ Cada ADR registra uma decisão importante, o motivo e as alternativas. Um ADR ac
 | [0012](0012-documentacao.md) | Documentação como memória do projeto | aceita |
 | [0013](0013-central-de-conhecimento.md) | Central de conhecimento em sessão separada | aceita |
 | [0014](0014-organizacao-do-repositorio.md) | Organização do repositório em Engine, Frameworks e Samples | aceita |
+| [0015](0015-arquivos-cpp-em-pascalcase.md) | Arquivos C++ e pastas de include em PascalCase | aceita |

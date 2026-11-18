@@ -46,7 +46,7 @@ class CppRulesTests(TempRepositoryTest):
 
     def test_the_tests_of_the_platform_layer_cannot_read_the_system_clock(self) -> None:
         code = "auto now() { return std::chrono::steady_clock::now(); }\n"
-        self.assert_refused(self.findings_for(code, "Engine/Source/Runtime/PlatformSDL/Tests/a_test.cpp"), "INV-05")
+        self.assert_refused(self.findings_for(code, "Engine/Source/Runtime/PlatformSDL/Tests/ATest.cpp"), "INV-05")
 
     def test_reinterpreting_bytes_is_refused(self) -> None:
         self.assert_refused(self.findings_for("auto p = reinterpret_cast<const H*>(bytes);\n"), "INV-12")
@@ -59,9 +59,9 @@ class CppRulesTests(TempRepositoryTest):
         self.assert_refused(self.findings_for("// first\n\nint* a = new int(1);\n"), "line 3")
 
     def test_rules_also_apply_to_programs_and_tests(self) -> None:
-        for path in ("Samples/DemoGame/Source/Client/Private/main.cpp", "Engine/Source/Runtime/Core/Tests/a_test.cpp",
-                     "Samples/DemoGame/Source/TestServer/Private/main.cpp", "Frameworks/Classic/Private/a.cpp",
-                     "tests/architecture/a_test.cpp"):
+        for path in ("Samples/DemoGame/Source/Client/Private/Main.cpp", "Engine/Source/Runtime/Core/Tests/ATest.cpp",
+                     "Samples/DemoGame/Source/TestServer/Private/Main.cpp", "Frameworks/Classic/Private/a.cpp",
+                     "tests/architecture/ATest.cpp"):
             with self.subTest(path=path):
                 self.assert_refused(self.findings_for("int* a = new int(1);\n", path), "'new' is forbidden")
 

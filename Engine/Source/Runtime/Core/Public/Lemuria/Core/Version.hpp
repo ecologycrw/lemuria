@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string_view>
 
-#include "lemuria/core/result.hpp"
+#include "Lemuria/Core/Result.hpp"
 
 namespace lemuria::core {
 

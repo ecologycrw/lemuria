@@ -1,3 +1,3 @@
 lemuria_add_tests(classic_tests
-    SOURCES framework_info_test.cpp
+    SOURCES FrameworkInfoTest.cpp
     DEPS lemuria_classic)

@@ -54,7 +54,7 @@ Todo módulo tem o mesmo formato:
 
 ```text
 Core/
-├─ Public/lemuria/core/   o que outros módulos podem usar
+├─ Public/Lemuria/Core/   o que outros módulos podem usar
 ├─ Private/               detalhes internos
 ├─ Tests/                 os testes deste módulo
 └─ CMakeLists.txt
@@ -72,7 +72,7 @@ Regras de dependência:
 
 - O Núcleo não inclui nada do Classic; o Classic não inclui nada de jogo.
 - Só `lemuria_platform_sdl` inclui o SDL (INV-09).
-- As regras valem para todo arquivo de código, inclusive o `main.cpp` dos programas.
+- As regras valem para todo arquivo de código, inclusive o `Main.cpp` dos programas.
 - Um alvo novo só nasce quando existe um motivo real (ver a [regra de três](CONVENTIONS.md#regra-de-três)).
 
 ## O quadro

@@ -1,6 +1,6 @@
 # The only target allowed to use SDL (INV-09). SDL stays private: nothing else can see it.
 lemuria_add_library(lemuria_platform_sdl
-    SOURCES Private/platform_info.cpp
+    SOURCES Private/PlatformInfo.cpp
     PUBLIC_DEPS lemuria_core
     PRIVATE_DEPS SDL3::SDL3)
 
