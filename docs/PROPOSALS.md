@@ -36,6 +36,13 @@ Formato de cada entrada (o modelo completo fica em `templates/proposal.md`):
 - Prioridade sugerida: média
 - Status: aberta
 
+### P-0004: definir quando o histórico do STATUS é atualizado
+- Origem: feedback do dono, durante a fatia 0
+- Tipo: regra
+- Evidência: o dono perguntou "normalmente quando que a seção ## Histórico do STATUS.md recebe algo ?". Nenhuma skill nem documento do fluxo define isso, e a conclusão das etapas 1 e 2 da fatia 0 não foi registrada nessa seção. Sugestão: atualizar ao aprovar a spec, ao fechar a fatia e ao fazer o merge
+- Prioridade sugerida: baixa
+- Status: aberta
+
 ## Processadas
 
 *(nenhuma)*
