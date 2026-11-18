@@ -20,7 +20,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T09: Shaders em HLSL compilados no build para SPIR-V e DXIL (CA-22). Verificação: o build gera os dois formatos.
 - [x] T10: Desenho com a SDL GPU, na janela e fora dela, com desenho em lote (CA-22). Verificação: teste com a etiqueta `gpu` desenha numa imagem fora da tela.
 - [x] T11: Câmera 3/4 e escolha do bloco sob o cursor no Classic (CA-02). Verificação: testes com a etiqueta `[0000-CA-02]`. Os valores da câmera são dados do jogo (INV-06), então a etiqueta `[0000-CA-01]` fica nos testes do cliente, na T12.
-- [ ] T12: Paleta, mapa gerado e cliente que mostra o chão (CA-01). Verificação: a janela mostra o chão, e a IA abre a imagem gerada.
+- [x] T12: Paleta, mapa gerado e cliente que mostra o chão (CA-01). Verificação: a janela mostra o chão, e a IA abre a imagem gerada.
 
 ## Etapa 3: Prova visual
 
@@ -62,7 +62,13 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 ## Prova visual
 
-*(ainda não há imagem)*
+**T12, cena de prova em 1280 por 720, com Vulkan e Direct3D 12.**
+
+- **O que a imagem mostra:** o chão preenche toda a imagem em tons escuros e quentes, com manchas de terra, musgo, folhagem e sombra. A faixa de trilha atravessa o mapa, e as pedras aparecem em grupos, sobre a folhagem. Os dois personagens se destacam do chão e são fáceis de diferenciar.
+- **O que ficou ruim:** as bordas das formas são serrilhadas e os blocos do chão são bem visíveis. O serrilhado ainda não tem fatia definida. Os blocos visíveis são aceitos nesta fatia e mudam na fatia 2.
+- **Primeira medição reprovada:** a sombra profunda ficou em 6,7%, abaixo da faixa. A parte de sombra do mapa subiu de 20% para 30%.
+- **Números atuais (medição provisória, a ferramenta definitiva vem na T14):** brilho mediano 0,137; sombra profunda 13,5%; tons escuros 84,0%; pontos de luz 0,35% (não exigido); tons quentes 96,5%; saturação mediana 0,622. Todos dentro das faixas exigidas.
+- **Vulkan e Direct3D 12:** na primeira geração, os dois arquivos saíram idênticos byte a byte. A comparação definitiva fica para a T15.
 
 ## Revisão
 
@@ -71,10 +77,11 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T05. A etapa 1 está concluída.
+- Próxima tarefa: T13. As etapas 1 e 2 estão concluídas.
+- O cliente já aceita `--proof-image arquivo`, `--graphics-api nome` e `--frames quantidade`. A cena de prova fica em `DemoClient/ProofScene.hpp`.
 - `glslc` fica em `vcpkg_installed/<triplet do host>/tools/shaderc/`. A regra de compilar shaders deve ficar no `CMakeLists.txt` de `PlatformSDL`, para não mexer em `cmake/`, que é trava.
 - A SDL 3.4.20 tem `SDL_SavePNG`, então a imagem da prova não precisa de biblioteca nova. A medição em Python lê o PNG com `zlib`, da biblioteca padrão.
-- Mistura inicial de blocos para cumprir as faixas da prova visual (estimativa, confira medindo): 20% sombra profunda, 55% terra na sombra, 17% musgo, 5% trilha ou folhagem e 3% pedra. A mediana estimada do brilho é 0,13.
+- Mistura de blocos do mapa: 30% sombra profunda, 45% terra na sombra, 17% musgo, 5% folhagem e 3% pedra, além da faixa de trilha.
 - A medição de fluidez não pode ficar presa à sincronização vertical, ou todo quadro mediria cerca de 16,7 ms. Use o modo de apresentação sem espera.
 - Resposta antiga depois de uma correção: o evento de confirmação traz a origem do movimento, e o Classic só aceita a confirmação se essa origem for o início da caminhada atual.
 - Testes com rede real: use porta escolhida pelo sistema, só no próprio computador, e espera por condição com limite.
