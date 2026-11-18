@@ -77,8 +77,13 @@ def _required_spec_files(status: str) -> tuple[str, ...]:
     return ("spec.md", "plan.md")
 
 
+def _is_test_source(root: Path, file: Path) -> bool:
+    parts = file.relative_to(root).parts
+    return parts[0] == "tests" or "Tests" in parts
+
+
 def _test_sources(root: Path) -> str:
-    return "\n".join(read_text(file) for file in iter_files(root / "tests", ".cpp"))
+    return "\n".join(read_text(file) for file in iter_files(root, ".cpp") if _is_test_source(root, file))
 
 
 def _check_specs(root: Path, findings: list[Finding]) -> None:

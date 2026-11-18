@@ -103,13 +103,34 @@ class DocsCheckTests(TempRepositoryTest):
     def test_a_tagged_test_is_a_proof(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
         self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
-        self.write("tests/core/a_test.cpp", 'TEST_CASE("it works", "[0001-CA-01]") {}\n')
+        self.write("Engine/Source/Runtime/Core/Tests/a_test.cpp", 'TEST_CASE("it works", "[0001-CA-01]") {}\n')
         self.assertEqual(self.run_check(), [])
+
+    def test_a_tagged_test_of_a_framework_or_sample_is_a_proof(self) -> None:
+        for path in ("Frameworks/Classic/Tests/a_test.cpp", "Samples/DemoGame/Source/Protocol/Tests/a_test.cpp"):
+            with self.subTest(path=path):
+                self.spec("concluida", extra=("tasks.md",))
+                self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
+                self.write(path, 'TEST_CASE("it works", "[0001-CA-01]") {}\n')
+                self.assertEqual(self.run_check(), [])
+                (self.root / path).unlink()
+
+    def test_a_tagged_test_of_the_repository_is_a_proof(self) -> None:
+        self.spec("concluida", extra=("tasks.md",))
+        self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
+        self.write("tests/architecture/a_test.cpp", 'TEST_CASE("it works", "[0001-CA-01]") {}\n')
+        self.assertEqual(self.run_check(), [])
+
+    def test_a_tag_outside_the_tests_is_not_a_proof(self) -> None:
+        self.spec("concluida", extra=("tasks.md",))
+        self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
+        self.write("Engine/Source/Runtime/Core/Private/a.cpp", '// [0001-CA-01]\n')
+        self.assert_refused(self.run_check(), "has no proof")
 
     def test_a_test_of_another_slice_is_not_a_proof(self) -> None:
         self.spec("concluida", extra=("tasks.md",))
         self.write("specs/0001-first/report.md", "| CA-01 | test |\n")
-        self.write("tests/core/a_test.cpp", 'TEST_CASE("it works", "[0002-CA-01]") {}\n')
+        self.write("Engine/Source/Runtime/Core/Tests/a_test.cpp", 'TEST_CASE("it works", "[0002-CA-01]") {}\n')
         self.assert_refused(self.run_check(), "has no proof")
 
     def test_a_manual_verification_is_a_proof(self) -> None:

@@ -25,7 +25,7 @@ function Invoke-Python {
     }
 }
 
-$changed = @(git status --porcelain -- src samples tests tools docs specs templates cmake .claude AGENTS.md CLAUDE.md CMakeLists.txt 2>$null)
+$changed = @(git status --porcelain -- Engine Frameworks Samples tests tools docs specs templates cmake .claude AGENTS.md CLAUDE.md CMakeLists.txt 2>$null)
 if ($changed.Count -eq 0) { exit 0 }
 
 $problems = @()

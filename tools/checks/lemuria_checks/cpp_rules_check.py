@@ -10,9 +10,9 @@ from .repository import iter_files, read_text, relative
 
 NAME = "cpp-rules"
 
-_SCANNED_FOLDERS = ("src", "samples", "tools/test_server", "tests")
+_SCANNED_FOLDERS = ("Engine", "Frameworks", "Samples", "tests")
 _EXEMPT_FOLDER = "tests/architecture/sanitizer_canary/"
-_PLATFORM_FOLDER = "src/core/lemuria_platform_sdl/src/"
+_PLATFORM_FOLDER = "Engine/Source/Runtime/PlatformSDL/Private/"
 
 _RULES = (
     (re.compile(r"\bnew\b"), "'new' is forbidden: use std::make_unique or a container (INV-11)"),

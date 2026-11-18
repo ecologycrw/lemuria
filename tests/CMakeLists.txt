@@ -1,5 +1,1 @@
-add_subdirectory(core)
-add_subdirectory(platform_sdl)
-add_subdirectory(classic)
-add_subdirectory(demo)
 add_subdirectory(architecture)

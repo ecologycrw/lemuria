@@ -23,7 +23,7 @@ Checks: >
   readability-identifier-naming,
   readability-misleading-indentation
 WarningsAsErrors: '*'
-HeaderFilterRegex: '.*[/\\](src|samples|tools)[/\\].*'
+HeaderFilterRegex: '.*[/\\](Engine|Frameworks|Samples)[/\\].*'
 CheckOptions:
   readability-function-cognitive-complexity.Threshold: 25
   readability-function-size.LineThreshold: 80

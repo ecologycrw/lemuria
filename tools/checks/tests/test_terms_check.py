@@ -11,11 +11,11 @@ class TermsCheckTests(TempRepositoryTest):
         self.write(terms_check.TERMS_FILE, "# comment\nacmegame ; docs/*\nsecretformat ;\nrareclient ; docs/adr/0009-*\n")
 
     def test_a_forbidden_term_in_code_is_refused(self) -> None:
-        self.write("src/core/lemuria_core/src/a.cpp", "// reads files of AcmeGame\n")
+        self.write("Engine/Source/Runtime/Core/Private/a.cpp", "// reads files of AcmeGame\n")
         self.assert_refused(terms_check.run(self.root), "the term 'acmegame' is not allowed")
 
     def test_a_forbidden_term_is_refused_in_any_folder_outside_the_allowed_ones(self) -> None:
-        for path in ("samples/a.txt", "tests/a_test.cpp", "tools/a.py", "README.md", ".github/a.yml", "templates/a.md"):
+        for path in ("Samples/a.txt", "Frameworks/a.txt", "tests/a_test.cpp", "tools/a.py", "README.md", ".github/a.yml", "templates/a.md"):
             with self.subTest(path=path):
                 self.write(path, "acmegame\n")
                 self.assert_refused(terms_check.run(self.root), path)
@@ -35,7 +35,7 @@ class TermsCheckTests(TempRepositoryTest):
         self.assert_refused(terms_check.run(self.root), "docs/VISION.md")
 
     def test_only_whole_words_count(self) -> None:
-        self.write("src/a.cpp", "// acmegames and myacmegame are other words\n")
+        self.write("Engine/a.cpp", "// acmegames and myacmegame are other words\n")
         self.assertEqual(terms_check.run(self.root), [])
 
     def test_files_that_stay_out_of_git_are_skipped(self) -> None:

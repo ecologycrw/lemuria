@@ -41,24 +41,26 @@ _REASONS = {
     "classic": "must not depend on the Classic framework (INV-02)",
     "platform": "must not depend on the platform layer (INV-02)",
     "game": "must not depend on game code (INV-02)",
-    "sdl": "must not use SDL: only src/core/lemuria_platform_sdl/src may (INV-09)",
-    "os": "must not use the operating system directly: only src/core/lemuria_platform_sdl/src may (INV-09)",
+    "sdl": "must not use SDL: only Engine/Source/Runtime/PlatformSDL/Private may (INV-09)",
+    "os": "must not use the operating system directly: only Engine/Source/Runtime/PlatformSDL/Private may (INV-09)",
 }
 
 # What each part of the repository cannot depend on. Parts are tried in order: the first match wins.
 _PARTS: tuple[tuple[str, frozenset[str]], ...] = (
-    ("src/core/lemuria_core/", frozenset({"classic", "platform", "game", "sdl", "os"})),
-    ("src/core/lemuria_platform_sdl/include/", frozenset({"classic", "game", "sdl", "os"})),
-    ("src/core/lemuria_platform_sdl/", frozenset({"classic", "game"})),
-    ("src/framework/", frozenset({"platform", "game", "sdl", "os"})),
+    ("Engine/Source/Runtime/Core/", frozenset({"classic", "platform", "game", "sdl", "os"})),
+    ("Engine/Source/Runtime/PlatformSDL/Public/", frozenset({"classic", "game", "sdl", "os"})),
+    ("Engine/Source/Runtime/PlatformSDL/Tests/", frozenset({"classic", "game", "sdl", "os"})),
+    ("Engine/Source/Runtime/PlatformSDL/", frozenset({"classic", "game"})),
+    ("Engine/", frozenset({"classic", "game", "sdl", "os"})),
+    ("Frameworks/", frozenset({"platform", "game", "sdl", "os"})),
     ("tests/architecture/custom_framework/", frozenset({"classic", "platform", "game", "sdl", "os"})),
-    ("samples/demo_protocol/", frozenset({"classic", "platform", "sdl", "os"})),
-    ("samples/", frozenset({"sdl", "os"})),
-    ("tools/test_server/", frozenset({"classic", "platform", "sdl", "os"})),
+    ("Samples/DemoGame/Source/Protocol/", frozenset({"classic", "platform", "sdl", "os"})),
+    ("Samples/DemoGame/Source/TestServer/", frozenset({"classic", "platform", "sdl", "os"})),
+    ("Samples/", frozenset({"sdl", "os"})),
     ("tests/", frozenset({"sdl", "os"})),
 )
 
-_SCANNED_FOLDERS = ("src", "samples", "tools/test_server", "tests")
+_SCANNED_FOLDERS = ("Engine", "Frameworks", "Samples", "tests")
 
 
 def _forbidden_for(path: str) -> frozenset[str]:
