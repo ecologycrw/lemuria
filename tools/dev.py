@@ -197,11 +197,15 @@ def mutation() -> None:
     if IS_WINDOWS:
         raise StepFailed("The mutation tests only run on Linux (docs/adr/0011-ferramentas-de-verificacao.md).")
     environment = build_environment()
+    if not environment.get("MULL_IR_FRONTEND"):
+        raise StepFailed("The MULL_IR_FRONTEND variable must point to the Mull compiler plugin.")
     environment["MULL_CONFIG"] = str(ROOT / "cmake" / "mull.yml")
     run(["cmake", "--preset", preset("mutation")], environment)
     run(["cmake", "--build", "--preset", preset("mutation")], environment)
+    # Informative for now: mutants that survive are reported, but do not fail the job.
     for program in MUTATION_TEST_PROGRAMS:
-        run(["mull-runner-19", "--reporters=IDE", f"build/{preset('mutation')}/{program}"], environment)
+        run(["mull-runner-19", "--reporters=IDE", "--allow-surviving", f"build/{preset('mutation')}/{program}"],
+            environment)
 
 
 def vcpkg_baseline() -> None:

@@ -54,7 +54,7 @@
       "inherits": "linux-base",
       "cacheVariables": {
         "CMAKE_CXX_COMPILER": "clang++-19",
-        "CMAKE_CXX_FLAGS": "-O0 -g -grecord-command-line -fpass-plugin=/usr/lib/mull-ir-frontend-19"
+        "CMAKE_CXX_FLAGS": "-O0 -g -grecord-command-line -fpass-plugin=$env{MULL_IR_FRONTEND}"
       }
     }
   ],

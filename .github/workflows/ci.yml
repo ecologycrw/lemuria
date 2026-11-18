@@ -70,9 +70,11 @@ jobs:
       - uses: ./.github/actions/setup-build
       - name: Install Mull and Clang 19
         run: |
-          sudo apt-get install -y clang-19
-          curl -fsSL -o mull.deb https://github.com/mull-project/mull/releases/download/0.38.0/Mull-19-0.38.0-LLVM-19.1.1-ubuntu-amd64-24.04.deb
-          sudo apt-get install -y ./mull.deb
+          release=https://github.com/mull-project/mull/releases/download/0.38.0
+          curl -fsSL -o mull.deb "$release/Mull-0.38.0-ubuntu-amd64-24.04.deb"
+          curl -fsSL -o mull-19.deb "$release/Mull-19-0.38.0-LLVM-19.1.1-ubuntu-amd64-24.04.deb"
+          sudo apt-get install -y clang-19 ./mull.deb ./mull-19.deb
+          echo "MULL_IR_FRONTEND=$(dpkg -L mull-19 | grep 'mull-ir-frontend' | head -n 1)" >> "$GITHUB_ENV"
       - name: Mutation tests
         run: python tools/dev.py mutation
 
