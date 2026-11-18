@@ -1,3 +1,3 @@
 lemuria_add_tests(core_tests
-    SOURCES MathTest.cpp ResultTest.cpp VersionTest.cpp
+    SOURCES FrameClockTest.cpp MathTest.cpp ResultTest.cpp SeededRandomTest.cpp VersionTest.cpp
     DEPS lemuria_core)
