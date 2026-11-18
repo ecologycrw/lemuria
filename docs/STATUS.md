@@ -1,7 +1,7 @@
 ---
-fase: preparacao
+fase: entre-fatias
 spec-atual:
-branch: preparacao/ambiente
+branch: main
 atualizado-em: 2026-11-18
 ---
 
@@ -9,11 +9,11 @@ atualizado-em: 2026-11-18
 
 ## Agora
 
-**Preparação, parte 4 (GitHub): aguardando o dono publicar o repositório.** A CI, o Linux e os testes de mutação só rodam de verdade depois da publicação.
+**Preparação concluída com o merge do PR #1.** O repositório tem os documentos, o esqueleto do código, as travas automáticas, o ambiente de IA e a `main` protegida. Nenhuma funcionalidade da engine foi construída ainda.
 
 ## Próxima ação
 
-O dono segue os passos 6 a 10 de `docs/setup/GITHUB.md`. Depois, a IA envia a branch `preparacao/ambiente` e abre o PR #1.
+Abrir uma sessão nova só com o Lemuria e rodar `/planejar` para a fatia 0 (Primeiros passos).
 
 ## Bloqueios
 
@@ -28,3 +28,4 @@ Nenhum.
 | 2026-11-18 | Parte 1 aprovada pelo dono: regras dos agentes, visão, arquitetura, fluxo, convenções, roadmap, modelos e 13 ADRs |
 | 2026-11-18 | Parte 2 aprovada pelo dono: esqueleto em C++, comando único, checagens, hooks do Git e CI; cada trava foi quebrada de propósito para provar que funciona |
 | 2026-11-18 | Parte 3 aprovada pelo dono: 10 skills, revisor, auditor, hooks do Claude Code, permissões e acesso controlado à central de conhecimento |
+| 2026-11-18 | Parte 4: repositório publicado, `main` protegida e PR #1 aberto |
