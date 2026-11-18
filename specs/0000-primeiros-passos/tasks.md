@@ -7,8 +7,8 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Etapa 1: Fundações
 
 - [x] T01: Adicionar `sdl3-net` e `shaderc` ao `vcpkg.json`, conferir as licenças instaladas e registrá-las em `docs/THIRD_PARTY.md`. Verificação: `py tools/dev.py verify` passa com as bibliotecas instaladas.
-- [ ] T02: Permitir que o servidor de teste use a camada de plataforma e fazer a checagem de SDL reconhecer o SDL3_net. Verificação: testes em `tools/checks/tests` provam o que passa a ser aceito e o que continua recusado.
-- [ ] T03: Liberar `new` e `malloc` só na pasta `tests/architecture/frame_allocations/`. Verificação: testes em `tools/checks/tests` provam que o resto do repositório continua recusado.
+- [x] T02: Permitir que o servidor de teste use a camada de plataforma e fazer a checagem de SDL reconhecer o SDL3_net. Verificação: testes em `tools/checks/tests` provam o que passa a ser aceito e o que continua recusado.
+- [x] T03: Liberar `new` e `malloc` só na pasta `tests/architecture/frame_allocations/`. Verificação: testes em `tools/checks/tests` provam que o resto do repositório continua recusado.
 - [ ] T04: Escrever os ADRs 0017 (contrato do adaptador), 0018 (conexões) e 0019 (shaders). Verificação: `py tools/checks/run.py docs terms` passa.
 
 ## Etapa 2: Desenho

@@ -13,15 +13,22 @@ NAME = "cpp-rules"
 _SCANNED_FOLDERS = ("Engine", "Frameworks", "Samples", "tests")
 _EXEMPT_FOLDER = "tests/architecture/sanitizer_canary/"
 _PLATFORM_FOLDER = "Engine/Source/Runtime/PlatformSDL/Private/"
+# Counting allocations (INV-13) requires replacing the global allocation functions. Every other rule still applies.
+_ALLOCATION_COUNTER_FOLDER = "tests/architecture/frame_allocations/"
 
-_RULES = (
+_MEMORY_RULES = (
     (re.compile(r"\bnew\b"), "'new' is forbidden: use std::make_unique or a container (INV-11)"),
     (re.compile(r"\b(malloc|calloc|realloc|free)\s*\("), "manual memory management is forbidden (INV-11)"),
+)
+
+_STRING_RULES = (
     (
         re.compile(r"\b(strcpy|strncpy|strcat|strncat|sprintf|vsprintf|gets|scanf|sscanf|fscanf)\s*\("),
         "C string functions without bounds are forbidden: use std::string or std::span",
     ),
 )
+
+_RULES = _MEMORY_RULES + _STRING_RULES
 
 _PLATFORM_ONLY_RULES = (
     (re.compile(r"\b(rand|srand)\s*\("), "random numbers must come from an injected source (INV-05)"),
@@ -61,14 +68,23 @@ def _is_real_delete(code: str, position: int) -> bool:
     return not code[:position].rstrip().endswith("=")
 
 
+def _rules_for(where: str) -> tuple[tuple[re.Pattern[str], str], ...]:
+    if where.startswith(_PLATFORM_FOLDER):
+        return _RULES
+    if where.startswith(_ALLOCATION_COUNTER_FOLDER):
+        return _STRING_RULES + _PLATFORM_ONLY_RULES
+    return _RULES + _PLATFORM_ONLY_RULES
+
+
 def check_file(where: str, text: str) -> list[Finding]:
     code = strip_comments_and_strings(text)
-    rules = _RULES if where.startswith(_PLATFORM_FOLDER) else _RULES + _PLATFORM_ONLY_RULES
     findings = [
         Finding(NAME, where, f"line {_line_of(code, match.start())}: {message}")
-        for pattern, message in rules
+        for pattern, message in _rules_for(where)
         for match in pattern.finditer(code)
     ]
+    if where.startswith(_ALLOCATION_COUNTER_FOLDER):
+        return findings
     findings += [
         Finding(NAME, where, f"line {_line_of(code, match.start())}: 'delete' is forbidden: use std::unique_ptr (INV-11)")
         for match in _DELETE.finditer(code)
