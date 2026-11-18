@@ -11,6 +11,10 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 *(nenhum)*
 
+## Prova visual
+
+O que a IA viu em cada imagem da cena de prova, inclusive o que ficou ruim. Se a fatia não muda o que aparece na tela: "não se aplica".
+
 ## Revisão
 
 Achados do revisor e o que foi feito com cada um. Preenchido pelo `/revisar`.
