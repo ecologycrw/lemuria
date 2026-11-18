@@ -11,6 +11,7 @@ Termos usados no projeto, em português simples.
 | **Bloom** | O halo suave em volta das partes da imagem que brilham |
 | **Branch** | Uma linha de trabalho paralela no Git. Cada fatia é feita na sua branch, sem mexer na versão oficial |
 | **CA** | Critério de aceitação: uma frase verificável que diz quando uma fatia está pronta (por exemplo, `CA-01`) |
+| **Cena de prova** | Uma cena fixa, sempre igual, usada para gerar uma imagem e conferir o visual de uma fatia |
 | **Central de conhecimento** | Um projeto separado, só no computador do dono, que estuda projetos de referência e escreve lições genéricas para o Lemuria |
 | **CI** | Integração contínua: os testes que rodam nas máquinas do GitHub a cada envio de código |
 | **Classic** | O framework oficial do Lemuria, com as mecânicas de cliente do estilo clássico. É opcional. Nome provisório |
@@ -42,6 +43,7 @@ Termos usados no projeto, em português simples.
 | **PR** | *Pull Request*: o pedido para juntar uma branch na `main`. É onde o dono revisa e aprova |
 | **`Private`** | A pasta de um módulo com os detalhes internos, que os outros módulos não podem usar |
 | **Protocolo** | As mensagens que cliente e servidor trocam, e o formato delas |
+| **Prova visual** | A conferência da imagem gerada por uma fatia: a IA e o revisor abrem a imagem, os números são medidos e o dono aprova. As regras ficam em [VISUAL.md](VISUAL.md#prova-visual) |
 | **`Public`** | A pasta de um módulo com o que os outros módulos podem usar |
 | **Push** | Enviar os commits para o GitHub |
 | **Quadro** | Uma imagem da janela. A cada quadro o cliente lê o que chegou do servidor, move os personagens e desenha a cena |
