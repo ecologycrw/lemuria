@@ -1,5 +1,5 @@
 lemuria_add_library(lemuria_core
-    SOURCES Private/Version.cpp
+    SOURCES Private/Math.cpp Private/Version.cpp
     PUBLIC_DEPS tl::expected)
 
 target_compile_definitions(lemuria_core PRIVATE
