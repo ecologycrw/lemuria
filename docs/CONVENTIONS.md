@@ -18,14 +18,14 @@
 | Pastas da infraestrutura | minúsculas | `tools/checks` |
 | Alvos do build | `lemuria_<área>` | `lemuria_core` |
 | Namespaces | `lemuria::<área>` | `lemuria::core` |
-| Arquivos | `snake_case`, com `.hpp` e `.cpp` | `frame_clock.hpp` |
-| Includes públicos | `lemuria/<área>/<arquivo>.hpp` | `lemuria/core/frame_clock.hpp` |
+| Arquivos C++ | `PascalCase`, com `.hpp` e `.cpp`, e o nome do tipo principal | `FrameClock.hpp` |
+| Includes públicos | `Lemuria/<Área>/<Arquivo>.hpp` | `Lemuria/Core/FrameClock.hpp` |
 | Tipos | `PascalCase` | `FrameClock` |
 | Funções e variáveis | `snake_case` | `advance_time` |
 | Membros privados | `snake_case_` | `elapsed_` |
 | Constantes | `kPascalCase` | `kMaxBones` |
 | Macros (evitar) | `LEMURIA_MAIUSCULAS` | `LEMURIA_ASSERT` |
-| Testes | `<módulo>/Tests/<arquivo>_test.cpp` | `Engine/Source/Runtime/Core/Tests/frame_clock_test.cpp` |
+| Testes | `<Módulo>/Tests/<Arquivo>Test.cpp` | `Engine/Source/Runtime/Core/Tests/FrameClockTest.cpp` |
 | Specs | `specs/NNNN-nome-em-kebab-case/` | `specs/0000-primeiros-passos/` |
 | ADRs | `docs/adr/NNNN-nome-em-kebab-case.md` | `docs/adr/0001-cpp20-cmake-vcpkg.md` |
 
@@ -94,9 +94,9 @@ A IA imita o código que já existe. Por isso, os melhores exemplos de cada padr
 | Para... | Siga |
 |---|---|
 | declarar uma biblioteca, um programa ou testes | `cmake/LemuriaModule.cmake`, com o exemplo em `Engine/Source/Runtime/Core/CMakeLists.txt` |
-| ler dados externos com validação e devolver erros por valor | `Engine/Source/Runtime/Core/Private/version.cpp` |
-| testar uma leitura com dados inválidos | `Engine/Source/Runtime/Core/Tests/version_test.cpp` |
-| esconder uma biblioteca externa atrás da camada de plataforma | `Engine/Source/Runtime/PlatformSDL/Private/platform_info.cpp` |
+| ler dados externos com validação e devolver erros por valor | `Engine/Source/Runtime/Core/Private/Version.cpp` |
+| testar uma leitura com dados inválidos | `Engine/Source/Runtime/Core/Tests/VersionTest.cpp` |
+| esconder uma biblioteca externa atrás da camada de plataforma | `Engine/Source/Runtime/PlatformSDL/Private/PlatformInfo.cpp` |
 
 ## Testes
 
