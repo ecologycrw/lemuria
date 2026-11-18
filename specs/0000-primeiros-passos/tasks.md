@@ -16,7 +16,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T05: Matemática do Núcleo: vetores, matrizes, projeção e raio a partir da tela (base de CA-01 e CA-02). Verificação: testes em `Engine/Source/Runtime/Core/Tests`.
 - [x] T06: Relógio do quadro e sorteio injetados no Núcleo (base de CA-04 e CA-19). Verificação: testes em `Engine/Source/Runtime/Core/Tests`.
 - [x] T07: Descrição da cena no Núcleo, só com dados. Verificação: testes em `Engine/Source/Runtime/Core/Tests`.
-- [ ] T08: Janela, entrada e relógio real na camada de plataforma. Verificação: teste com a etiqueta `gpu` e abertura manual da janela.
+- [x] T08: Janela, entrada e relógio real na camada de plataforma. Verificação: teste com a etiqueta `gpu` e abertura manual da janela.
 - [ ] T09: Shaders em HLSL compilados no build para SPIR-V e DXIL (CA-22). Verificação: o build gera os dois formatos.
 - [ ] T10: Desenho com a SDL GPU, na janela e fora dela, com desenho em lote (CA-22). Verificação: teste com a etiqueta `gpu` desenha numa imagem fora da tela.
 - [ ] T11: Câmera 3/4 e escolha do bloco sob o cursor no Classic (CA-01, CA-02). Verificação: testes com as etiquetas `[0000-CA-01]` e `[0000-CA-02]`.

@@ -1,9 +1,9 @@
 lemuria_add_tests(platform_sdl_tests
-    SOURCES PlatformInfoTest.cpp
+    SOURCES InputFrameTest.cpp MonotonicClockTest.cpp PlatformInfoTest.cpp
     DEPS lemuria_platform_sdl)
 
 # Needs a GPU or a software renderer, so it only runs when asked for (py tools/dev.py gpu-test).
 lemuria_add_tests(platform_gpu_tests
-    SOURCES GpuProbeTest.cpp
+    SOURCES GpuProbeTest.cpp WindowTest.cpp
     DEPS lemuria_platform_sdl
     LABELS gpu)
