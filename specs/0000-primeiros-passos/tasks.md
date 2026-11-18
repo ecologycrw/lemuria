@@ -6,7 +6,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 ## Etapa 1: Fundações
 
-- [ ] T01: Conferir os termos do `dxil.dll`, adicionar `sdl3-net` e `directx-dxc` ao `vcpkg.json` e registrar as licenças em `docs/THIRD_PARTY.md`. Verificação: `py tools/dev.py verify` passa com as bibliotecas instaladas.
+- [!] T01: Conferir os termos do `dxil.dll`, adicionar `sdl3-net` e `directx-dxc` ao `vcpkg.json` e registrar as licenças em `docs/THIRD_PARTY.md`. Verificação: `py tools/dev.py verify` passa com as bibliotecas instaladas.
 - [ ] T02: Permitir que o servidor de teste use a camada de plataforma e fazer a checagem de SDL reconhecer o SDL3_net. Verificação: testes em `tools/checks/tests` provam o que passa a ser aceito e o que continua recusado.
 - [ ] T03: Liberar `new` e `malloc` só na pasta `tests/architecture/frame_allocations/`. Verificação: testes em `tools/checks/tests` provam que o resto do repositório continua recusado.
 - [ ] T04: Escrever os ADRs 0017 (contrato do adaptador), 0018 (conexões) e 0019 (shaders). Verificação: `py tools/checks/run.py docs terms` passa.
@@ -58,7 +58,15 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 ## Bloqueios
 
-*(nenhum)*
+**T01: a ferramenta de shaders `directx-dxc` depende de uma decisão do dono.** O pacote de Windows da versão fixada traz o arquivo `LICENSE-MS.txt`, com termos próprios da Microsoft. Eles limitam o uso ao Windows, preveem coleta de dados de uso e passam a valer para quem usar o programa. Nada foi instalado nem executado desse pacote: só o texto dos termos foi lido.
+
+Alternativa testada nesta máquina com um shader de exemplo:
+
+- o `dxc` do Windows SDK, já exigido para compilar o projeto no Windows, gerou DXIL assinado;
+- esse mesmo `dxc` não gera SPIR-V;
+- o `glslc`, do pacote `shaderc` (Apache-2.0), gerou SPIR-V válido a partir do mesmo código HLSL.
+
+Recomendação: trocar `directx-dxc` por `shaderc` no plano e usar o `dxc` do Windows SDK para o DXIL. Aguardando a resposta do dono.
 
 ## Prova visual
 
