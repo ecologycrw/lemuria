@@ -25,6 +25,7 @@ description: Processa o que a fatia do Lemuria ensinou - aplica a escada de erro
    - `docs/ROADMAP.md`: mova a próxima fatia, ajuste os horizontes (o Claude Code vai pedir a confirmação do dono);
    - `docs/PROPOSALS.md`: mova as propostas decididas para "Processadas", com o destino;
    - `docs/STATUS.md`: `spec-atual` vazio, fase `entre-fatias`, próxima ação `/planejar`;
+   - imagens que o dono aprovou no teste: entregue a ele o comando pronto para copiar cada imagem para `tests/visual/approved/`. A IA nunca copia nem altera essas imagens. Depois que o dono rodar o comando, inclua as imagens no commit;
    - mudanças em travas que o dono aprovou: aplique (cada edição pede a confirmação do dono).
 7. **Commit e push.** Commit `docs(NNNN): retrospective of slice N` e `git push`. Rode `/verificar`.
 8. **Avise o dono** que o PR está pronto para a aprovação e o squash merge pelo navegador.

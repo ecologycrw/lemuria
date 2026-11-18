@@ -19,5 +19,7 @@
 /tools/checks/               @ecologycrw
 /tests/architecture/         @ecologycrw
 /tests/hooks/                @ecologycrw
+/tests/visual/approved/      @ecologycrw
 /docs/VISION.md              @ecologycrw
 /docs/ROADMAP.md             @ecologycrw
+/docs/VISUAL.md              @ecologycrw

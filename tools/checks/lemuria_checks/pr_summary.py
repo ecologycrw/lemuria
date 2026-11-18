@@ -12,10 +12,11 @@ from pathlib import Path, PurePosixPath
 
 PROTECTED_PREFIXES = (
     ".claude/", ".githooks/", ".github/", "cmake/", "tools/checks/", "tests/architecture/", "tests/hooks/",
+    "tests/visual/approved/",
 )
 PROTECTED_FILES = (
     "AGENTS.md", "CLAUDE.md", "CMakePresets.json", "vcpkg.json", "vcpkg-configuration.json", ".clang-format",
-    ".clang-tidy", ".editorconfig", "tools/dev.py", "docs/VISION.md", "docs/ROADMAP.md",
+    ".clang-tidy", ".editorconfig", "tools/dev.py", "docs/VISION.md", "docs/ROADMAP.md", "docs/VISUAL.md",
 )
 _DESCRIPTIONS = {"A": "criado", "D": "apagado", "R": "renomeado"}
 _TEST_MARKERS = ("TEST_CASE(", "TEMPLATE_TEST_CASE(", "SCENARIO(", "def test_")

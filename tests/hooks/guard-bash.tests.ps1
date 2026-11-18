@@ -59,6 +59,9 @@ $blocked = @(
     'rm -rf tests/architecture',
     'echo x >> docs/ROADMAP.md',
     'echo x >> docs/VISION.md',
+    'echo x >> docs/VISUAL.md',
+    'cp new.png tests/visual/approved/scene.png',
+    'rm -rf tests/visual/approved',
     'mv tests/hooks/guard-bash.tests.ps1 /tmp/'
 )
 
@@ -108,7 +111,24 @@ if (-not (Get-GuardViolation -Command 'git commit -m "x"' -CurrentBranch 'main')
     $failures++
 }
 
-$total = $blocked.Count + $allowed.Count + 1
+$blockedOnMain = @('git push', 'git push origin', 'git push origin HEAD', 'git push -u origin HEAD')
+foreach ($command in $blockedOnMain) {
+    if (-not (Get-GuardViolation -Command $command -CurrentBranch 'main')) {
+        Write-Output "FAIL (should be blocked while on main): $command"
+        $failures++
+    }
+}
+
+$allowedOnMain = @('git push -u origin fatia/0000-x', 'git pull --ff-only', 'git switch main')
+foreach ($command in $allowedOnMain) {
+    $reason = Get-GuardViolation -Command $command -CurrentBranch 'main'
+    if ($reason) {
+        Write-Output "FAIL (should be allowed while on main): $command -> $reason"
+        $failures++
+    }
+}
+
+$total = $blocked.Count + $allowed.Count + 1 + $blockedOnMain.Count + $allowedOnMain.Count
 Write-Output "guard-bash tests: $($total - $failures) of $total passed."
 if ($failures -gt 0) { exit 1 }
 exit 0

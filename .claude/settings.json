@@ -15,8 +15,11 @@
       "Bash(git branch --show-current)",
       "Bash(git switch -c fatia/:*)",
       "Bash(git switch -c consolidacao/:*)",
+      "Bash(git switch main)",
+      "Bash(git pull --ff-only)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
+      "Bash(git push)",
       "Bash(git push -u origin fatia/:*)",
       "Bash(git push origin fatia/:*)",
       "Bash(git push -u origin consolidacao/:*)",
@@ -44,8 +47,10 @@
       "Edit(tools/checks/**)",
       "Edit(tests/architecture/**)",
       "Edit(tests/hooks/**)",
+      "Edit(tests/visual/approved/**)",
       "Edit(docs/VISION.md)",
-      "Edit(docs/ROADMAP.md)"
+      "Edit(docs/ROADMAP.md)",
+      "Edit(docs/VISUAL.md)"
     ],
     "deny": [
       "Bash(git push --force:*)",

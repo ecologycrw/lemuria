@@ -123,7 +123,7 @@ Vale para toda fatia que muda o que aparece na tela.
 2. **A IA olha.** A cada tarefa visual, a IA gera a imagem, abre o arquivo e compara com este guia. Ela anota no `tasks.md` o que viu, inclusive o que ficou ruim. Rodar o comando sem abrir a imagem não conta.
 3. **Os números conferem.** A medição da imagem precisa ficar dentro das faixas que a spec exigir.
 4. **O revisor olha sozinho.** Ele abre as imagens sem confiar na descrição de quem fez o trabalho.
-5. **O dono aprova.** O report mostra as imagens, e só o dono transforma uma imagem em referência aprovada. Depois disso, uma mudança que altere essa imagem sem aprovação é recusada.
+5. **O dono aprova.** O report mostra as imagens, e só o dono copia uma imagem para `tests/visual/approved/`, a pasta das referências aprovadas. Essa pasta é uma trava: a IA não altera as imagens dela. Depois disso, uma mudança que altere o resultado sem aprovação é recusada.
 
 ## Fluidez
 
@@ -136,7 +136,7 @@ Vale para toda fatia que muda o que aparece na tela.
 
 - Um comando que desenha a cena de prova e salva a imagem em um arquivo.
 - A medição dos números da imagem.
-- A comparação com a imagem aprovada, com uma tolerância justificada.
+- A comparação com as imagens de `tests/visual/approved/`, com uma tolerância justificada.
 - O medidor de fluidez.
 - A definição de onde a prova roda na CI, já que o Windows da CI não tem placa de vídeo ([TD-0005](TECH_DEBT.md)).
 

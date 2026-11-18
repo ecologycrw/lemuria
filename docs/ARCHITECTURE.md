@@ -67,6 +67,7 @@ Uma pasta só nasce quando tiver uso. Quando forem necessárias, estas pastas fi
 | `Engine/Source/Programs/` | programas próprios da engine, como importadores de conteúdo |
 | `Engine/Shaders/` e `Engine/Content/` | shaders e conteúdo padrão da engine |
 | `Samples/DemoGame/Content/` e `Samples/DemoGame/Config/` | a arte e as configurações do jogo de demonstração |
+| `tests/visual/approved/` | as imagens que o dono aprovou como referência da [prova visual](VISUAL.md#prova-visual) |
 
 Regras de dependência:
 

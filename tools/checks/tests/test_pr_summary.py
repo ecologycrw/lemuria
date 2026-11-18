@@ -8,7 +8,8 @@ from lemuria_checks import pr_summary
 class PrSummaryTests(unittest.TestCase):
     def test_protected_paths_are_recognized(self) -> None:
         for path in (".claude/settings.json", ".github/workflows/ci.yml", "cmake/LemuriaModule.cmake", "AGENTS.md",
-                     "tools/dev.py", "tools/checks/run.py", "tests/architecture/CMakeLists.txt", "docs/ROADMAP.md"):
+                     "tools/dev.py", "tools/checks/run.py", "tests/architecture/CMakeLists.txt", "docs/ROADMAP.md",
+                     "docs/VISUAL.md", "tests/visual/approved/scene.png"):
             with self.subTest(path=path):
                 self.assertTrue(pr_summary.is_protected(path))
 

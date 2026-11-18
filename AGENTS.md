@@ -11,6 +11,7 @@ Engine open source em C++20, **só de cliente**, para MMORPGs no estilo clássic
 - `docs/WORKFLOW.md`: o ciclo das fatias e o que exige aprovação.
 - `docs/CONVENTIONS.md`: padrões, antipadrões e código de referência.
 - `docs/VISION.md` e `docs/adr/`: o produto e o porquê das decisões.
+- `docs/VISUAL.md`: a aparência desejada e a prova visual das fatias que mudam a tela.
 
 **O dono do produto não programa:** o papel do dono é decidir, testar e aprovar. Use português simples, sem jargão (veja `docs/GLOSSARY.md`), e diga sempre qual é o próximo passo do dono.
 
@@ -45,8 +46,8 @@ O ciclo de cada fatia: `/planejar` → `/implementar` → `/verificar` → `/rev
 
 - A spec de cada fatia, e o merge (feito só pelo dono).
 - Bibliotecas externas novas; mudanças de arquitetura (com ADR), nos formatos de conteúdo e no contrato do adaptador de protocolo.
-- Mudanças no `docs/ROADMAP.md` e no `docs/VISION.md`.
-- Mudanças nas **travas**: `AGENTS.md`, `CLAUDE.md`, `.claude/`, `.githooks/`, `.github/`, `cmake/`, `CMakePresets.json`, `vcpkg.json`, `vcpkg-configuration.json`, `.clang-format`, `.clang-tidy`, `.editorconfig`, `tools/dev.py`, `tools/checks/`, `tests/architecture/` e `tests/hooks/`. Antes de pedir, explique por que a mudança é necessária.
+- Mudanças no `docs/ROADMAP.md`, no `docs/VISION.md` e no `docs/VISUAL.md`.
+- Mudanças nas **travas**: `AGENTS.md`, `CLAUDE.md`, `.claude/`, `.githooks/`, `.github/`, `cmake/`, `CMakePresets.json`, `vcpkg.json`, `vcpkg-configuration.json`, `.clang-format`, `.clang-tidy`, `.editorconfig`, `tools/dev.py`, `tools/checks/`, `tests/architecture/`, `tests/hooks/` e `tests/visual/approved/`. Antes de pedir, explique por que a mudança é necessária.
 
 ## Proibido
 
