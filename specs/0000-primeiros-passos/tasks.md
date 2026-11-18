@@ -19,7 +19,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T08: Janela, entrada e relógio real na camada de plataforma. Verificação: teste com a etiqueta `gpu` e abertura manual da janela.
 - [x] T09: Shaders em HLSL compilados no build para SPIR-V e DXIL (CA-22). Verificação: o build gera os dois formatos.
 - [x] T10: Desenho com a SDL GPU, na janela e fora dela, com desenho em lote (CA-22). Verificação: teste com a etiqueta `gpu` desenha numa imagem fora da tela.
-- [ ] T11: Câmera 3/4 e escolha do bloco sob o cursor no Classic (CA-01, CA-02). Verificação: testes com as etiquetas `[0000-CA-01]` e `[0000-CA-02]`.
+- [x] T11: Câmera 3/4 e escolha do bloco sob o cursor no Classic (CA-02). Verificação: testes com a etiqueta `[0000-CA-02]`. Os valores da câmera são dados do jogo (INV-06), então a etiqueta `[0000-CA-01]` fica nos testes do cliente, na T12.
 - [ ] T12: Paleta, mapa gerado e cliente que mostra o chão (CA-01). Verificação: a janela mostra o chão, e a IA abre a imagem gerada.
 
 ## Etapa 3: Prova visual
