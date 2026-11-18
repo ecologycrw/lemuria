@@ -23,3 +23,4 @@ Cada ADR registra uma decisão importante, o motivo e as alternativas. Um ADR ac
 | [0017](0017-contrato-do-adaptador.md) | Contrato do adaptador de protocolo | aceita |
 | [0018](0018-conexoes-de-rede.md) | Conexões de rede com SDL3_net e caminho para o GNS | aceita |
 | [0019](0019-shaders-em-hlsl.md) | Shaders em HLSL, compilados durante o build | aceita |
+| [0020](0020-fronteira-do-desenho.md) | Fronteira do desenho e troca futura da API gráfica | aceita |

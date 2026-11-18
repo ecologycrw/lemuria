@@ -48,6 +48,7 @@ A ordem coloca o maior risco técnico (o desenho pela SDL GPU e a prova visual) 
 |---|---|---|
 | O mapa da demonstração é gerado por código | o formato de mapa e o build de conteúdo ainda não existem | fatia 2 |
 | O desenho usa um único passe, sem luzes | as luzes chegam com o clima | fatia 2 |
+| O código de desenho fala direto com a SDL GPU (TD-0009) | a separação só se justifica quando existir mais de uma forma de desenhar | fatia 2 |
 | A demonstração não tem login nem escolha de personagem | só um servidor real justifica esse fluxo | fatia 6 |
 | Uma queda de conexão encerra a sessão, sem reconexão automática | a política de retomada depende do servidor real | fatia 6 |
 | O sinal de presença é declarado nas capacidades, mas não é enviado | o servidor de teste não exige esse sinal | fatia 6 |
@@ -74,7 +75,8 @@ O plano aprovado previa o `directx-dxc`. O dono aprovou a troca pelo `shaderc` e
 | 0017 | Contrato do adaptador de protocolo |
 | 0018 | Conexões TCP com SDL3_net, o caminho para oferecer também o GNS, e o servidor de teste usando a camada de plataforma |
 | 0019 | Shaders em HLSL, compilados no build para SPIR-V com o `shaderc` e para DXIL com o `dxc` do Windows SDK (decisão prevista no [ADR 0006](../../docs/adr/0006-sdl3-plataforma-e-graficos.md)) |
-| 0020 | Onde a prova visual roda, qual é a tolerância da comparação e como a TD-0005 se resolve |
+| 0020 | Fronteira do desenho e troca futura da API gráfica, aprovada pelo dono durante a fatia |
+| 0021 | Onde a prova visual roda, qual é a tolerância da comparação e como a TD-0005 se resolve |
 
 ### Mudanças nas travas (precisam da aprovação do dono)
 
@@ -141,9 +143,9 @@ Nenhuma mudança.
 | A fatia é grande | As seis etapas têm entregas próprias. Se uma etapa revelar trabalho demais, a IA para e propõe dividir a fatia |
 | Duas ferramentas compilam o mesmo shader e podem gerar resultados diferentes | A prova visual compara as imagens do Direct3D 12 e do Vulkan (CA-22) |
 | A versão do `dxc` depende do Windows SDK instalado, que o repositório não fixa | O build recusa com uma mensagem clara quando não encontra o `dxc`, e os shaders usam só recursos básicos |
-| Placas de vídeo diferentes geram imagens um pouco diferentes | A tolerância é medida entre Direct3D 12, Vulkan e o renderizador por software, e justificada no ADR 0020 |
+| Placas de vídeo diferentes geram imagens um pouco diferentes | A tolerância é medida entre Direct3D 12, Vulkan e o renderizador por software, e justificada no ADR 0021 |
 | O Windows da CI não tem placa de vídeo, e a SDL GPU não oferece um renderizador por software para o Direct3D 12 | A prova roda na CI do Linux e, no Windows, na máquina de desenvolvimento |
-| O contador de alocações pode entrar em conflito com os sanitizers | O teste roda na build normal. Se não puder rodar com sanitizers, o motivo fica registrado no ADR 0020 e no report |
+| O contador de alocações pode entrar em conflito com os sanitizers | O teste roda na build normal. Se não puder rodar com sanitizers, o motivo fica registrado no ADR 0021 e no report |
 | Teste com rede real pode falhar de forma intermitente | Portas livres escolhidas pelo sistema, somente no próprio computador, e espera por condição com limite, sem pausas fixas |
 | A conexão de teste só imita o GNS e pode não revelar tudo o que a biblioteca real exige | O contrato cobre as diferenças conhecidas, e a integração real terá ADR e testes próprios ([P-0003](../../docs/PROPOSALS.md)) |
 | O contrato pode servir só para o servidor de teste | Os cenários "mal-educados" e os dois adaptadores com capacidades diferentes testam casos que o servidor de teste não produz. A prova final continua sendo a fatia 6 ([TD-0003](../../docs/TECH_DEBT.md)) |

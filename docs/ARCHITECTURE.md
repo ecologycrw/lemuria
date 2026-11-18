@@ -140,6 +140,7 @@ O contrato detalhado nasce na fatia 0. Ele é comparado com o fluxo real de um s
 ## Gráficos
 
 - **Plataforma:** janela, entrada, arquivos e GPU ficam atrás de `lemuria_platform_sdl`, com SDL3 e SDL GPU ([ADR 0006](adr/0006-sdl3-plataforma-e-graficos.md)).
+- **Fronteira do desenho:** o jogo, o Classic e o Núcleo só conhecem a descrição da cena. A partir da fatia 2, só uma camada interna fala com a SDL GPU, para que a API gráfica possa ser trocada no futuro ([ADR 0020](adr/0020-fronteira-do-desenho.md)).
 - **Destino da renderização:** forward+ (clustered forward), adequado a muita transparência aditiva e a muitas luzes pequenas.
 - **Personagens:** skinning na GPU e desenho em lote (instancing) por peça de equipamento.
 - **Efeitos:** partículas na GPU, com orçamento.
