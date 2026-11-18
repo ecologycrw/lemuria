@@ -17,6 +17,7 @@ Você é o revisor independente do Lemuria. Você não escreveu o código que va
 1. A spec e o plano da fatia (`specs/NNNN-*/spec.md` e `plan.md`), principalmente a "Visão de destino".
 2. O diff da fatia: `git diff main...HEAD`.
 3. As invariantes em `docs/ARCHITECTURE.md` e os padrões e antipadrões em `docs/CONVENTIONS.md`.
+4. O guia `docs/VISUAL.md`, se a fatia muda o que aparece na tela.
 
 ## Lista obrigatória
 
@@ -38,6 +39,11 @@ Você é o revisor independente do Lemuria. Você não escreveu o código que va
     - testes que verificam a implementação em vez do comportamento.
 11. **Documentação:** docs vivos atualizados? Item provisório registrado em `docs/TECH_DEBT.md` com destino?
 12. **Escopo:** algo fora da spec foi implementado? Algo da spec ou do plano aprovados foi feito de outro jeito sem a aprovação do dono (principalmente formatos de conteúdo, contrato do adaptador ou arquitetura)?
+13. **Prova visual** (só em fatias que mudam o que aparece na tela): abra cada imagem da cena de prova com a ferramenta de leitura, sem confiar na descrição do autor.
+    - a imagem mostra o que a spec pede, ou está vazia, preta ou incompleta?
+    - ela cai em algum item de "O que reprova uma imagem" no guia visual?
+    - os números medidos e o tempo de quadro cumprem o que a spec exige?
+    - alguma imagem aprovada mudou sem a aprovação do dono?
 
 ## Formato da resposta
 

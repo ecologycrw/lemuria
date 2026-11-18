@@ -11,6 +11,10 @@ De 2 a 4 frases: o que foi entregue e o que dá para ver funcionando.
 | CA-01 | teste `NomeDoTeste` (etiqueta `[NNNN-CA-01]`) | passou |
 | CA-02 | verificação manual: o que foi feito e o que se viu | confirmado |
 
+## Prova visual
+
+As imagens da cena de prova, os números medidos, o tempo de quadro e o que a IA e o revisor viram. Se a fatia não muda o que aparece na tela: "não se aplica".
+
 ## O que você deve testar
 
 Passo a passo em português simples, com os comandos prontos para copiar e o que você deve ver em cada passo.

@@ -26,6 +26,15 @@ Cada critério é verificável: por um teste automático com a etiqueta `[NNNN-C
 - CA-01: Descrição verificável.
 - CA-02: Descrição verificável.
 
+## Prova visual
+
+Preencha se a fatia muda o que aparece na tela (ver `docs/VISUAL.md`). Se não muda, escreva "não se aplica".
+
+- **Cena de prova:** o que aparece e de onde a câmera olha.
+- **O que a imagem precisa mostrar:** o resultado esperado, de acordo com o guia visual.
+- **Números exigidos:** quais faixas do guia visual esta fatia já precisa cumprir.
+- **Fluidez:** o tempo de quadro esperado na cena de prova.
+
 ## Como o dono testa
 
 Passo a passo em português simples, com os comandos prontos para copiar.

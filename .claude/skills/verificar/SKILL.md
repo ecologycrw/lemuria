@@ -24,8 +24,10 @@ Se houver uma fatia em andamento, monte também a tabela de critérios:
 
 Para achar as provas, procure `[NNNN-CA-` nos arquivos `.cpp` das pastas `Tests/` de cada módulo e de `tests/`.
 
+Se a fatia muda o que aparece na tela, faça também a prova visual de `docs/VISUAL.md`: gere a imagem da cena de prova, abra o arquivo, diga o que vê e mostre os números medidos e o tempo de quadro.
+
 ## Resultado
 
-- **Verde** só se o comando passou nesta execução.
+- **Verde** só se o comando passou nesta execução. Numa fatia que muda a tela, a imagem também precisa ter sido gerada e conferida nesta execução.
 - Se algo falhar, mostre o erro, explique em linguagem simples e corrija (dentro do escopo da tarefa).
 - Nunca diga que passou sem ter rodado.

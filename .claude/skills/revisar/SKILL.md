@@ -15,6 +15,7 @@ description: Faz a revisão independente da fatia do Lemuria com o subagente rev
 1. **Chame o subagente `revisor`** com a ferramenta de agentes. Passe:
    - o número e o nome da fatia;
    - os caminhos da spec e do plano;
+   - os caminhos das imagens da cena de prova, se a fatia muda o que aparece na tela;
    - a instrução para revisar o diff `git diff main...HEAD` seguindo a lista obrigatória dele.
 
    Não resuma o código para ele: ele precisa ler sozinho, com contexto limpo.

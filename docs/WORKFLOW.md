@@ -49,6 +49,7 @@ Cada fatia tem uma pasta `specs/NNNN-nome/`. A fatia N fica na pasta de número 
 - Todo CA tem uma prova: um teste com a etiqueta `[NNNN-CA-xx]` ou uma verificação manual descrita no report.
 - A spec aprovada não é editada em silêncio. Uma mudança de escopo é registrada no report ou volta para a aprovação do dono.
 - Uma fatia grande demais vira duas fatias, nunca specs dentro de specs.
+- Toda fatia que muda o que aparece na tela tem uma **prova visual**: a IA e o revisor abrem a imagem gerada, os números são conferidos e o dono aprova o resultado ([guia visual](VISUAL.md#prova-visual)).
 
 ## O que exige aprovação do dono
 
