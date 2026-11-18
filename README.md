@@ -19,6 +19,7 @@ A engine tem três camadas:
 ## Documentação
 
 - [Visão](docs/VISION.md): o que o produto é e o que ele não é
+- [Guia visual](docs/VISUAL.md): a aparência desejada e como ela é conferida
 - [Arquitetura](docs/ARCHITECTURE.md): como as peças se encaixam
 - [Fluxo de trabalho](docs/WORKFLOW.md): como o projeto é desenvolvido
 - [Decisões (ADRs)](docs/adr/README.md): por que cada decisão foi tomada

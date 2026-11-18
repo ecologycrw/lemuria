@@ -13,6 +13,7 @@ description: Fecha a fatia do Lemuria - escreve o report, atualiza a documentaç
 
 1. **Report.** Escreva `specs/NNNN-nome/report.md` a partir de `templates/report.md`:
    - a tabela de critérios com a prova de cada um;
+   - a prova visual, se a fatia muda o que aparece na tela: as imagens para o dono aprovar, os números medidos e o tempo de quadro;
    - **"O que você deve testar":** passo a passo para o dono, com comandos prontos e o que deve aparecer;
    - desvios do plano, revisão, itens provisórios e propostas geradas;
    - travas alteradas (`git diff --name-only main...HEAD`, comparando com a lista de travas do `AGENTS.md`) e testes removidos, com o motivo.

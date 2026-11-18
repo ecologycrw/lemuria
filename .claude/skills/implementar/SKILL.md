@@ -18,8 +18,9 @@ description: Implementa a fatia aprovada do Lemuria, uma tarefa por vez, com tes
    2. Escreva o teste primeiro, quando possível. O teste que prova um critério recebe a etiqueta `[NNNN-CA-xx]` no `TEST_CASE`.
    3. Implemente seguindo `docs/CONVENTIONS.md` e o código de referência citado lá. Respeite as invariantes de `docs/ARCHITECTURE.md`.
    4. Rode as verificações da skill `/verificar`.
-   5. Se tudo passou: marque `[x]`, faça o commit `tipo(NNNN): Txx descrição` e `git push`.
-   6. Se não passar depois de tentativas razoáveis: marque `[!]`, descreva o bloqueio em "Bloqueios" no `tasks.md`, pare e pergunte ao dono.
+   5. Se a tarefa mudou o que aparece na tela, gere a imagem da cena de prova, abra o arquivo e compare com `docs/VISUAL.md`. Anote no `tasks.md` o que viu. Uma imagem errada impede o commit, como um teste que falha.
+   6. Se tudo passou: marque `[x]`, faça o commit `tipo(NNNN): Txx descrição` e `git push`.
+   7. Se não passar depois de tentativas razoáveis: marque `[!]`, descreva o bloqueio em "Bloqueios" no `tasks.md`, pare e pergunte ao dono.
 3. **Ao terminar todas as tarefas,** diga ao dono que a próxima etapa é `/revisar`.
 
 ## Durante o trabalho
