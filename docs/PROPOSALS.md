@@ -22,6 +22,13 @@ Formato de cada entrada (o modelo completo fica em `templates/proposal.md`):
 - Prioridade sugerida: baixa
 - Status: aberta
 
+### P-0002: resolver o conflito entre `/propor` e `/planejar`
+- Origem: registro da proposta P-0001, entre duas fatias
+- Tipo: trava
+- Evidência: sem fatia em andamento, o passo 4 do `/propor` manda deixar a proposta "para a próxima branch", mas as pré-condições do `/planejar` exigem `git status --short` vazio. A proposta não salva bloqueia o planejamento da fatia seguinte. Na P-0001, foi preciso abrir um PR só para a proposta. O dono respondeu "Sim, registrar"
+- Prioridade sugerida: média
+- Status: aberta
+
 ## Processadas
 
 *(nenhuma)*
