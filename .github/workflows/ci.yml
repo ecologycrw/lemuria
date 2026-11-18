@@ -1,0 +1,92 @@
+# Runs every check again, outside the development machine (docs/WORKFLOW.md, "Proteções em camadas").
+# The job names are required status checks in the main branch ruleset (docs/setup/ruleset-main.json).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: build-test (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-msvc
+            os: windows-latest
+          - name: linux-clang
+            os: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-build
+      - name: Build, tests, sanitizers and checks
+        run: python tools/dev.py verify --no-static
+      - name: GPU test with a software renderer
+        if: runner.os == 'Linux'
+        env:
+          SDL_VIDEODRIVER: offscreen
+        run: python tools/dev.py gpu-test
+
+  static-analysis:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-build
+      - name: Install the pinned formatter
+        run: python -m pip install clang-format==22.1.3
+      - name: Formatting
+        run: python tools/dev.py format
+      - name: Static analysis
+        run: python tools/dev.py tidy
+
+  mermaid:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - name: Install mermaid-cli
+        run: npm install --global @mermaid-js/mermaid-cli@12.2.0
+      - name: Render every diagram
+        run: node .github/scripts/check-mermaid.mjs
+
+  # Informative for now: it never blocks a pull request (docs/adr/0011-ferramentas-de-verificacao.md).
+  mutation:
+    runs-on: ubuntu-24.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-build
+      - name: Install Mull and Clang 19
+        run: |
+          sudo apt-get install -y clang-19
+          curl -fsSL -o mull.deb https://github.com/mull-project/mull/releases/download/0.38.0/Mull-19-0.38.0-LLVM-19.1.1-ubuntu-amd64-24.04.deb
+          sudo apt-get install -y ./mull.deb
+      - name: Mutation tests
+        run: python tools/dev.py mutation
+
+  pr-summary:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - name: Safety summary
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: python tools/checks/run.py pr-summary --base "origin/$BASE_REF"

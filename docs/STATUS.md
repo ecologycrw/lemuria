@@ -9,11 +9,11 @@ atualizado-em: 2026-11-18
 
 ## Agora
 
-**Preparação, parte 2 (esqueleto do código e travas): em andamento.** As skills e os hooks do Claude Code citados nos documentos ainda não existem: eles chegam na parte 3.
+**Preparação, parte 3 (ambiente de IA): em andamento.** A CI, o Linux e os testes de mutação só rodam de verdade quando o repositório chegar ao GitHub, na parte 4.
 
 ## Próxima ação
 
-A IA termina a parte 2 e a apresenta para a aprovação do dono.
+A IA termina a parte 3 e a apresenta para a aprovação do dono.
 
 ## Bloqueios
 
@@ -26,3 +26,4 @@ Nenhum.
 | 2026-11-18 | Plano da preparação aprovado pelo dono |
 | 2026-11-18 | Etapa 0 concluída: conta de máquina `lemuria-ci-dev`, chave de assinatura e primeiro commit assinado na `main` |
 | 2026-11-18 | Parte 1 aprovada pelo dono: regras dos agentes, visão, arquitetura, fluxo, convenções, roadmap, modelos e 13 ADRs |
+| 2026-11-18 | Parte 2 aprovada pelo dono: esqueleto em C++, comando único, checagens, hooks do Git e CI; cada trava foi quebrada de propósito para provar que funciona |

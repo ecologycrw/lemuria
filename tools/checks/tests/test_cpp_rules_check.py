@@ -1,0 +1,67 @@
+import unittest
+
+from support import TempRepositoryTest
+
+from lemuria_checks import cpp_rules_check
+
+
+class CppRulesTests(TempRepositoryTest):
+    def findings_for(self, code: str, path: str = "src/core/lemuria_core/src/a.cpp") -> list:
+        self.write(path, code)
+        return cpp_rules_check.run(self.root)
+
+    def test_loose_new_is_refused(self) -> None:
+        self.assert_refused(self.findings_for("int* a = new int(1);\n"), "'new' is forbidden")
+
+    def test_loose_delete_is_refused(self) -> None:
+        self.assert_refused(self.findings_for("void f(int* a) { delete a; }\n"), "'delete' is forbidden")
+
+    def test_array_delete_is_refused(self) -> None:
+        self.assert_refused(self.findings_for("void f(int* a) { delete[] a; }\n"), "'delete' is forbidden")
+
+    def test_deleted_functions_are_allowed(self) -> None:
+        self.assertEqual(self.findings_for("struct A { A(const A&) = delete; A& operator=(A&&) =\n delete; };\n"), [])
+
+    def test_manual_memory_is_refused(self) -> None:
+        for call in ("malloc(4)", "std::calloc(1, 4)", "realloc(p, 4)", "free(p)"):
+            with self.subTest(call=call):
+                self.assert_refused(self.findings_for(f"auto a = {call};\n"), "manual memory")
+
+    def test_functions_of_other_libraries_with_similar_names_are_allowed(self) -> None:
+        self.assertEqual(self.findings_for("void f() { SDL_free(p); release_free(p); }\n"), [])
+
+    def test_unbounded_string_functions_are_refused(self) -> None:
+        for call in ("strcpy(a, b)", "sprintf(a, b)", "std::strcat(a, b)", "scanf(a)"):
+            with self.subTest(call=call):
+                self.assert_refused(self.findings_for(f"void f() {{ {call}; }}\n"), "C string functions")
+
+    def test_system_time_and_random_are_refused_outside_the_platform_layer(self) -> None:
+        for code in ("std::chrono::steady_clock::now()", "std::chrono::system_clock::now()", "rand()", "std::random_device d"):
+            with self.subTest(code=code):
+                self.assert_refused(self.findings_for(f"void f() {{ {code}; }}\n"), "INV-05")
+
+    def test_the_platform_layer_may_read_the_system_clock(self) -> None:
+        code = "auto now() { return std::chrono::steady_clock::now(); }\n"
+        self.assertEqual(self.findings_for(code, "src/core/lemuria_platform_sdl/src/a.cpp"), [])
+
+    def test_reinterpreting_bytes_is_refused(self) -> None:
+        self.assert_refused(self.findings_for("auto p = reinterpret_cast<const H*>(bytes);\n"), "INV-12")
+
+    def test_comments_and_strings_are_ignored(self) -> None:
+        code = '// new delete malloc(1)\n/* strcpy(a, b) */\nauto a = "new delete free(p)";\nauto b = R"x(rand())x";\n'
+        self.assertEqual(self.findings_for(code), [])
+
+    def test_the_line_of_the_problem_is_reported(self) -> None:
+        self.assert_refused(self.findings_for("// first\n\nint* a = new int(1);\n"), "line 3")
+
+    def test_rules_also_apply_to_programs_and_tests(self) -> None:
+        for path in ("samples/demo_client/src/main.cpp", "tests/core/a_test.cpp", "tools/test_server/src/main.cpp"):
+            with self.subTest(path=path):
+                self.assert_refused(self.findings_for("int* a = new int(1);\n", path), "'new' is forbidden")
+
+    def test_the_sanitizer_canaries_are_exempt(self) -> None:
+        self.assertEqual(self.findings_for("int* a = new int(1);\n", "tests/architecture/sanitizer_canary/a.cpp"), [])
+
+
+if __name__ == "__main__":
+    unittest.main()

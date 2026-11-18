@@ -1,0 +1,81 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 30, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed"
+      }
+    },
+    {
+      "name": "windows-base",
+      "hidden": true,
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" },
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "cl",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-md"
+      }
+    },
+    {
+      "name": "linux-base",
+      "hidden": true,
+      "inherits": "base",
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++",
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      }
+    },
+    { "name": "windows-dev", "displayName": "Windows (MSVC)", "inherits": "windows-base" },
+    {
+      "name": "windows-asan",
+      "displayName": "Windows (MSVC) with sanitizers",
+      "inherits": "windows-base",
+      "cacheVariables": { "LEMURIA_SANITIZE": "ON" }
+    },
+    { "name": "linux-dev", "displayName": "Linux (Clang)", "inherits": "linux-base" },
+    {
+      "name": "linux-asan",
+      "displayName": "Linux (Clang) with sanitizers",
+      "inherits": "linux-base",
+      "cacheVariables": { "LEMURIA_SANITIZE": "ON" }
+    },
+    {
+      "name": "linux-mutation",
+      "displayName": "Linux (Clang 19) instrumented for mutation tests",
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++-19",
+        "CMAKE_CXX_FLAGS": "-O0 -g -grecord-command-line -fpass-plugin=/usr/lib/mull-ir-frontend-19"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "windows-dev", "configurePreset": "windows-dev" },
+    { "name": "windows-asan", "configurePreset": "windows-asan" },
+    { "name": "linux-dev", "configurePreset": "linux-dev" },
+    { "name": "linux-asan", "configurePreset": "linux-asan" },
+    { "name": "linux-mutation", "configurePreset": "linux-mutation" }
+  ],
+  "testPresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error" },
+      "filter": { "exclude": { "label": "gpu" } }
+    },
+    { "name": "windows-dev", "inherits": "base", "configurePreset": "windows-dev" },
+    { "name": "windows-asan", "inherits": "base", "configurePreset": "windows-asan" },
+    { "name": "linux-dev", "inherits": "base", "configurePreset": "linux-dev" },
+    { "name": "linux-asan", "inherits": "base", "configurePreset": "linux-asan" }
+  ]
+}

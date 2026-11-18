@@ -1,0 +1,6 @@
+# Mutation tests (docs/adr/0011-ferramentas-de-verificacao.md): only the logic of the Core is mutated.
+mutators:
+  - cxx_all
+includePaths:
+  - .*src/core/lemuria_core/.*
+timeout: 10000

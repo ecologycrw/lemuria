@@ -91,7 +91,10 @@ A IA imita o código que já existe. Por isso, os melhores exemplos de cada padr
 
 | Para... | Siga |
 |---|---|
-| *(nenhum exemplo ainda)* | |
+| declarar uma biblioteca, um programa ou testes | `cmake/LemuriaModule.cmake`, com o exemplo em `src/core/lemuria_core/CMakeLists.txt` |
+| ler dados externos com validação e devolver erros por valor | `src/core/lemuria_core/src/version.cpp` |
+| testar uma leitura com dados inválidos | `tests/core/version_test.cpp` |
+| esconder uma biblioteca externa atrás da camada de plataforma | `src/core/lemuria_platform_sdl/src/platform_info.cpp` |
 
 ## Testes
 

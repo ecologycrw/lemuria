@@ -1,0 +1,11 @@
+# Terms that cannot appear in the repository (INV-16, docs/adr/0009-repositorio-publico-e-terceiros.md).
+# Format: term ; folders or files where the term is allowed, separated by commas.
+# Nothing after the semicolon means the term is not allowed anywhere.
+openmu ; docs/*
+mu online ; docs/*
+muonline ;
+mumain ; docs/adr/0009-*, docs/adr/0013-*
+webzen ;
+bmd ;
+ozj ;
+ozt ;

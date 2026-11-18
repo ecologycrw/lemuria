@@ -2,7 +2,7 @@
 
 > Documento vivo: descreve como o sistema **é agora** e para onde vai. É atualizado no mesmo PR que muda o que ele descreve. Os porquês das decisões estão nos [ADRs](adr/README.md).
 >
-> **Como é agora:** o projeto está em preparação e ainda não tem código da engine. Tudo abaixo descreve o destino.
+> **Como é agora:** existe o esqueleto do código, com as travas automáticas, e nenhuma funcionalidade da engine. Exceto na seção "Estrutura do repositório", tudo abaixo descreve o destino.
 
 ## Visão geral
 
@@ -36,15 +36,13 @@ As dependências só descem (INV-02). **O Classic não tem acesso especial ao N�
 
 ## Estrutura do repositório
 
-A estrutura nasce na parte 2 da preparação.
-
 | Pasta | Alvos do build | Camada |
 |---|---|---|
 | `src/core/` | `lemuria_core`, `lemuria_platform_sdl` (a camada de plataforma) | Núcleo |
 | `src/framework/` | `lemuria_classic` | Classic |
 | `samples/` | `demo_protocol` (as mensagens da demonstração), `demo_client` (o jogo de demonstração) | Jogo |
 | `tools/` | `dev.py` (o comando único), `checks/` (as checagens), `test_server/` (o servidor de teste) | Ferramentas |
-| `tests/` | testes de cada módulo, `architecture/` e `hooks/` | Testes |
+| `tests/` | testes de cada módulo; `architecture/` (o framework de exemplo e os programas com erro proposital para os sanitizers) e `hooks/` (testes dos hooks do Git) | Testes |
 
 Regras de dependência:
 
