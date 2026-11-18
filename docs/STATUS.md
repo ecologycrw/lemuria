@@ -9,11 +9,11 @@ atualizado-em: 2026-11-18
 
 ## Agora
 
-**Fatia 0 (Primeiros passos) em construção.** As etapas 1 (Fundações) e 2 (Desenho) estão concluídas: a janela mostra o chão em blocos com Vulkan e Direct3D 12. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
+**Fatia 0 (Primeiros passos) em construção.** As etapas 1 (Fundações) e 2 (Desenho) estão concluídas: a janela mostra o chão em blocos com Vulkan e Direct3D 12. A etapa 3 (Prova visual) está em andamento. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
 
 ## Próxima ação
 
-Abrir uma sessão nova na branch `fatia/0000-primeiros-passos` e rodar `/implementar` para continuar da tarefa T13, a primeira da etapa 3 (Prova visual).
+Abrir uma sessão nova na branch `fatia/0000-primeiros-passos` e rodar `/implementar` para continuar da tarefa T14, a medição dos números da imagem, na etapa 3 (Prova visual).
 
 ## Bloqueios
 

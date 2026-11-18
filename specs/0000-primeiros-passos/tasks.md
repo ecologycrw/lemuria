@@ -24,7 +24,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 ## Etapa 3: Prova visual
 
-- [ ] T13: Cena de prova e imagem em arquivo (CA-19). Verificação: teste com a etiqueta `[0000-CA-19]`, com duas imagens idênticas.
+- [x] T13: Cena de prova e imagem em arquivo (CA-19). Verificação: teste com a etiqueta `[0000-CA-19]`, com duas imagens idênticas.
 - [ ] T14: Medição dos números da imagem em `tools/checks` (CA-20). Verificação: testes em `tools/checks/tests` e números da cena de prova dentro das faixas.
 - [ ] T15: Comparação com a imagem aprovada, tolerância medida e ADR 0021 (CA-21, CA-22). Verificação: testes em `tools/checks/tests` e comparação entre Direct3D 12 e Vulkan.
 - [ ] T16: Estatísticas e medidor de fluidez (CA-23). Verificação: teste com a etiqueta `[0000-CA-23]` e medição real na cena de prova.
@@ -70,6 +70,14 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - **Números atuais (medição provisória, a ferramenta definitiva vem na T14):** brilho mediano 0,137; sombra profunda 13,5%; tons escuros 84,0%; pontos de luz 0,35% (não exigido); tons quentes 96,5%; saturação mediana 0,622. Todos dentro das faixas exigidas.
 - **Vulkan e Direct3D 12:** na primeira geração, os dois arquivos saíram idênticos byte a byte. A comparação definitiva fica para a T15.
 
+**T13, a mesma cena gerada duas vezes em cada API gráfica.**
+
+- **O que a imagem mostra:** a tarefa não mudou a aparência. O chão continua preenchendo toda a imagem em tons escuros e quentes, com a trilha na diagonal, as pedras em grupos e os dois personagens fáceis de diferenciar no centro.
+- **O que ficou ruim:** continuam o serrilhado nas bordas e os blocos visíveis, já anotados na T12.
+- **Repetição:** as quatro imagens (duas com Vulkan e duas com Direct3D 12) saíram idênticas byte a byte neste computador.
+- **O teste detecta diferenças:** com um defeito colocado de propósito, que mudava a cena a cada geração, o teste `[0000-CA-19]` falhou. O defeito foi retirado.
+- **Números:** não foram medidos de novo, porque a cena não mudou. A ferramenta definitiva vem na T14.
+
 ## Revisão
 
 *(preenchido pelo `/revisar`)*
@@ -77,9 +85,9 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T13. As etapas 1 e 2 estão concluídas.
+- Próxima tarefa: T14. As etapas 1 e 2 e a T13 estão concluídas.
 - O dono escolheu separar o desenho por etapas ([ADR 0020](../../docs/adr/0020-fronteira-do-desenho.md)). Nesta fatia, nenhum tipo de API gráfica pode aparecer em cabeçalhos públicos. A separação interna fica para a fatia 2 (TD-0009).
-- O cliente já aceita `--proof-image arquivo`, `--graphics-api nome` e `--frames quantidade`. A cena de prova fica em `DemoClient/ProofScene.hpp`.
+- O cliente já aceita `--proof-image arquivo`, `--graphics-api nome` e `--frames quantidade`. A cena de prova fica em `DemoClient/ProofScene.hpp`, e `DemoClient/ProofImage.hpp` desenha essa cena numa imagem em memória.
 - `glslc` fica em `vcpkg_installed/<triplet do host>/tools/shaderc/`. A regra de compilar shaders deve ficar no `CMakeLists.txt` de `PlatformSDL`, para não mexer em `cmake/`, que é trava.
 - A SDL 3.4.20 tem `SDL_SavePNG`, então a imagem da prova não precisa de biblioteca nova. A medição em Python lê o PNG com `zlib`, da biblioteca padrão.
 - Mistura de blocos do mapa: 30% sombra profunda, 45% terra na sombra, 17% musgo, 5% folhagem e 3% pedra, além da faixa de trilha.

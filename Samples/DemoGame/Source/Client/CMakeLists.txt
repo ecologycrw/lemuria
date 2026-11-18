@@ -1,6 +1,6 @@
 lemuria_add_library(demo_client_lib
-    SOURCES Private/GroundScene.cpp Private/ProofScene.cpp
-    PUBLIC_DEPS lemuria_classic lemuria_core demo_protocol)
+    SOURCES Private/GroundScene.cpp Private/ProofImage.cpp Private/ProofScene.cpp
+    PUBLIC_DEPS lemuria_classic lemuria_core lemuria_platform_sdl demo_protocol)
 
 lemuria_add_program(demo_client
     SOURCES Private/Main.cpp

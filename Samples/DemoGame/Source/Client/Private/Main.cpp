@@ -9,7 +9,7 @@
 
 #include "DemoClient/DemoStyle.hpp"
 #include "DemoClient/GroundScene.hpp"
-#include "DemoClient/ProofScene.hpp"
+#include "DemoClient/ProofImage.hpp"
 #include "DemoProtocol/DemoMap.hpp"
 #include "DemoProtocol/Protocol.hpp"
 #include "Lemuria/Classic/FrameworkInfo.hpp"
@@ -99,26 +99,12 @@ void print_versions() {
 
 // Draws the scene used to check the look of the game and saves it as an image.
 [[nodiscard]] core::Result<void> save_proof_image(const Options& options, const std::string& path) {
-    auto renderer = platform::Renderer::offscreen(
-        demo_client::kProofImageWidth, demo_client::kProofImageHeight, renderer_options_for(options));
-    if (!renderer) {
-        return tl::unexpected(renderer.error());
+    const auto proof = demo_client::render_proof_image(options.graphics_api);
+    if (!proof) {
+        return tl::unexpected(proof.error());
     }
-
-    const demo_protocol::DemoMap map;
-    core::SceneDescription scene(demo_client::kGroundTileBudget, demo_client::kBoxBudget);
-    demo_client::fill_proof_scene(map, scene);
-
-    auto drawn = renderer->draw(scene);
-    if (!drawn) {
-        return drawn;
-    }
-    const auto image = renderer->read_image();
-    if (!image) {
-        return tl::unexpected(image.error());
-    }
-    std::cout << "Graphics API: " << renderer->graphics_api() << '\n';
-    return platform::save_png(*image, path);
+    std::cout << "Graphics API: " << proof->graphics_api << '\n';
+    return platform::save_png(proof->image, path);
 }
 
 [[nodiscard]] int run_game(const Options& options) {
