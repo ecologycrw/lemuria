@@ -6,7 +6,8 @@ lemuria_add_tests(demo_client_tests
         GroundSceneTest.cpp
         ProofSceneTest.cpp
         SmoothnessTest.cpp
-    DEPS demo_client_lib)
+        TwoPlayersTest.cpp
+    DEPS demo_client_lib demo_test_support test_server_lib)
 
 # Needs a GPU or a software renderer, so it only runs when asked for (py tools/dev.py gpu-test).
 lemuria_add_tests(demo_client_gpu_tests

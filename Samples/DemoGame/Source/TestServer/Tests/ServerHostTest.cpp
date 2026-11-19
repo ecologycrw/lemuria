@@ -1,11 +1,9 @@
 #include <array>
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <optional>
 #include <span>
-#include <thread>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -17,8 +15,8 @@
 #include "DemoProtocol/MessageCodec.hpp"
 #include "DemoProtocol/Messages.hpp"
 #include "DemoProtocol/Protocol.hpp"
+#include "DemoTestSupport/RealNetwork.hpp"
 #include "Lemuria/Core/Connections.hpp"
-#include "Lemuria/Platform/MonotonicClock.hpp"
 #include "Lemuria/Platform/TcpConnections.hpp"
 #include "Lemuria/Platform/TcpListener.hpp"
 #include "TestServer/ServerGrid.hpp"
@@ -39,6 +37,8 @@ using demo_protocol::StepList;
 using demo_protocol::Tile;
 using demo_protocol::WalkConfirmed;
 using demo_protocol::WalkRequest;
+using demo_test_support::kFirstTestPort;
+using demo_test_support::kTestPortCount;
 using test_server::demo_host_limits;
 using test_server::demo_server_config;
 using test_server::HostLimits;
@@ -46,13 +46,6 @@ using test_server::ServerGrid;
 using test_server::ServerHost;
 
 namespace {
-
-// The same range the tests of the platform layer use. Each test looks for a free port in it.
-constexpr std::uint16_t kFirstTestPort = 24'100;
-constexpr std::uint16_t kTestPortCount = 400;
-
-// Real connections take real time, so the tests wait for a condition, always with a limit.
-constexpr std::uint64_t kWaitLimitNanoseconds = 20'000'000'000;
 
 // The time the rules see advances by this much in each round, whatever the real clock says (INV-05).
 constexpr double kSecondsPerRound = 0.002;
@@ -155,15 +148,7 @@ public:
 
     template <typename Condition>
     [[nodiscard]] bool serve_until(Condition condition) {
-        const std::uint64_t give_up_at = lemuria::platform::monotonic_nanoseconds() + kWaitLimitNanoseconds;
-        while (!condition()) {
-            if (lemuria::platform::monotonic_nanoseconds() > give_up_at) {
-                return false;
-            }
-            serve_round();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-        return true;
+        return demo_test_support::wait_until(condition, [this] { serve_round(); });
     }
 
     void serve_round() {
