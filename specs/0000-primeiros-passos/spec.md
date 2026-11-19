@@ -44,7 +44,7 @@ No fim desta fatia, o Lemuria abre uma janela com um chão em blocos, visto de c
 
 ### Janela, câmera e movimento
 
-- CA-01: O cliente abre uma janela com chão em blocos, visto por uma câmera a 50 graus, com variação de um grau para mais ou para menos. O personagem ocupa de 8% a 10% da altura da tela.
+- CA-01: O cliente abre uma janela com chão em blocos, visto por uma câmera a 50 graus, com variação de um grau para mais ou para menos. O personagem ocupa de 8% a 10% da altura da tela, medido dos pés à cabeça.
 - CA-02: Um clique na tela identifica o bloco que está sob o cursor, inclusive nas bordas e nos cantos da janela.
 - CA-03: O caminho até o bloco clicado desvia dos blocos bloqueados. Um clique em bloco bloqueado ou inalcançável não move o personagem.
 - CA-04: Depois do mesmo tempo de caminhada, o personagem está no mesmo ponto com 30, 60 ou 144 quadros por segundo.

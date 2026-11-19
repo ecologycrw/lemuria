@@ -13,7 +13,7 @@ atualizado-em: 2026-11-19
 
 ## Próxima ação
 
-O dono decide como medir o tamanho do personagem na CA-01: a linha dos pés até a cabeça (8% a 10%, como o teste mede) ou a silhueta inteira (hoje cerca de 15%). Depois, rodar `/revisar` na branch `fatia/0000-primeiros-passos`.
+Rodar `/revisar` na branch `fatia/0000-primeiros-passos`. O dono já decidiu que o tamanho do personagem, na CA-01, é medido dos pés à cabeça.
 
 ## Bloqueios
 
