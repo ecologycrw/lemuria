@@ -1,5 +1,6 @@
 lemuria_add_tests(core_tests
     SOURCES
+        ConnectionsTest.cpp
         FrameClockTest.cpp
         FrameTimeMeterTest.cpp
         MathTest.cpp

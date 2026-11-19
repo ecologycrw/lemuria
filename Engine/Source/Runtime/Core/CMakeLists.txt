@@ -1,5 +1,6 @@
 lemuria_add_library(lemuria_core
     SOURCES
+        Private/Connections.cpp
         Private/FrameClock.cpp
         Private/FrameTimeMeter.cpp
         Private/Math.cpp

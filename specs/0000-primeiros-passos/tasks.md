@@ -32,7 +32,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 ## Etapa 4: Contrato e mundo
 
-- [ ] T18: Interface de conexões no Núcleo, com tipos de conexão e opções de entrega (CA-14, CA-16). Verificação: testes em `Engine/Source/Runtime/Core/Tests`.
+- [x] T18: Interface de conexões no Núcleo, com tipos de conexão e opções de entrega (CA-14, CA-16). Verificação: testes em `Engine/Source/Runtime/Core/Tests`.
 - [ ] T19: Conexões TCP em segundo plano com o SDL3_net (CA-14, CA-16, CA-17). Verificação: testes em `Engine/Source/Runtime/PlatformSDL/Tests`.
 - [ ] T20: Grade e cálculo de caminho no Classic (CA-03). Verificação: testes com a etiqueta `[0000-CA-03]`.
 - [ ] T21: Eventos, pedidos, capacidades e contrato do adaptador no Classic (CA-15, CA-16). Verificação: adaptador de teste compila e passa nos testes.
@@ -135,7 +135,8 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T18, a primeira da etapa 4. As etapas 1, 2 e 3 estão concluídas.
+- Próxima tarefa: T19. As etapas 1, 2 e 3 e a T18 estão concluídas.
+- Cada tipo de conexão deriva de `lemuria::core::Connections` (`Lemuria/Core/Connections.hpp`) e implementa `traits`, `start_connecting`, `queue_bytes`, `stop_connection` e `collect_events`. A classe base já garante as regras comuns: números que não se repetem, limite de 8 conexões abertas, recusa de opções de envio não oferecidas e nenhum dado depois do fim da conexão. O `collect_events` roda na thread do quadro e não pode esperar pela rede.
 - A TD-0007 foi resolvida pelo comando `py tools/dev.py visual` e saiu de `docs/TECH_DEBT.md`. O report da fatia precisa registrar essa resolução.
 - A fluidez é medida com `demo_client --measure-frame-times [--graphics-api nome]`. O comando abre uma janela visível por alguns segundos e termina com código 1 se passar do limite de 16,6 ms. A CI do Linux não tem janela de verdade, então essa medição fica só no computador de desenvolvimento.
 - Não encerre o turno com um build em segundo plano: o hook `stop-check` compila ao mesmo tempo e os dois builds entram em conflito.
