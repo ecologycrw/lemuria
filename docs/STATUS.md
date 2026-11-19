@@ -9,11 +9,11 @@ atualizado-em: 2026-11-19
 
 ## Agora
 
-**Fatia 0 (Primeiros passos) em construção, com 33 de 34 tarefas concluídas.** As etapas 1 (Fundações), 2 (Desenho), 3 (Prova visual), 4 (Contrato e mundo) e 5 (Protocolo e servidor) estão concluídas, assim como as tarefas T29 a T33 da etapa 6 (Jogo completo). O comando `py tools/dev.py demo` abre o servidor de teste e duas janelas do jogo: cada jogador vê o outro no mapa, e o título da janela mostra o estado da conexão. Testes automáticos com conexões de verdade provam que cada jogador vê o outro chegar, andar até o destino e sumir ao sair, e que o quadro aquecido não pede memória. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
+**Fatia 0 (Primeiros passos) com as 34 tarefas concluídas, esperando a revisão.** As seis etapas estão concluídas. O comando `py tools/dev.py demo` abre o servidor de teste e duas janelas do jogo: cada jogador vê o outro no mapa, e o título da janela mostra o estado da conexão. Testes automáticos com conexões de verdade provam que cada jogador vê o outro chegar, andar até o destino e sumir ao sair, e que o quadro aquecido não pede memória. A prova visual final (T34) gerou a mesma imagem com Vulkan e Direct3D 12, com todos os números dentro das faixas e a fluidez bem abaixo do limite. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
 
 ## Próxima ação
 
-Rodar `/implementar` na branch `fatia/0000-primeiros-passos`, para fazer a T34 (prova visual final da fatia), a última tarefa. Depois vem o `/revisar`.
+O dono decide como medir o tamanho do personagem na CA-01: a linha dos pés até a cabeça (8% a 10%, como o teste mede) ou a silhueta inteira (hoje cerca de 15%). Depois, rodar `/revisar` na branch `fatia/0000-primeiros-passos`.
 
 ## Bloqueios
 

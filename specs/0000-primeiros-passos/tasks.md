@@ -54,7 +54,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T31: Teste de ponta a ponta com dois clientes (CA-09). Verificação: teste com a etiqueta `[0000-CA-09]`, com conexão real.
 - [x] T32: Teste do quadro sem alocação de memória (CA-18). Verificação: teste com a etiqueta `[0000-CA-18]` em `tests/architecture/frame_allocations`.
 - [x] T33: Comando `py tools/dev.py demo` e documentação viva (arquitetura, módulos, glossário, convenções, itens provisórios). Verificação: `py tools/dev.py verify` passa.
-- [ ] T34: Prova visual final da fatia. Verificação: a IA abre a imagem, confere os números e a fluidez e anota o resultado abaixo.
+- [x] T34: Prova visual final da fatia. Verificação: a IA abre a imagem, confere os números e a fluidez e anota o resultado abaixo.
 
 ## Bloqueios
 
@@ -134,6 +134,25 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - **O título em cada situação (CA-14):** sem servidor, "the test server could not be reached"; com servidor, "on the map"; com o servidor fechado no meio do jogo, "the connection to the test server was lost". Nos três casos, a janela continuou respondendo.
 - **A cena de prova não mudou:** `py tools/dev.py visual` gerou a mesma imagem, com 0 pontos diferentes da anterior, e todos os números dentro das faixas. A fluidez ficou em 0,32 ms de média e 1,78 ms no pior 1% com Direct3D 12, e 0,34 ms e 1,87 ms com Vulkan.
 
+**T34, prova visual final da fatia, com Vulkan e Direct3D 12 (`py tools/dev.py visual`, três execuções em 2026-11-19).**
+
+- **O que a imagem mostra:** abri `build/visual/proof_scene_direct3d12.png`. O chão preenche toda a imagem em tons escuros e quentes: terra na sombra, manchas de sombra profunda (mais fortes na parte de baixo), musgo e folhagem em verde-oliva. A trilha atravessa a imagem na diagonal, do alto até o canto de baixo à direita. As pedras aparecem em dois grupos, sobre a folhagem: um no alto à esquerda e outro à direita. No centro, os dois personagens são fáceis de ver e de diferenciar: um claro e um avermelhado, em blocos vizinhos.
+- **Comparação com o guia visual:** as cores de magia não aparecem no cenário, o chão continua visível nas partes escuras, não há halo, nem verde vivo de desenho animado, e nada lembra a tela de outro jogo.
+- **O que ficou ruim:** continuam o serrilhado nas bordas e os blocos visíveis (aceitos nesta fatia, mudam na fatia 2). Os personagens ainda são caixas e não têm sombra nos pés (fatia 1).
+- **Tamanho do personagem (CA-01), ponto para o dono decidir:** o teste `[0000-CA-01]` mede a linha dos pés até a cabeça, no centro do personagem, e ela fica entre 8% e 10% da altura da tela. Mas a silhueta inteira da caixa, com o topo e a profundidade, ocupa 111 pontos de 720 (15,4%) no personagem claro e 112 (15,6%) no avermelhado. A diferença vem da largura da caixa (0,7 bloco) vista do alto. Nem a spec nem o guia visual dizem qual das duas medidas vale.
+- **Repetição:** o comando desenhou a cena duas vezes com cada API gráfica, e as duas imagens saíram idênticas byte a byte nas três execuções (CA-19).
+- **Vulkan e Direct3D 12:** as duas imagens são idênticas byte a byte (0 pontos diferentes). A imagem de hoje também é idêntica, byte a byte, à de 2026-11-18: a cena não mudou desde a T14.
+- **Números:** brilho mediano 0,137; sombra profunda 13,54%; tons escuros 83,96%; tons quentes 96,49%; saturação mediana 0,622. Todos dentro das faixas (CA-20). Pontos de luz 0,35% (não exigido nesta fatia). A sombra profunda continua perto do limite inferior de 12%.
+- **Imagem aprovada:** ainda não existe. O comando avisou e não falhou (CA-21). O dono aprova a imagem no fim da fatia.
+
+| API gráfica | Tempo médio | Tempo do pior 1% | Limite |
+|---|---|---|---|
+| Direct3D 12 | 0,35 a 0,39 ms | 3,06 a 3,78 ms | 16,6 ms |
+| Vulkan | 0,36 a 0,40 ms | 3,46 a 4,71 ms | 16,6 ms |
+
+- **Fluidez (CA-23):** dentro do limite nas três execuções, com folga grande. O pior 1% ficou mais alto que na T30 (1,78 a 1,87 ms) e na T16 (2,56 a 2,88 ms), sem mudança no desenho desde então. O mais provável é a carga de outros programas no computador durante a medição. O resultado vale só para este computador, na build de desenvolvimento, e não comprova o piso de hardware (TD-0002, TD-0011).
+- **Linux:** a T34 não repetiu a prova no ambiente igual ao da CI (o Docker não estava ligado). A T15 e a T17 já fizeram isso, e a prova definitiva da CA-22 é o check verde da CI quando o PR for aberto.
+
 ## Revisão
 
 *(preenchido pelo `/revisar`)*
@@ -141,7 +160,8 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T34 (prova visual final). As etapas 1 a 5 e as tarefas T29 a T33 estão concluídas, com commits enviados.
+- Todas as 34 tarefas estão concluídas, com commits enviados. A próxima etapa é o `/revisar`.
+- A T34 deixou uma decisão para o dono: na CA-01, vale a linha dos pés até a cabeça (8% a 10%, como o teste mede) ou a silhueta inteira (hoje 15,4% e 15,6%)? Veja a anotação da T34 em "Prova visual". O revisor deve conferir a resposta do dono.
 - O teste de alocação (CA-18, T32) fica em `tests/architecture/frame_allocations`. O `AllocationCounter.cpp` troca o `new` e o `delete` do programa inteiro e conta só o que a própria linha de execução pede (a linha de rede da plataforma não é o quadro). O `MeasuredMatch.hpp` joga a demonstração com três jogadores e conexões de verdade: Alice (medida) e Bob andam 2 blocos e voltam, enquanto Carol chega e sai. São 2 ciclos de aquecimento e 2 medidos, com 124 quadros medidos. O quadro medido é o do programa com janela, sem a leitura da janela: clique, jogo, cena, câmera e, no teste com a etiqueta `gpu`, o desenho fora da tela. A contagem sai separada por parte, para dizer onde a memória foi pedida.
 - A T32 achou três pedidos de memória no quadro aquecido, todos na camada de rede, e corrigiu os três: a troca dos lotes de mensagens com `std::swap` (2 por quadro na build de desenvolvimento do MSVC, que pede memória ao mover um contêiner); o endereço vazio em todo pedido de envio (2 por envio); e os dois lotes de envio, que se revezam e às vezes ainda não tinham crescido (1 em cada 12 execuções). Agora cada lote de envio reserva 64 pedidos e 64 KB desde o começo. Depois das correções, o teste deu zero em 30 de 30 execuções, e o teste com desenho em 6 de 6.
 - O contador conta mais de uma vez cada contêiner na build de desenvolvimento do MSVC, que pede um bloco a mais para conferir os iteradores. Por isso o teste do contador exige "pelo menos 1" para contêineres e "exatamente 1" para `make_unique` e `make_shared`.
