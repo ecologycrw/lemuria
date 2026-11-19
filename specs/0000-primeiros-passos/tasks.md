@@ -39,7 +39,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T22: Sessão e entrada no mapa, com fila de retenção, época de mapa e prazos (CA-13, CA-14). Verificação: testes com as etiquetas `[0000-CA-13]` e `[0000-CA-14]`.
 - [x] T23: Mundo e entidades, com números temporários (CA-12). Verificação: testes com a etiqueta `[0000-CA-12]`.
 - [x] T24: Movimento, antecipação e correção (CA-04, CA-05, CA-06, CA-07). Verificação: testes com as etiquetas correspondentes, com tempo injetado.
-- [ ] T25: Cenários de servidor "mal-educado" e adaptadores com capacidades diferentes (CA-15, CA-16). Verificação: testes com as etiquetas `[0000-CA-15]` e `[0000-CA-16]`.
+- [x] T25: Cenários de servidor "mal-educado" e adaptadores com capacidades diferentes (CA-15, CA-16). Verificação: testes com as etiquetas `[0000-CA-15]` e `[0000-CA-16]`.
 
 ## Etapa 5: Protocolo e servidor
 
@@ -135,7 +135,12 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T25. As etapas 1, 2 e 3 e as tarefas T18 a T24 estão concluídas.
+- Próxima tarefa: T26. As etapas 1, 2, 3 e 4 estão concluídas.
+- Os cenários de servidor "mal-educado" ficam em `Frameworks/Classic/Tests/MisbehavingServerTest.cpp`. O `TestGame` de lá liga o adaptador, a sessão e o mundo como o cliente da T30 deve fazer, e serve de modelo para ele: a cada quadro, `session.update`, depois `world.update` e o envio do pedido de caminhada. Em `on_map_entered`, chama `world.enter_map`; quando o mapa carregar, `world.set_grid` e depois `session.finish_map_load`.
+- Cada cenário roda com dois servidores: um recebe os passos por um fluxo de bytes, que chega byte a byte, e pede o aviso de mapa carregado; o outro recebe só o destino, por mensagens inteiras, com as caminhadas enviadas sem garantia de chegada. O `TestGame` nunca pergunta qual é o servidor: só monta o `MovementRules` a partir das capacidades.
+- O protocolo de teste ganhou três mensagens: "trocando de mapa" (7), "troca de mapa recusada" (8) e "blocos mudaram" (9).
+- A T25 não precisou mudar o código do framework: todos os cenários passaram na primeira rodada. Para provar que os testes detectam erros, 11 defeitos foram colocados de propósito no `GameSession` e no `World`, um de cada vez, e os testes da T25 reprovaram todos.
+- O cenário de recusar a reconexão fica para a fatia 6, como diz o plano.
 - O movimento fica em `World` e `EntityMotion`. A cada quadro, o cliente da T30 chama `world.update`, depois `world.take_walk_request` e envia o pedido com `send_request` do adaptador. O clique chama `world.walk_own_to`.
 - `MovementRules` precisa repetir o que o adaptador declara em `AdapterCapabilities`: `walk_requests` e `max_steps_per_request`.
 - Uma confirmação só vale para a caminhada atual: a origem precisa ser a mesma e, quando o pedido leva passos, o destino confirmado precisa ser um desses passos ou a própria origem. O resto é ignorado e contado em `stale_confirmation_count`.

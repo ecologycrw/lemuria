@@ -5,6 +5,7 @@ lemuria_add_tests(classic_tests
         FrameworkInfoTest.cpp
         GameEventQueueTest.cpp
         GameSessionTest.cpp
+        MisbehavingServerTest.cpp
         PathFinderTest.cpp
         ProtocolAdapterTest.cpp
         ThreeQuarterCameraTest.cpp

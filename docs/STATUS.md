@@ -9,11 +9,11 @@ atualizado-em: 2026-11-19
 
 ## Agora
 
-**Fatia 0 (Primeiros passos) em construção.** As etapas 1 (Fundações), 2 (Desenho) e 3 (Prova visual) estão concluídas: a janela mostra o chão em blocos com Vulkan e Direct3D 12, e `py tools/dev.py visual` gera a imagem de prova, confere os números e mede a fluidez. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
+**Fatia 0 (Primeiros passos) em construção.** As etapas 1 (Fundações), 2 (Desenho), 3 (Prova visual) e 4 (Contrato e mundo) estão concluídas: a janela mostra o chão em blocos com Vulkan e Direct3D 12, `py tools/dev.py visual` gera a imagem de prova, e o framework passa nos cenários de servidor "mal-educado" com dois adaptadores que funcionam de jeitos diferentes. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
 
 ## Próxima ação
 
-Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T25, os cenários de servidor "mal-educado" e os adaptadores com capacidades diferentes, na etapa 4 (Contrato e mundo).
+Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T26, as mensagens da demonstração, na etapa 5 (Protocolo e servidor).
 
 ## Bloqueios
 

@@ -35,6 +35,9 @@ inline constexpr int kEntityWalkedMessage = 3;
 inline constexpr int kPositionCorrectedMessage = 4;
 inline constexpr int kEntityLeftMessage = 5;
 inline constexpr int kWalkConfirmedMessage = 6;
+inline constexpr int kChangingMapMessage = 7;
+inline constexpr int kMapChangeRefusedMessage = 8;
+inline constexpr int kTilesChangedMessage = 9;
 inline constexpr int kWalkStepsMessage = 10;
 inline constexpr int kWalkDestinationMessage = 11;
 inline constexpr int kMapLoadedMessage = 12;
@@ -137,9 +140,27 @@ private:
     return GameEvent{walked};
 }
 
+// Reads the messages about the map as a whole: a change of map and tiles that change during the game.
+[[nodiscard]] inline std::optional<GameEvent> read_map_message(int type, std::span<const std::byte> fields) {
+    const std::size_t size = fields.size();
+    if (type == kChangingMapMessage && size == 0) {
+        return GameEvent{SessionPhaseReached{SessionPhase::ChangingMap}};
+    }
+    if (type == kMapChangeRefusedMessage && size == 0) {
+        return GameEvent{MapChangeRefused{}};
+    }
+    if (type == kTilesChangedMessage && size == 5 && field_at(fields, 4) <= 1) {
+        return GameEvent{TilesChanged{tile_at(fields, 0), tile_at(fields, 2), field_at(fields, 4) == 1}};
+    }
+    return std::nullopt;
+}
+
 // Nothing when the type is unknown or the fields do not match it.
 [[nodiscard]] inline std::optional<GameEvent> read_message(int type, std::span<const std::byte> fields) {
     const std::size_t size = fields.size();
+    if (auto map_event = read_map_message(type, fields)) {
+        return map_event;
+    }
     if (type == kMapEnteredMessage && size == 4) {
         return GameEvent{
             MapEntered{MapId{number_at(fields, 0)}, EntityId{number_at(fields, 1)}, tile_at(fields, 2)}};
