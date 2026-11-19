@@ -45,7 +45,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 - [x] T26: Mensagens da demonstração, enquadramento e leitura com limites (CA-10, CA-11). Verificação: testes com dados inválidos em `Samples/DemoGame/Source/Protocol/Tests`.
 - [x] T27: Regras do servidor de teste (CA-08). Verificação: testes com a etiqueta `[0000-CA-08]`.
-- [ ] T28: Programa do servidor de teste, aceitando conexões só do próprio computador. Verificação: teste com conexão real.
+- [x] T28: Programa do servidor de teste, aceitando conexões só do próprio computador. Verificação: teste com conexão real.
 
 ## Etapa 6: Jogo completo
 
@@ -135,11 +135,14 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T28. As etapas 1, 2, 3 e 4 e as tarefas T26 e T27 estão concluídas.
+- Próxima tarefa: T29. As etapas 1 a 5 estão concluídas.
 - As regras do servidor ficam na biblioteca `test_server_lib` (`Samples/DemoGame/Source/TestServer`), sem nenhuma conexão: `ServerWorld` recebe as mensagens de cada cliente (`receive`), a saída de um cliente (`remove`) e o tempo, e responde por um `ServerOutbox` (`send` e `disconnect`). O programa da T28 escolhe os `ClientId`, lê os quadros com o `FrameReader` e envia o que o `ServerOutbox` receber.
 - O fluxo do servidor: `Hello` com a versão certa coloca o jogador no bloco livre mais perto do centro e responde `MapEntered`; versão errada, servidor cheio ou nenhum bloco livre desconectam. Depois de `MapLoaded`, o jogador vê quem já está no mundo e é visto por eles. Uma caminhada aceita volta como `WalkConfirmed` para o jogador e `EntityWalked` para os outros; um pedido sem passos chega aos outros como `PositionCorrected`. Uma caminhada recusada vira `PositionCorrected` para todos, no bloco em que o servidor acredita que o jogador está, e o jogador para ali. A saída de um jogador vira `EntityLeft` para os outros.
 - As regras de caminhada (CA-08) ficam em `check_walk`: uma caminhada que começa na rota atual vale a partir do momento em que o jogador chega ali; fora da rota, ela precisa começar a até `origin_tolerance_steps` passos do bloco atual e paga essa distância na velocidade de andar. Se o jogador só pudesse estar na origem mais de `early_tolerance_seconds` depois de agora, o pedido é rápido demais. Cada passo precisa tocar o anterior, cair num bloco permitido pelo servidor e, na diagonal, ter livres os dois blocos ao lado.
-- Valores para o programa da T28: mapa `DemoMap::kId`, velocidade `demo_protocol::kWalkTilesPerSecond` (`DemoRules.hpp`), tolerância de origem de 1 passo, tolerância de antecipação de 0,5 s, centro em (`DemoMap::kSpawnCenter`, `DemoMap::kSpawnCenter`) e um limite de jogadores, como 8.
+- O servidor com conexões de verdade é o `ServerHost` (`TestServer/ServerHost.hpp`), também na `test_server_lib`: recebe um `TcpListener` já aberto e, a cada `serve(now)`, aceita conexões, lê as mensagens e encerra o que precisa terminar. Os valores da demonstração ficam em `demo_server_config()` (mapa `DemoMap::kId`, velocidade `kWalkTilesPerSecond`, 1 passo e 0,5 s de tolerância, 8 jogadores) e `demo_host_limits()` (16 conexões). O teste de ponta a ponta da T31 pode rodar o `ServerHost` no mesmo processo, como faz o `ServerHostTest.cpp`.
+- O programa `test_server` escuta em `127.0.0.1`, na porta `demo_protocol::kDefaultServerPort` (24000, em `Protocol.hpp`), ou na porta de `--port`. Ele avisa "Listening on 127.0.0.1:<porta>" quando está pronto e roda até a janela ser fechada. Uma porta ocupada encerra o programa com erro.
+- Uma conexão TCP só aceita `send` depois de `on_connected`. O cliente de teste espera a conexão abrir antes de enviar.
+- Testes com rede real fora da camada de plataforma usam a mesma faixa de portas (24100 a 24499) e esperam por condição com limite de 20 s. O `ServerHostTest.cpp` tem a segunda cópia desse laço de espera; na terceira (T31), ele vira uma peça compartilhada.
 - O cliente das tarefas T29 e T30 precisa combinar com o servidor: velocidade `kWalkTilesPerSecond`, `DiagonalRule::WhenBothSidesAreFree`, `max_steps_per_request = kMaxWalkSteps` (16) e `needs_map_loaded_notice = true`. Velocidades diferentes fariam o servidor corrigir caminhadas certas.
 - A T27 passou por 43 defeitos colocados de propósito numa cópia do código. Na primeira rodada, quatro não compilaram e foram reescritos, e um sobreviveu, revelando que o teste de "mapa errado" não conferia se o jogador tinha entrado no mundo. O teste foi reforçado, e agora os 43 são reprovados.
 - O hook `guard-bash` também bloqueia um comando que escreve arquivos (como um `write_text` do Python) e cita `tools/dev.py`. Edite num passo e rode o `dev.py` em outro.
