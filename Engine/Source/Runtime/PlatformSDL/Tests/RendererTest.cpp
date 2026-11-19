@@ -127,6 +127,16 @@ TEST_CASE("drawing the same scene twice gives the same image") {
     CHECK(first.pixels == second.pixels);
 }
 
+TEST_CASE("an image in memory always has a frame to draw on") {
+    auto renderer = Renderer::offscreen(kImageSize, kImageSize, RendererOptions{});
+    REQUIRE(renderer.has_value());
+
+    const auto drawn = renderer->draw(top_down_scene());
+
+    REQUIRE(drawn.has_value());
+    CHECK(renderer->skipped_frame_count() == 0);
+}
+
 TEST_CASE("an image to draw on needs an area") {
     const auto renderer = Renderer::offscreen(0, 64, RendererOptions{});
 

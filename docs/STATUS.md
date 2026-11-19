@@ -13,7 +13,7 @@ atualizado-em: 2026-11-18
 
 ## Próxima ação
 
-Abrir uma sessão nova na branch `fatia/0000-primeiros-passos` e rodar `/implementar` para continuar da tarefa T16, as estatísticas e o medidor de fluidez, na etapa 3 (Prova visual).
+Abrir uma sessão nova na branch `fatia/0000-primeiros-passos` e rodar `/implementar` para continuar da tarefa T17, o comando `py tools/dev.py visual`, na etapa 3 (Prova visual).
 
 ## Bloqueios
 

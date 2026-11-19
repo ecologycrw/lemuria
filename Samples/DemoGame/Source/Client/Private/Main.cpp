@@ -10,13 +10,17 @@
 #include "DemoClient/DemoStyle.hpp"
 #include "DemoClient/GroundScene.hpp"
 #include "DemoClient/ProofImage.hpp"
+#include "DemoClient/ProofScene.hpp"
+#include "DemoClient/Smoothness.hpp"
 #include "DemoProtocol/DemoMap.hpp"
 #include "DemoProtocol/Protocol.hpp"
 #include "Lemuria/Classic/FrameworkInfo.hpp"
 #include "Lemuria/Classic/ThreeQuarterCamera.hpp"
 #include "Lemuria/Classic/TileCoord.hpp"
+#include "Lemuria/Core/FrameTimeMeter.hpp"
 #include "Lemuria/Core/SceneDescription.hpp"
 #include "Lemuria/Core/Version.hpp"
+#include "Lemuria/Platform/MonotonicClock.hpp"
 #include "Lemuria/Platform/PlatformInfo.hpp"
 #include "Lemuria/Platform/Renderer.hpp"
 #include "Lemuria/Platform/Window.hpp"
@@ -28,6 +32,7 @@ namespace platform = lemuria::platform;
 
 struct Options {
     bool show_version = false;
+    bool measure_frame_times = false;
     std::optional<std::uint64_t> frame_limit;
     std::optional<std::string> proof_image_path;
     std::string graphics_api;
@@ -70,6 +75,8 @@ void print_versions() {
         const std::string_view argument = arguments[index];
         if (argument == "--version") {
             options.show_version = true;
+        } else if (argument == "--measure-frame-times") {
+            options.measure_frame_times = true;
         } else if (argument == "--frames" && index + 1 < arguments.size()) {
             ++index;
             options.frame_limit = parse_count(arguments[index]);
@@ -105,6 +112,55 @@ void print_versions() {
     }
     std::cout << "Graphics API: " << proof->graphics_api << '\n';
     return platform::save_png(proof->image, path);
+}
+
+// Draws the proof scene on a window as fast as the computer can, without waiting for the display.
+[[nodiscard]] core::Result<core::FrameTimeSummary> measure_frame_times(const Options& options) {
+    auto window = platform::Window::open(platform::WindowOptions{"Lemuria Demo"});
+    if (!window) {
+        return tl::unexpected(window.error());
+    }
+    platform::RendererOptions renderer_options = renderer_options_for(options);
+    renderer_options.wait_for_display = false;
+    auto renderer = platform::Renderer::for_window(*window, renderer_options);
+    if (!renderer) {
+        return tl::unexpected(renderer.error());
+    }
+
+    const demo_protocol::DemoMap map;
+    core::SceneDescription scene(demo_client::kGroundTileBudget, demo_client::kBoxBudget);
+    demo_client::fill_proof_scene(map, scene);
+
+    core::FrameTimeMeter meter(demo_client::kWarmUpFrames, demo_client::kMeasuredFrames);
+    platform::InputFrame input;
+    std::uint64_t previous = platform::monotonic_nanoseconds();
+    while (!meter.finished()) {
+        window->poll_input(input);
+        if (input.quit_requested) {
+            return core::make_error("the window was closed before the measurement finished");
+        }
+        const auto drawn = renderer->draw(scene);
+        if (!drawn) {
+            return tl::unexpected(drawn.error());
+        }
+        const std::uint64_t now = platform::monotonic_nanoseconds();
+        meter.record(now - previous);
+        previous = now;
+    }
+    if (renderer->skipped_frame_count() > 0) {
+        return core::make_error("the window must stay visible during the measurement");
+    }
+    return meter.summary();
+}
+
+[[nodiscard]] int report_frame_times(const Options& options) {
+    const auto summary = measure_frame_times(options);
+    if (!summary) {
+        std::cerr << summary.error().message << '\n';
+        return 1;
+    }
+    std::cout << demo_client::describe_frame_times(*summary) << '\n';
+    return demo_client::is_within_frame_budget(*summary) ? 0 : 1;
 }
 
 [[nodiscard]] int run_game(const Options& options) {
@@ -154,13 +210,16 @@ void print_versions() {
 int main(int argc, char** argv) {
     const auto options = parse_options(std::span<char*>(argv, static_cast<std::size_t>(argc)));
     if (!options) {
-        std::cerr
-            << "Usage: demo_client [--version] [--frames count] [--proof-image file] [--graphics-api name]\n";
+        std::cerr << "Usage: demo_client [--version] [--frames count] [--proof-image file] "
+                     "[--measure-frame-times] [--graphics-api name]\n";
         return 2;
     }
     if (options->show_version) {
         print_versions();
         return 0;
+    }
+    if (options->measure_frame_times) {
+        return report_frame_times(*options);
     }
     if (options->proof_image_path) {
         const auto saved = save_proof_image(*options, *options->proof_image_path);

@@ -45,6 +45,9 @@ public:
     // Copies the last frame of an offscreen renderer to memory.
     [[nodiscard]] core::Result<Image> read_image();
 
+    // How many frames had no image to draw on, as happens while the window is minimized.
+    [[nodiscard]] std::uint64_t skipped_frame_count() const noexcept;
+
     // The name of the graphics API in use.
     [[nodiscard]] std::string_view graphics_api() const noexcept;
 

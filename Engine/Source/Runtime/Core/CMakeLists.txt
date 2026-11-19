@@ -1,6 +1,7 @@
 lemuria_add_library(lemuria_core
     SOURCES
         Private/FrameClock.cpp
+        Private/FrameTimeMeter.cpp
         Private/Math.cpp
         Private/SceneDescription.cpp
         Private/SeededRandom.cpp

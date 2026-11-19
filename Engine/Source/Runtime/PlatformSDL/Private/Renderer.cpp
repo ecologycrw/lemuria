@@ -151,6 +151,8 @@ struct Renderer::Impl {
     GpuTransferBuffer image_download;
     Uint32 offscreen_width = 0;
     Uint32 offscreen_height = 0;
+
+    std::uint64_t skipped_frames = 0;
 };
 
 core::Result<void> Renderer::Impl::open_device(const RendererOptions& options) {
@@ -512,6 +514,8 @@ core::Result<void> Renderer::draw(const core::SceneDescription& scene) {
             impl_->draw_shapes(commands, *target, scene, static_cast<Uint32>(tiles.size()),
                                static_cast<Uint32>(boxes.size()));
         }
+    } else {
+        ++impl_->skipped_frames;
     }
 
     if (!SDL_SubmitGPUCommandBuffer(commands)) {
@@ -564,6 +568,10 @@ core::Result<Image> Renderer::read_image() {
     std::memcpy(image.pixels.data(), mapped, image.pixels.size());
     SDL_UnmapGPUTransferBuffer(device, impl_->image_download.get());
     return image;
+}
+
+std::uint64_t Renderer::skipped_frame_count() const noexcept {
+    return impl_->skipped_frames;
 }
 
 std::string_view Renderer::graphics_api() const noexcept {
