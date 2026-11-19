@@ -13,7 +13,7 @@ atualizado-em: 2026-11-19
 
 ## Próxima ação
 
-A revisão foi feita, e os achados que não dependem de trava foram corrigidos. O dono decide se aprova mexer em duas travas: a checagem de camadas e o teste de alocação do quadro. Depois, rodar `/fechar` na branch `fatia/0000-primeiros-passos`.
+A revisão foi feita e todos os achados foram tratados, inclusive os dois que mexeram em travas, com a aprovação do dono. Rodar `/fechar` na branch `fatia/0000-primeiros-passos`.
 
 ## Bloqueios
 
