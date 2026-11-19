@@ -13,7 +13,7 @@ atualizado-em: 2026-11-19
 
 ## Próxima ação
 
-Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T24, o movimento, a antecipação e a correção, na etapa 4 (Contrato e mundo).
+Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T25, os cenários de servidor "mal-educado" e os adaptadores com capacidades diferentes, na etapa 4 (Contrato e mundo).
 
 ## Bloqueios
 

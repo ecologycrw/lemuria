@@ -11,6 +11,7 @@
 #include "AdapterTestSupport.hpp"
 #include "Lemuria/Classic/GameSession.hpp"
 #include "Lemuria/Classic/World.hpp"
+#include "WorldTestSupport.hpp"
 
 using lemuria::classic::Entity;
 using lemuria::classic::EntityAppeared;
@@ -35,6 +36,7 @@ using lemuria::classic::TileGrid;
 using lemuria::classic::TilesChanged;
 using lemuria::classic::WalkSteps;
 using lemuria::classic::World;
+using lemuria::classic::testing::make_world;
 using lemuria::classic::testing::ScriptedAdapter;
 using lemuria::core::FrameTime;
 
@@ -51,9 +53,20 @@ constexpr MapEntered kFirstMap{MapId{1}, kPlayer, TileCoord{3, 3}};
 constexpr MapEntered kSecondMap{MapId{2}, kPlayer, TileCoord{6, 6}};
 
 [[nodiscard]] TileGrid make_grid() {
-    auto grid = TileGrid::create(kMapSide, kMapSide);
-    REQUIRE(grid.has_value());
-    return *std::move(grid);
+    return lemuria::classic::testing::make_grid(kMapSide);
+}
+
+// What the tests compare about an entity.
+struct EntitySummary {
+    EntityId id;
+    TileCoord tile;
+    std::optional<TileCoord> destination;
+
+    friend bool operator==(const EntitySummary&, const EntitySummary&) = default;
+};
+
+[[nodiscard]] EntitySummary summary_of(const Entity& entity) {
+    return {entity.id, entity.tile(), entity.destination};
 }
 
 [[nodiscard]] GameEvent appeared(EntityId entity, TileCoord position) {
@@ -77,7 +90,7 @@ constexpr MapEntered kSecondMap{MapId{2}, kPlayer, TileCoord{6, 6}};
 // A world that already has its map ready.
 class WorldFixture {
 public:
-    explicit WorldFixture(std::size_t max_other_entities = 3) : world(max_other_entities) {
+    explicit WorldFixture(std::size_t max_other_entities = 3) : world(make_world(max_other_entities)) {
         world.enter_map(kFirstMap);
         world.set_grid(make_grid());
     }
@@ -106,7 +119,7 @@ private:
 } // namespace
 
 TEST_CASE("world has nothing before the first map", "[0000-CA-12]") {
-    const World world(3);
+    const World world = make_world(3);
 
     CHECK(world.entities().empty());
     CHECK(world.own() == nullptr);
@@ -114,7 +127,7 @@ TEST_CASE("world has nothing before the first map", "[0000-CA-12]") {
 }
 
 TEST_CASE("world refuses events that arrive before its map is ready", "[0000-CA-12]") {
-    World world(3);
+    World world = make_world(3);
 
     world.apply(appeared(kOther, {1, 1}));
     world.enter_map(kFirstMap);
@@ -129,7 +142,7 @@ TEST_CASE("world places the player when it enters a map", "[0000-CA-12]") {
 
     REQUIRE(fixture.world.own() != nullptr);
     CHECK(fixture.world.own()->id == kPlayer);
-    CHECK(fixture.world.own()->tile == kFirstMap.own_position);
+    CHECK(fixture.world.own()->tile() == kFirstMap.own_position);
     CHECK(fixture.world.entities().size() == 1);
     CHECK(fixture.world.map() == kFirstMap.map);
 }
@@ -140,7 +153,7 @@ TEST_CASE("world adds what comes into view", "[0000-CA-12]") {
     fixture.world.apply(EntityAppeared{kOther, TileCoord{1, 2}, TileCoord{4, 2}});
 
     REQUIRE(fixture.world.find(kOther) != nullptr);
-    CHECK(*fixture.world.find(kOther) == Entity{kOther, TileCoord{1, 2}, TileCoord{4, 2}});
+    CHECK(summary_of(*fixture.world.find(kOther)) == EntitySummary{kOther, TileCoord{1, 2}, TileCoord{4, 2}});
     CHECK(fixture.world.entities().size() == 2);
 }
 
@@ -164,7 +177,7 @@ TEST_CASE("world replaces what had a number when the number is used again", "[00
     fixture.world.apply(appeared(kOther, {8, 8}));
 
     REQUIRE(fixture.world.find(kOther) != nullptr);
-    CHECK(*fixture.world.find(kOther) == Entity{kOther, TileCoord{8, 8}, std::nullopt});
+    CHECK(summary_of(*fixture.world.find(kOther)) == EntitySummary{kOther, TileCoord{8, 8}, std::nullopt});
     CHECK(fixture.world.entities().size() == 2);
     CHECK(fixture.world.unknown_entity_event_count() == 0);
 }
@@ -178,7 +191,7 @@ TEST_CASE("world accepts a number again after it left", "[0000-CA-12]") {
     fixture.world.apply(appeared(kOther, {2, 2}));
 
     REQUIRE(fixture.world.find(kOther) != nullptr);
-    CHECK(fixture.world.find(kOther)->tile == TileCoord{2, 2});
+    CHECK(fixture.world.find(kOther)->tile() == TileCoord{2, 2});
 }
 
 TEST_CASE("world removes only what left", "[0000-CA-12]") {
@@ -226,7 +239,7 @@ TEST_CASE("world refuses new arrivals when it is full", "[0000-CA-12]") {
 
     SECTION("a number in use can still be replaced") {
         fixture.world.apply(appeared(EntityId{2}, {4, 4}));
-        CHECK(fixture.world.find(EntityId{2})->tile == TileCoord{4, 4});
+        CHECK(fixture.world.find(EntityId{2})->tile() == TileCoord{4, 4});
         CHECK(fixture.world.refused_event_count() == 1);
     }
     SECTION("there is room again after someone leaves") {
@@ -242,7 +255,7 @@ TEST_CASE("world records where someone is walking to", "[0000-CA-12]") {
 
     fixture.world.apply(walked(kOther, {5, 1}));
 
-    CHECK(*fixture.world.find(kOther) == Entity{kOther, TileCoord{1, 1}, TileCoord{5, 1}});
+    CHECK(summary_of(*fixture.world.find(kOther)) == EntitySummary{kOther, TileCoord{1, 1}, TileCoord{5, 1}});
 }
 
 TEST_CASE("world follows the origin of a walk when the server sends it", "[0000-CA-12]") {
@@ -251,7 +264,7 @@ TEST_CASE("world follows the origin of a walk when the server sends it", "[0000-
 
     fixture.world.apply(EntityWalked{kOther, TileCoord{2, 1}, TileCoord{5, 1}, steps_through({3, 1})});
 
-    CHECK(*fixture.world.find(kOther) == Entity{kOther, TileCoord{2, 1}, TileCoord{5, 1}});
+    CHECK(summary_of(*fixture.world.find(kOther)) == EntitySummary{kOther, TileCoord{2, 1}, TileCoord{5, 1}});
 }
 
 TEST_CASE("world moves what the server corrects and cancels its walk", "[0000-CA-12]") {
@@ -260,14 +273,14 @@ TEST_CASE("world moves what the server corrects and cancels its walk", "[0000-CA
 
     fixture.world.apply(PositionCorrected{kOther, TileCoord{9, 0}});
 
-    CHECK(*fixture.world.find(kOther) == Entity{kOther, TileCoord{9, 0}, std::nullopt});
+    CHECK(summary_of(*fixture.world.find(kOther)) == EntitySummary{kOther, TileCoord{9, 0}, std::nullopt});
 }
 
 TEST_CASE("world refuses events with tiles outside the map", "[0000-CA-12]") {
     WorldFixture fixture;
     const EntityId known{50};
     fixture.world.apply(EntityAppeared{known, TileCoord{1, 1}, TileCoord{2, 2}});
-    const Entity before = *fixture.world.find(known);
+    const EntitySummary before = summary_of(*fixture.world.find(known));
     const GameEvent event = GENERATE_COPY(
         GameEvent{EntityAppeared{known, kOutside, std::nullopt}},
         GameEvent{EntityAppeared{known, TileCoord{3, 3}, kOutside}},
@@ -279,7 +292,7 @@ TEST_CASE("world refuses events with tiles outside the map", "[0000-CA-12]") {
 
     fixture.world.apply(event);
 
-    CHECK(*fixture.world.find(known) == before);
+    CHECK(summary_of(*fixture.world.find(known)) == before);
     CHECK(fixture.world.refused_event_count() == 1);
 }
 
@@ -378,7 +391,7 @@ TEST_CASE("world removes everyone when the map changes", "[0000-CA-13]") {
     fixture.world.enter_map(kSecondMap);
 
     REQUIRE(fixture.world.entities().size() == 1);
-    CHECK(fixture.world.own()->tile == kSecondMap.own_position);
+    CHECK(fixture.world.own()->tile() == kSecondMap.own_position);
     CHECK(fixture.world.map() == kSecondMap.map);
     CHECK(fixture.world.grid() == nullptr);
 }
@@ -386,7 +399,7 @@ TEST_CASE("world removes everyone when the map changes", "[0000-CA-13]") {
 TEST_CASE("nothing of the previous map survives a change of map during a session", "[0000-CA-13]") {
     constexpr SessionLimits kLimits{5.0, 5.0, 5.0, 5.0, 8, 8};
     ScriptedAdapter adapter;
-    World world(8);
+    World world = make_world(8);
     WorldLoader loader(world);
     GameSession session(adapter, kLimits, loader);
     REQUIRE(session.start().has_value());

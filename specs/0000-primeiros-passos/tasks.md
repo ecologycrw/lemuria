@@ -38,7 +38,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T21: Eventos, pedidos, capacidades e contrato do adaptador no Classic (CA-15, CA-16). Verificação: adaptador de teste compila e passa nos testes.
 - [x] T22: Sessão e entrada no mapa, com fila de retenção, época de mapa e prazos (CA-13, CA-14). Verificação: testes com as etiquetas `[0000-CA-13]` e `[0000-CA-14]`.
 - [x] T23: Mundo e entidades, com números temporários (CA-12). Verificação: testes com a etiqueta `[0000-CA-12]`.
-- [ ] T24: Movimento, antecipação e correção (CA-04, CA-05, CA-06, CA-07). Verificação: testes com as etiquetas correspondentes, com tempo injetado.
+- [x] T24: Movimento, antecipação e correção (CA-04, CA-05, CA-06, CA-07). Verificação: testes com as etiquetas correspondentes, com tempo injetado.
 - [ ] T25: Cenários de servidor "mal-educado" e adaptadores com capacidades diferentes (CA-15, CA-16). Verificação: testes com as etiquetas `[0000-CA-15]` e `[0000-CA-16]`.
 
 ## Etapa 5: Protocolo e servidor
@@ -135,7 +135,13 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T24. As etapas 1, 2 e 3 e as tarefas T18 a T23 estão concluídas.
+- Próxima tarefa: T25. As etapas 1, 2 e 3 e as tarefas T18 a T24 estão concluídas.
+- O movimento fica em `World` e `EntityMotion`. A cada quadro, o cliente da T30 chama `world.update`, depois `world.take_walk_request` e envia o pedido com `send_request` do adaptador. O clique chama `world.walk_own_to`.
+- `MovementRules` precisa repetir o que o adaptador declara em `AdapterCapabilities`: `walk_requests` e `max_steps_per_request`.
+- Uma confirmação só vale para a caminhada atual: a origem precisa ser a mesma e, quando o pedido leva passos, o destino confirmado precisa ser um desses passos ou a própria origem. O resto é ignorado e contado em `stale_confirmation_count`.
+- Caminhadas longas vão em partes. Sem resposta do servidor, o personagem continua andando até o destino.
+- O servidor de teste da T27 precisa aceitar pedidos em partes, em que a origem de cada parte é o fim da anterior.
+- A T24 passou por 96 defeitos colocados de propósito numa cópia do código, e os testes reprovaram todos. Na primeira rodada, seis sobreviveram: três revelaram faltas de teste, que foram criados, e três mostraram linhas sem efeito, que foram removidas.
 - O mundo fica em `lemuria::classic::World`. Em `on_map_entered`, o jogo chama `enter_map`. Quando o mapa carregar, chama `set_grid` e só depois `finish_map_load`, porque o mundo recusa eventos enquanto não tem a grade.
 - A T24 precisa tratar `OwnWalkConfirmed`, que o mundo ainda recusa e conta. `EntityWalked` hoje só guarda o destino, e o personagem ainda não anda.
 - O jogador nunca é removido do mundo enquanto há um mapa, e sempre tem lugar reservado. Quando o mundo enche, novos personagens são recusados e contados.

@@ -1,6 +1,7 @@
 lemuria_add_library(lemuria_classic
     SOURCES
         Private/AdapterCapabilities.cpp
+        Private/EntityMotion.cpp
         Private/FrameworkInfo.cpp
         Private/GameSession.cpp
         Private/PathFinder.cpp
