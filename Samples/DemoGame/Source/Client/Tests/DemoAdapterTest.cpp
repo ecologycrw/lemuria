@@ -234,7 +234,7 @@ TEST_CASE("the demo adapter begins only once, and only over TCP") {
     }
 }
 
-TEST_CASE("[0000-CA-10] messages that arrive one byte at a time become events, in order") {
+TEST_CASE("messages that arrive one byte at a time become events, in order", "[0000-CA-10]") {
     AdapterFixture fixture;
     fixture.connect();
     const Conversation conversation = every_kind_of_message();
@@ -248,7 +248,7 @@ TEST_CASE("[0000-CA-10] messages that arrive one byte at a time become events, i
     CHECK(fixture.adapter.invalid_message_count() == 0);
 }
 
-TEST_CASE("[0000-CA-10] several messages that arrive together become events, in order") {
+TEST_CASE("several messages that arrive together become events, in order", "[0000-CA-10]") {
     AdapterFixture fixture;
     fixture.connect();
     const Conversation conversation = every_kind_of_message();
@@ -259,8 +259,8 @@ TEST_CASE("[0000-CA-10] several messages that arrive together become events, in 
     CHECK(fixture.sink.events == conversation.events);
 }
 
-TEST_CASE(
-    "[0000-CA-11] bytes that break the format end the session, and nothing after them becomes an event") {
+TEST_CASE("bytes that break the format end the session, and nothing after them becomes an event",
+          "[0000-CA-11]") {
     AdapterFixture fixture;
     fixture.connect();
     Bytes bytes = bytes_of(protocol::PositionCorrected{7, {33, 33}});
@@ -280,7 +280,7 @@ TEST_CASE(
     CHECK(fixture.connections.stop_count == 1);
 }
 
-TEST_CASE("[0000-CA-11] a frame larger than the format allows ends the session") {
+TEST_CASE("a frame larger than the format allows ends the session", "[0000-CA-11]") {
     AdapterFixture fixture;
     fixture.connect();
 
@@ -292,7 +292,7 @@ TEST_CASE("[0000-CA-11] a frame larger than the format allows ends the session")
           std::vector<classic::GameEvent>{classic::SessionEnded{classic::SessionEndReason::InvalidData}});
 }
 
-TEST_CASE("[0000-CA-11] a wrong message is only counted, and the messages after it still become events") {
+TEST_CASE("a wrong message is only counted, and the messages after it still become events", "[0000-CA-11]") {
     AdapterFixture fixture;
     fixture.connect();
     // A type the client does not know, a hello sent to the client, an entity numbered 0 and a walk without
@@ -313,9 +313,8 @@ TEST_CASE("[0000-CA-11] a wrong message is only counted, and the messages after 
     CHECK(fixture.connections.stop_count == 0);
 }
 
-TEST_CASE(
-    "[0000-CA-11] random bytes never break the demo adapter, and the end of the session is always the last "
-    "event") {
+TEST_CASE("random bytes never break the demo adapter, and the end of the session is always the last event",
+          "[0000-CA-11]") {
     core::SeededRandom random(20261119);
     for (int round = 0; round < 300; ++round) {
         AdapterFixture fixture;
