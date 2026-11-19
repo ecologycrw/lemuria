@@ -142,6 +142,20 @@ TEST_CASE("the demo adapter says hello with the protocol version as soon as it c
           std::vector<classic::GameEvent>{classic::SessionPhaseReached{classic::SessionPhase::EnteringMap}});
 }
 
+TEST_CASE("a hello that cannot leave ends the session as a lost connection, before the map is awaited") {
+    AdapterFixture fixture;
+    REQUIRE(fixture.adapter.begin_session().has_value());
+    fixture.connections.refuses_sends = true;
+
+    fixture.connections.arrive_connected();
+    fixture.poll();
+
+    CHECK(fixture.connections.sent.empty());
+    CHECK(fixture.sink.events ==
+          std::vector<classic::GameEvent>{classic::SessionEnded{classic::SessionEndReason::ConnectionLost}});
+    CHECK(fixture.connections.stop_count == 1);
+}
+
 TEST_CASE("the demo adapter begins only once, and only over TCP") {
     SECTION("twice") {
         AdapterFixture fixture;

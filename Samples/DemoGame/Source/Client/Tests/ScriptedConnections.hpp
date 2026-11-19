@@ -11,6 +11,7 @@
 #include "DemoProtocol/MessageCodec.hpp"
 #include "DemoProtocol/Messages.hpp"
 #include "Lemuria/Core/Connections.hpp"
+#include "Lemuria/Core/Result.hpp"
 
 // A connection written by each test, and the bytes the tests send through it.
 namespace demo_client::testing {
@@ -60,6 +61,9 @@ public:
     std::vector<Bytes> sent;
     int stop_count = 0;
 
+    // Every send fails, as when the connection breaks while the bytes are queued.
+    bool refuses_sends = false;
+
 private:
     enum class StepKind : std::uint8_t { Connected, Bytes, Closed };
 
@@ -79,6 +83,9 @@ private:
     lemuria::core::Result<void> queue_bytes(lemuria::core::ConnectionId /*connection*/,
                                             std::span<const std::byte> bytes,
                                             lemuria::core::SendOptions /*options*/) override {
+        if (refuses_sends) {
+            return lemuria::core::make_error("the scripted connection refuses to send");
+        }
         sent.emplace_back(bytes.begin(), bytes.end());
         return {};
     }

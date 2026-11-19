@@ -40,11 +40,19 @@ if(WIN32)
 endif()
 
 # Turns a compiled shader into a C++ array. Each line holds 32 bytes, because compilers limit the line length.
+# The file is written only when its content changes, so configuring again does not rebuild the renderer.
 function(lemuria_embed_shader binary symbol output)
     file(READ "${binary}" bytes HEX)
     string(REGEX REPLACE "(................................................................)" "\\1\n" bytes "${bytes}")
     string(REGEX REPLACE "([0-9a-f][0-9a-f])" "0x\\1," bytes "${bytes}")
-    file(WRITE "${output}" "inline constexpr unsigned char ${symbol}[] = {\n${bytes}\n};\n")
+    set(content "inline constexpr unsigned char ${symbol}[] = {\n${bytes}\n};\n")
+    if(EXISTS "${output}")
+        file(READ "${output}" previous)
+        if(previous STREQUAL content)
+            return()
+        endif()
+    endif()
+    file(WRITE "${output}" "${content}")
 endfunction()
 
 function(lemuria_run_shader_compiler source binary)

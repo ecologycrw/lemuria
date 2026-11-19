@@ -136,6 +136,9 @@ core::Vec3 DemoGame::focus() const noexcept {
 }
 
 std::string_view DemoGame::status() const noexcept {
+    if (!map_refusal_.empty()) {
+        return map_refusal_;
+    }
     return connection_status(session_.phase(), session_.end_reason());
 }
 
@@ -148,17 +151,23 @@ void DemoGame::on_world_event(const classic::GameEvent& event) {
     world_.apply(event);
 }
 
-// The demonstration has a single map, which is always ready. A map the client does not know ends the session.
+// The demonstration has a single map, which is always ready. A map the client does not know, or a place
+// outside the map, ends the session.
 void DemoGame::finish_map_load() {
     if (!pending_load_) {
         return;
     }
     const classic::MapLoadTicket ticket = *std::exchange(pending_load_, std::nullopt);
     if (ticket.map != classic::MapId{DemoMap::kId}) {
+        map_refusal_ = "the test server sent a map the client does not know";
         session_.end();
         return;
     }
-    world_.set_grid(grid_);
+    if (!world_.set_grid(grid_)) {
+        map_refusal_ = "the test server placed the player outside the map";
+        session_.end();
+        return;
+    }
     session_.finish_map_load(ticket);
 }
 

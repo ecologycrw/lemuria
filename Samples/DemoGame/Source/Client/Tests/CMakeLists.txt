@@ -2,6 +2,7 @@ lemuria_add_tests(demo_client_tests
     SOURCES
         DemoAdapterTest.cpp
         DemoGameTest.cpp
+        DemoRulesTest.cpp
         DemoStyleTest.cpp
         GroundSceneTest.cpp
         ProofSceneTest.cpp

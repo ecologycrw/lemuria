@@ -186,7 +186,10 @@ public:
     // The map of the latest change of map is ready.
     void finish_loading() {
         REQUIRE(ticket_.has_value());
-        world.set_grid(make_grid(kMapSide));
+        if (!world.set_grid(make_grid(kMapSide))) {
+            session.end();
+            return;
+        }
         session.finish_map_load(*ticket_);
     }
 

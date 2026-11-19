@@ -56,8 +56,10 @@ public:
     // Removes everything from the previous map and places the player. Events are refused until `set_grid`.
     void enter_map(const MapEntered& entered);
 
-    // The tiles of the current map, which are ready after the map loads.
-    void set_grid(TileGrid grid);
+    // The tiles of the current map, which are ready after the map loads. A map that does not hold the player
+    // is refused and leaves the world without tiles: the server placed the player where the client cannot
+    // follow it (INV-12), and the game should end the session.
+    [[nodiscard]] core::Result<void> set_grid(TileGrid grid);
 
     // Applies something that happened on the current map.
     void apply(const GameEvent& event);

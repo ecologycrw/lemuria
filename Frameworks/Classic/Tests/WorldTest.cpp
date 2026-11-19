@@ -92,7 +92,7 @@ class WorldFixture {
 public:
     explicit WorldFixture(std::size_t max_other_entities = 3) : world(make_world(max_other_entities)) {
         world.enter_map(kFirstMap);
-        world.set_grid(make_grid());
+        REQUIRE(world.set_grid(make_grid()).has_value());
     }
 
     World world;
@@ -135,6 +135,20 @@ TEST_CASE("world refuses events that arrive before its map is ready", "[0000-CA-
 
     CHECK(world.find(kOther) == nullptr);
     CHECK(world.refused_event_count() == 2);
+}
+
+TEST_CASE("world refuses a map that does not hold the player, and stays without tiles", "[0000-CA-11]") {
+    World world = make_world(3);
+    const TileCoord outside =
+        GENERATE(kOutside, TileCoord{0, kMapSide}, TileCoord{-1, 3}, TileCoord{1000, 1000});
+    world.enter_map(MapEntered{MapId{1}, kPlayer, outside});
+
+    CHECK_FALSE(world.set_grid(make_grid()).has_value());
+
+    CHECK(world.grid() == nullptr);
+    world.apply(appeared(kOther, {1, 1}));
+    CHECK(world.find(kOther) == nullptr);
+    CHECK(world.refused_event_count() == 1);
 }
 
 TEST_CASE("world places the player when it enters a map", "[0000-CA-12]") {
@@ -406,7 +420,7 @@ TEST_CASE("nothing of the previous map survives a change of map during a session
 
     adapter.arrive(kFirstMap);
     session.update(FrameTime{});
-    world.set_grid(make_grid());
+    REQUIRE(world.set_grid(make_grid()).has_value());
     session.finish_map_load(loader.last_ticket);
     adapter.arrive(appeared(kOther, {1, 1}));
     session.update(FrameTime{});
@@ -417,7 +431,7 @@ TEST_CASE("nothing of the previous map survives a change of map during a session
     session.update(FrameTime{});
     CHECK(world.entities().size() == 1);
 
-    world.set_grid(make_grid());
+    REQUIRE(world.set_grid(make_grid()).has_value());
     session.finish_map_load(loader.last_ticket);
     session.update(FrameTime{});
 

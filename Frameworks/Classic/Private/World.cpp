@@ -74,9 +74,13 @@ void World::enter_map(const MapEntered& entered) {
     entities_.push_back(Entity{entered.own_entity, EntityMotion(entered.own_position), std::nullopt});
 }
 
-void World::set_grid(TileGrid grid) {
+core::Result<void> World::set_grid(TileGrid grid) {
+    if (const Entity* own_entity = own(); own_entity != nullptr && !grid.contains(own_entity->tile())) {
+        return core::make_error("the server placed the player outside the map");
+    }
     path_finder_.prepare_for(grid);
     grid_ = std::move(grid);
+    return {};
 }
 
 void World::apply(const GameEvent& event) {

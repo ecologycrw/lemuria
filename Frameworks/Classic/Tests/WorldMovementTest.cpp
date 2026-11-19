@@ -64,7 +64,7 @@ public:
     explicit WalkFixture(const MovementRules& rules = kMovementRules, TileGrid grid = make_grid(kMapSide))
         : world(make_world(4, rules)) {
         world.enter_map(kMap);
-        world.set_grid(std::move(grid));
+        REQUIRE(world.set_grid(std::move(grid)).has_value());
     }
 
     [[nodiscard]] const Entity& own() const { return *world.own(); }
@@ -518,7 +518,7 @@ TEST_CASE("changing map forgets the walk of the previous map", "[0000-CA-06]") {
     REQUIRE(fixture.world.walk_own_to({6, 2}).has_value());
 
     fixture.world.enter_map(kMap);
-    fixture.world.set_grid(make_grid(kMapSide));
+    REQUIRE(fixture.world.set_grid(make_grid(kMapSide)).has_value());
     fixture.world.apply(OwnWalkConfirmed{kStart, TileCoord{4, 2}});
 
     CHECK_FALSE(fixture.world.take_walk_request().has_value());

@@ -105,6 +105,10 @@ private:
     // The map is loaded after the session hands over its events, never while it is handing them over.
     std::optional<lemuria::classic::MapLoadTicket> pending_load_;
 
+    // Why the client left the map the server sent, when it did. The session records that end as asked by the
+    // player, so the status needs the real reason.
+    std::string_view map_refusal_;
+
     std::uint64_t unsent_requests_ = 0;
 };
 

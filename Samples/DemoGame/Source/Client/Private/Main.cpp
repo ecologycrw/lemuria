@@ -17,6 +17,7 @@
 #include "DemoProtocol/DemoMap.hpp"
 #include "DemoProtocol/Protocol.hpp"
 #include "Lemuria/Classic/FrameworkInfo.hpp"
+#include "Lemuria/Classic/SessionPhase.hpp"
 #include "Lemuria/Classic/ThreeQuarterCamera.hpp"
 #include "Lemuria/Classic/TileCoord.hpp"
 #include "Lemuria/Core/Connections.hpp"
@@ -249,8 +250,13 @@ void show_status(platform::Window& window, std::string_view status, std::string_
         std::cerr << game.error().message << '\n';
         return 1;
     }
-    // A failure to connect also ends the session, and the title of the window shows it.
-    static_cast<void>((*game)->start());
+    // A failure to connect ends the session, and the title of the window shows it. A session that could not
+    // even start is a mistake in the values of the demonstration, which the window would hide.
+    if (const auto started = (*game)->start();
+        !started && (*game)->session().phase() != lemuria::classic::SessionPhase::Ended) {
+        std::cerr << started.error().message << '\n';
+        return 1;
+    }
 
     const auto played = play(options, *window, *renderer, **game);
     (*game)->end();

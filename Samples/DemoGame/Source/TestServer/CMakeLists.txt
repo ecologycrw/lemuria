@@ -19,4 +19,16 @@ set_tests_properties(test_server_starts PROPERTIES PASS_REGULAR_EXPRESSION "Lemu
 add_test(NAME test_server_refuses_a_wrong_port COMMAND test_server --port 70000)
 set_tests_properties(test_server_refuses_a_wrong_port PROPERTIES WILL_FAIL TRUE)
 
+# Every wrong command line is refused with the usage, instead of starting a server (INV-12). A server that
+# starts anyway never ends, so the time limit fails the test.
+set(wrong_command_lines "--port 0" "--port 65536" "--port 24a00" "--port -1" "--port" "--speed 2")
+set(command_line_number 0)
+foreach(command_line IN LISTS wrong_command_lines)
+    math(EXPR command_line_number "${command_line_number} + 1")
+    separate_arguments(arguments NATIVE_COMMAND "${command_line}")
+    add_test(NAME test_server_refuses_command_line_${command_line_number} COMMAND test_server ${arguments})
+    set_tests_properties(test_server_refuses_command_line_${command_line_number} PROPERTIES
+        PASS_REGULAR_EXPRESSION "Usage: test_server" TIMEOUT 10)
+endforeach()
+
 add_subdirectory(Tests)

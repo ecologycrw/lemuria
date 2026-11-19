@@ -124,6 +124,40 @@ TEST_CASE("the window title tells every state of the connection", "[0000-CA-14]"
     CHECK(connection_status(SessionPhase::Ended, SessionEndReason::ClosedByPlayer) == "disconnected");
 }
 
+TEST_CASE("the window title gives a clear state for the phases and ends this demonstration does not use",
+          "[0000-CA-14]") {
+    using classic::SessionEndReason;
+    using classic::SessionPhase;
+
+    const SessionPhase between = GENERATE(SessionPhase::Authenticating, SessionPhase::ChoosingCharacter,
+                                          SessionPhase::ChangingMap, SessionPhase::Reconnecting);
+    CHECK(connection_status(between, std::nullopt) == "entering the map");
+    CHECK(connection_status(SessionPhase::Ended, SessionEndReason::TooManyHeldEvents) ==
+          "the test server sent data the client could not use");
+    CHECK(connection_status(SessionPhase::Ended, std::nullopt) ==
+          "the connection to the test server was lost");
+}
+
+TEST_CASE("before the player arrives, the camera looks at the middle of the map") {
+    GameFixture fixture;
+    const auto check_focus_on = [&](classic::TileCoord tile) {
+        const core::Vec3 focus = fixture.game->focus();
+        const core::Vec3 expected = classic::tile_center(tile);
+        CHECK(focus.x == expected.x);
+        CHECK(focus.z == expected.z);
+    };
+
+    check_focus_on({DemoMap::kSpawnCenter, DemoMap::kSpawnCenter});
+
+    const protocol::Tile arrival{kStart.x + 5, kStart.z};
+    fixture.connections.arrive_connected();
+    fixture.connections.arrive_bytes(bytes_of(protocol::MapEntered{DemoMap::kId, 7, arrival}));
+    fixture.frame();
+    fixture.frame();
+
+    check_focus_on({arrival.x, arrival.z});
+}
+
 TEST_CASE("the client believes only stone blocks the way, even where the server forbids more") {
     const DemoMap map;
     const auto grid = demo_client::client_grid(map);
@@ -216,4 +250,18 @@ TEST_CASE("the demo game leaves a map it does not know") {
 
     CHECK(fixture.game->session().phase() == classic::SessionPhase::Ended);
     CHECK_FALSE(fixture.has_sent(protocol::MapLoaded{DemoMap::kId + 1}));
+    CHECK(fixture.game->status() == "the test server sent a map the client does not know");
+}
+
+TEST_CASE("the demo game leaves a map where the server placed the player outside it", "[0000-CA-11]") {
+    GameFixture fixture;
+    fixture.connections.arrive_connected();
+    fixture.connections.arrive_bytes(bytes_of(protocol::MapEntered{DemoMap::kId, 7, {DemoMap::kSize, 3}}));
+
+    fixture.frame();
+    fixture.frame();
+
+    CHECK(fixture.game->session().phase() == classic::SessionPhase::Ended);
+    CHECK_FALSE(fixture.has_sent(protocol::MapLoaded{DemoMap::kId}));
+    CHECK(fixture.game->status() == "the test server placed the player outside the map");
 }

@@ -1,6 +1,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <initializer_list>
 #include <memory>
 #include <optional>
 #include <span>
@@ -239,6 +240,41 @@ TEST_CASE("players on the test server see each other arrive, walk and leave") {
     CHECK(alice.received<EntityLeft>().front() == EntityLeft{bob_entity, LeaveReason::Disconnected});
     CHECK(fixture.host.connection_count() == 1);
     CHECK(fixture.host.world().player_count() == 1);
+    CHECK(fixture.host.broken_connection_count() == 0);
+}
+
+TEST_CASE("nothing a client sends after the server ends its connection is handled") {
+    HostFixture fixture;
+    TestClient& alice = fixture.join();
+    TestClient& intruder = fixture.connect();
+
+    // A hello with another version ends the connection. The messages after it arrive in the same piece, and
+    // would put the intruder on the map and count a wrong message if they were handled.
+    std::vector<std::byte> bytes;
+    for (const ClientMessage& message :
+         {ClientMessage{Hello{static_cast<std::uint16_t>(protocol_version() + 1)}},
+          ClientMessage{Hello{protocol_version()}}, ClientMessage{MapLoaded{DemoMap::kId}}}) {
+        const demo_protocol::EncodedFrame frame = demo_protocol::encode(message);
+        bytes.insert(bytes.end(), frame.bytes().begin(), frame.bytes().end());
+    }
+    const demo_protocol::EncodedFrame unknown(200);
+    bytes.insert(bytes.end(), unknown.bytes().begin(), unknown.bytes().end());
+    intruder.send_bytes(bytes);
+
+    REQUIRE(fixture.serve_until([&] { return intruder.is_closed(); }));
+    CHECK(fixture.host.invalid_message_count() == 0);
+    CHECK(fixture.host.world().player_count() == 1);
+
+    // Anything the server sent Alice about the intruder arrives before the answer to her walk.
+    const Tile start = own_tile(alice);
+    const std::optional<Tile> neighbor = walkable_neighbor(start);
+    REQUIRE(neighbor.has_value());
+    StepList steps;
+    REQUIRE(steps.add(*neighbor));
+    alice.send(WalkRequest{start, steps});
+    REQUIRE(fixture.serve_until([&] { return !alice.received<WalkConfirmed>().empty(); }));
+    CHECK(alice.received<EntityAppeared>().empty());
+    CHECK(alice.received<EntityLeft>().empty());
 }
 
 TEST_CASE("the test server closes a connection whose bytes break the format, and the others keep playing") {
