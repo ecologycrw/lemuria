@@ -13,7 +13,7 @@ atualizado-em: 2026-11-19
 
 ## Próxima ação
 
-Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T26, as mensagens da demonstração, na etapa 5 (Protocolo e servidor).
+Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T27, as regras do servidor de teste, na etapa 5 (Protocolo e servidor).
 
 ## Bloqueios
 

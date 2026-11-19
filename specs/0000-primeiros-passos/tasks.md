@@ -43,7 +43,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 ## Etapa 5: Protocolo e servidor
 
-- [ ] T26: Mensagens da demonstração, enquadramento e leitura com limites (CA-10, CA-11). Verificação: testes com dados inválidos em `Samples/DemoGame/Source/Protocol/Tests`.
+- [x] T26: Mensagens da demonstração, enquadramento e leitura com limites (CA-10, CA-11). Verificação: testes com dados inválidos em `Samples/DemoGame/Source/Protocol/Tests`.
 - [ ] T27: Regras do servidor de teste (CA-08). Verificação: testes com a etiqueta `[0000-CA-08]`.
 - [ ] T28: Programa do servidor de teste, aceitando conexões só do próprio computador. Verificação: teste com conexão real.
 
@@ -135,7 +135,14 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T26. As etapas 1, 2, 3 e 4 estão concluídas.
+- Próxima tarefa: T27. As etapas 1, 2, 3 e 4 e a tarefa T26 estão concluídas.
+- As mensagens da demonstração ficam em `Samples/DemoGame/Source/Protocol`: `Messages.hpp` (os dados), `Framing.hpp` (`FrameReader` e `EncodedFrame`) e `MessageCodec.hpp` (`encode`, `read_client_message` e `read_server_message`). Cada quadro tem dois bytes com o tamanho do corpo, o menor primeiro, e o corpo começa pelo tipo da mensagem. O corpo tem no máximo 128 bytes.
+- Dois níveis de erro (ADR 0017): um `FrameError` quebra o formato, e a conexão precisa ser encerrada; um `MessageError` vale só para aquela mensagem, que é contada e deixada de lado, e a leitura continua.
+- O fluxo pensado para a T27 a T29: o cliente manda `Hello` com `protocol_version()` logo ao conectar; o servidor responde com `MapEntered`; o cliente manda `MapLoaded` depois de carregar o mapa (o adaptador declara `needs_map_loaded_notice`); o pedido de caminhada leva a origem e até 16 passos (`kMaxWalkSteps`), então o adaptador declara `max_steps_per_request = 16`. Um pedido sem passos quer dizer "parar na origem", como o `World` envia ao clicar no passo que está sendo andado.
+- Números de personagem nunca são 0, e os blocos vão até 1.023. `tile_from` converte coordenadas `int` e recusa as que não cabem numa mensagem; o adaptador e o servidor devem usá-lo.
+- O `FrameReader` só avança porque recusa o quadro sem corpo: um defeito que aceitava esse quadro fez a leitura entrar em laço infinito. Mantenha essa recusa.
+- A T26 passou por 29 defeitos colocados de propósito numa cópia do código. Na primeira rodada, um sobreviveu e revelou a falta de um teste para tamanhos em que o segundo byte importa. O teste foi criado, e agora os 29 são reprovados.
+- O Clang da CI do Linux trata função sem uso como erro, e o MSVC não avisa. Confira os auxiliares dos testes antes do commit.
 - Os cenários de servidor "mal-educado" ficam em `Frameworks/Classic/Tests/MisbehavingServerTest.cpp`. O `TestGame` de lá liga o adaptador, a sessão e o mundo como o cliente da T30 deve fazer, e serve de modelo para ele: a cada quadro, `session.update`, depois `world.update` e o envio do pedido de caminhada. Em `on_map_entered`, chama `world.enter_map`; quando o mapa carregar, `world.set_grid` e depois `session.finish_map_load`.
 - Cada cenário roda com dois servidores: um recebe os passos por um fluxo de bytes, que chega byte a byte, e pede o aviso de mapa carregado; o outro recebe só o destino, por mensagens inteiras, com as caminhadas enviadas sem garantia de chegada. O `TestGame` nunca pergunta qual é o servidor: só monta o `MovementRules` a partir das capacidades.
 - O protocolo de teste ganhou três mensagens: "trocando de mapa" (7), "troca de mapa recusada" (8) e "blocos mudaram" (9).
