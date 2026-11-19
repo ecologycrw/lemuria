@@ -9,11 +9,11 @@ atualizado-em: 2026-11-19
 
 ## Agora
 
-**Fatia 0 (Primeiros passos) com as 34 tarefas concluídas, esperando a revisão.** As seis etapas estão concluídas. O comando `py tools/dev.py demo` abre o servidor de teste e duas janelas do jogo: cada jogador vê o outro no mapa, e o título da janela mostra o estado da conexão. Testes automáticos com conexões de verdade provam que cada jogador vê o outro chegar, andar até o destino e sumir ao sair, e que o quadro aquecido não pede memória. A prova visual final (T34) gerou a mesma imagem com Vulkan e Direct3D 12, com todos os números dentro das faixas e a fluidez bem abaixo do limite. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
+**Fatia 0 (Primeiros passos) fechada, esperando o teste do dono.** As 34 tarefas e a revisão estão concluídas, e o PR da branch `fatia/0000-primeiros-passos` está aberto. O comando `py tools/dev.py demo` abre o servidor de teste e duas janelas do jogo: cada jogador vê o outro no mapa, e o título da janela mostra o estado da conexão. A prova visual gera a mesma imagem com Vulkan e Direct3D 12, com todos os números dentro das faixas. O [relatório da fatia](../specs/0000-primeiros-passos/report.md) traz as provas e o passo a passo do teste.
 
 ## Próxima ação
 
-A revisão foi feita e todos os achados foram tratados, inclusive os dois que mexeram em travas, com a aprovação do dono. Rodar `/fechar` na branch `fatia/0000-primeiros-passos`.
+O dono testa seguindo a seção "O que você deve testar" do [relatório](../specs/0000-primeiros-passos/report.md#o-que-você-deve-testar), aprova a imagem da cena de prova se ela agradar e confere se o check da CI ficou verde no PR. Depois, o dono conta o que achou, e a `/retrospectiva` roda no mesmo PR, antes do merge.
 
 ## Bloqueios
 
@@ -34,3 +34,4 @@ Nenhum.
 | 2026-11-18 | Guia visual e regras de prova visual definidos ([ADR 0016](adr/0016-direcao-visual-e-prova-visual.md)) |
 | 2026-11-18 | Auditoria do ambiente: guia visual e imagens aprovadas protegidos, prova visual exigida pelas checagens e licenças das bibliotecas registradas |
 | 2026-11-18 | Spec e plano da fatia 0 aprovados pelo dono, com TCP e a preparação para oferecer o GNS como opção de conexão |
+| 2026-11-19 | Fatia 0 fechada: 34 tarefas, revisão independente, relatório escrito e PR aberto para o teste do dono |

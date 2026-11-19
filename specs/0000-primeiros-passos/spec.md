@@ -1,7 +1,7 @@
 ---
 id: 0000
 titulo: Primeiros passos
-status: em-andamento
+status: concluida
 aprovada-em: 2026-11-18
 ---
 

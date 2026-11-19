@@ -62,6 +62,8 @@ Core/
 └─ CMakeLists.txt
 ```
 
+Cada módulo tem uma página própria em `docs/modules/`: [Núcleo](modules/core.md), [Plataforma](modules/platform-sdl.md), [Classic](modules/classic.md) e [jogo de demonstração](modules/demo-game.md).
+
 Uma pasta só nasce quando tiver uso. Quando forem necessárias, estas pastas ficam em:
 
 | Pasta | O que vai guardar |
