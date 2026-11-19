@@ -144,6 +144,24 @@ class ArchitectureCheckTests(TempRepositoryTest):
     def test_a_program_cannot_link_sdl_directly(self) -> None:
         self.refused(f"{CLIENT}/CMakeLists.txt", "lemuria_add_program(a DEPS SDL3::SDL3)\n", "INV-09")
 
+    def test_the_layers_below_the_game_cannot_include_any_header_of_the_demonstration(self) -> None:
+        for folder in (CORE, CLASSIC, "Engine/Source/Runtime/Renderer"):
+            for header in ("TestServer/ServerMotion.hpp", "testserver/x.hpp", "DemoClient/DemoGame.hpp",
+                           "DemoTestSupport/RealNetwork.hpp"):
+                with self.subTest(folder=folder, header=header):
+                    self.refused(f"{folder}/Private/A.cpp", f'#include "{header}"\n', "INV-02")
+
+    def test_the_layers_below_the_game_cannot_link_any_target_of_the_demonstration(self) -> None:
+        for folder in (CORE, CLASSIC):
+            for target in ("demo_protocol", "demo_client_lib", "demo_test_support", "test_server_lib", "test_server"):
+                with self.subTest(folder=folder, target=target):
+                    self.refused(f"{folder}/CMakeLists.txt", f"lemuria_add_library(a PRIVATE_DEPS {target})\n", "INV-02")
+
+    def test_names_that_only_resemble_the_demonstration_are_accepted(self) -> None:
+        self.write(f"{CLASSIC}/CMakeLists.txt", "lemuria_add_library(classic_test_servers PRIVATE_DEPS my_demo_x)\n")
+        self.write(f"{CLASSIC}/Private/A.cpp", '#include "Lemuria/Classic/TestServerlessGrid.hpp"\n')
+        self.assertEqual(architecture_check.run(self.root), [])
+
     def test_a_game_may_use_every_layer_of_the_engine(self) -> None:
         self.write(f"{CLIENT}/Private/Main.cpp",
                    '#include "Lemuria/Classic/A.hpp"\n#include "Lemuria/Platform/B.hpp"\n#include "DemoProtocol/C.hpp"\n')

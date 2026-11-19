@@ -22,7 +22,8 @@ _CMAKE_COMMENT = re.compile(r"#[^\n]*")
 _HEADER_GROUPS = {
     "classic": re.compile(r"^lemuria/classic/", re.IGNORECASE),
     "platform": re.compile(r"^lemuria/platform/", re.IGNORECASE),
-    "game": re.compile(r"^demo(_|[a-z0-9]*/)", re.IGNORECASE),
+    # Every folder of headers of the demonstration: DemoClient/, DemoProtocol/, DemoTestSupport/ and TestServer/.
+    "game": re.compile(r"^(demo(_|[a-z0-9]*/)|testserver/)", re.IGNORECASE),
     "sdl": re.compile(r"^SDL3?(_net)?(/|\.h$)|^SDL_", re.IGNORECASE),
     "os": re.compile(
         r"^(windows\.h|winsock2?\.h|ws2tcpip\.h|winuser\.h|d3d\d*\.h|dxgi\d*\.h|io\.h|direct\.h|process\.h"
@@ -34,7 +35,8 @@ _HEADER_GROUPS = {
 _TARGET_GROUPS = {
     "classic": re.compile(r"\blemuria_classic\b"),
     "platform": re.compile(r"\blemuria_platform_sdl\b"),
-    "game": re.compile(r"\bdemo_(protocol|client)\b"),
+    # Every target of the demonstration, such as demo_client_lib, demo_test_support and test_server_lib.
+    "game": re.compile(r"\b(demo_\w+|test_server\w*)\b"),
     "sdl": re.compile(r"\bSDL3(_net)?::"),
 }
 
