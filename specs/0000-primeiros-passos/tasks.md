@@ -50,7 +50,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Etapa 6: Jogo completo
 
 - [x] T29: Adaptador da demonstração (CA-10, CA-11). Verificação: testes em `Samples/DemoGame/Source/Client/Tests`.
-- [ ] T30: Cliente completo, com estado da conexão no título da janela (CA-01, CA-14). Verificação: abertura manual da demonstração.
+- [x] T30: Cliente completo, com estado da conexão no título da janela (CA-01, CA-14). Verificação: abertura manual da demonstração.
 - [ ] T31: Teste de ponta a ponta com dois clientes (CA-09). Verificação: teste com a etiqueta `[0000-CA-09]`, com conexão real.
 - [ ] T32: Teste do quadro sem alocação de memória (CA-18). Verificação: teste com a etiqueta `[0000-CA-18]` em `tests/architecture/frame_allocations`.
 - [ ] T33: Comando `py tools/dev.py demo` e documentação viva (arquitetura, módulos, glossário, convenções, itens provisórios). Verificação: `py tools/dev.py verify` passa.
@@ -128,6 +128,12 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - **Ainda sem imagem aprovada:** o comando avisa e não falha. O dono aprova a imagem no fim da fatia.
 - **Os testes detectam erros:** os 23 defeitos colocados de propósito numa cópia do `tools/dev.py` foram reprovados.
 
+**T30, cliente completo ligado ao servidor de teste.**
+
+- **A janela do jogo:** com o servidor e dois clientes abertos, capturei a janela do segundo cliente. O título dizia "Lemuria Demo - on the map", e a janela mostrava o chão escuro e quente, a trilha, as pedras, o próprio personagem (claro) e o outro jogador (avermelhado) no bloco ao lado. O servidor mostrou 1, depois 2 jogadores no mapa, e depois a saída dos dois.
+- **O título em cada situação (CA-14):** sem servidor, "the test server could not be reached"; com servidor, "on the map"; com o servidor fechado no meio do jogo, "the connection to the test server was lost". Nos três casos, a janela continuou respondendo.
+- **A cena de prova não mudou:** `py tools/dev.py visual` gerou a mesma imagem, com 0 pontos diferentes da anterior, e todos os números dentro das faixas. A fluidez ficou em 0,32 ms de média e 1,78 ms no pior 1% com Direct3D 12, e 0,34 ms e 1,87 ms com Vulkan.
+
 ## Revisão
 
 *(preenchido pelo `/revisar`)*
@@ -135,7 +141,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T30. As etapas 1 a 5 e a T29 estão concluídas.
+- Próxima tarefa: T31. As etapas 1 a 5 e as tarefas T29 e T30 estão concluídas.
 - As regras do servidor ficam na biblioteca `test_server_lib` (`Samples/DemoGame/Source/TestServer`), sem nenhuma conexão: `ServerWorld` recebe as mensagens de cada cliente (`receive`), a saída de um cliente (`remove`) e o tempo, e responde por um `ServerOutbox` (`send` e `disconnect`). O programa da T28 escolhe os `ClientId`, lê os quadros com o `FrameReader` e envia o que o `ServerOutbox` receber.
 - O fluxo do servidor: `Hello` com a versão certa coloca o jogador no bloco livre mais perto do centro e responde `MapEntered`; versão errada, servidor cheio ou nenhum bloco livre desconectam. Depois de `MapLoaded`, o jogador vê quem já está no mundo e é visto por eles. Uma caminhada aceita volta como `WalkConfirmed` para o jogador e `EntityWalked` para os outros; um pedido sem passos chega aos outros como `PositionCorrected`. Uma caminhada recusada vira `PositionCorrected` para todos, no bloco em que o servidor acredita que o jogador está, e o jogador para ali. A saída de um jogador vira `EntityLeft` para os outros.
 - As regras de caminhada (CA-08) ficam em `check_walk`: uma caminhada que começa na rota atual vale a partir do momento em que o jogador chega ali; fora da rota, ela precisa começar a até `origin_tolerance_steps` passos do bloco atual e paga essa distância na velocidade de andar. Se o jogador só pudesse estar na origem mais de `early_tolerance_seconds` depois de agora, o pedido é rápido demais. Cada passo precisa tocar o anterior, cair num bloco permitido pelo servidor e, na diagonal, ter livres os dois blocos ao lado.
@@ -144,6 +150,9 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - Uma conexão TCP só aceita `send` depois de `on_connected`. O cliente de teste espera a conexão abrir antes de enviar.
 - Testes com rede real fora da camada de plataforma usam a mesma faixa de portas (24100 a 24499) e esperam por condição com limite de 20 s. O `ServerHostTest.cpp` tem a segunda cópia desse laço de espera; na terceira (T31), ele vira uma peça compartilhada.
 - O adaptador da demonstração é o `DemoAdapter` (`DemoClient/DemoAdapter.hpp`, na `demo_client_lib`). Ele recebe um `core::Connections` (TCP de verdade no programa, uma conexão roteirizada nos testes) e o endereço do servidor, e recusa conexões que não sejam TCP. Ao conectar, envia `Hello` e entrega `SessionPhaseReached{EnteringMap}`. As capacidades ficam em `kDemoCapabilities`. Um `EntityLeft` por desconexão vira `EntityLeaveReason::Removed`.
+- O jogo de um jogador, sem janela, é a `DemoGame` (`DemoClient/DemoGame.hpp`): `create(adapter)`, `start()`, `click(tile)`, `frame(FrameTime)`, `describe(scene)`, `focus()` e `status()`. O programa com janela só lê a entrada, converte o clique em bloco com a câmera e desenha. O teste de ponta a ponta da T31 pode usar duas `DemoGame` com `TcpConnections` e `DemoAdapter` de verdade, e um `ServerHost` no mesmo processo.
+- O `demo_client` aceita `--port`, com a porta padrão 24000. O título da janela muda só quando o estado da conexão muda.
+- A conexão roteirizada dos testes do cliente fica em `Samples/DemoGame/Source/Client/Tests/ScriptedConnections.hpp`.
 - O cliente das tarefas T29 e T30 precisa combinar com o servidor: velocidade `kWalkTilesPerSecond`, `DiagonalRule::WhenBothSidesAreFree`, `max_steps_per_request = kMaxWalkSteps` (16) e `needs_map_loaded_notice = true`. Velocidades diferentes fariam o servidor corrigir caminhadas certas.
 - A T27 passou por 43 defeitos colocados de propósito numa cópia do código. Na primeira rodada, quatro não compilaram e foram reescritos, e um sobreviveu, revelando que o teste de "mapa errado" não conferia se o jogador tinha entrado no mundo. O teste foi reforçado, e agora os 43 são reprovados.
 - O hook `guard-bash` também bloqueia um comando que escreve arquivos (como um `write_text` do Python) e cita `tools/dev.py`. Edite num passo e rode o `dev.py` em outro.

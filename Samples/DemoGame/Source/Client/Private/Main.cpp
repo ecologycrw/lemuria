@@ -7,6 +7,8 @@
 #include <string>
 #include <string_view>
 
+#include "DemoClient/DemoAdapter.hpp"
+#include "DemoClient/DemoGame.hpp"
 #include "DemoClient/DemoStyle.hpp"
 #include "DemoClient/GroundScene.hpp"
 #include "DemoClient/ProofImage.hpp"
@@ -17,12 +19,15 @@
 #include "Lemuria/Classic/FrameworkInfo.hpp"
 #include "Lemuria/Classic/ThreeQuarterCamera.hpp"
 #include "Lemuria/Classic/TileCoord.hpp"
+#include "Lemuria/Core/Connections.hpp"
+#include "Lemuria/Core/FrameClock.hpp"
 #include "Lemuria/Core/FrameTimeMeter.hpp"
 #include "Lemuria/Core/SceneDescription.hpp"
 #include "Lemuria/Core/Version.hpp"
 #include "Lemuria/Platform/MonotonicClock.hpp"
 #include "Lemuria/Platform/PlatformInfo.hpp"
 #include "Lemuria/Platform/Renderer.hpp"
+#include "Lemuria/Platform/TcpConnections.hpp"
 #include "Lemuria/Platform/Window.hpp"
 
 namespace {
@@ -30,12 +35,15 @@ namespace {
 namespace core = lemuria::core;
 namespace platform = lemuria::platform;
 
+constexpr std::string_view kWindowTitle = "Lemuria Demo";
+
 struct Options {
     bool show_version = false;
     bool measure_frame_times = false;
     std::optional<std::uint64_t> frame_limit;
     std::optional<std::string> proof_image_path;
     std::string graphics_api;
+    std::uint16_t server_port = demo_protocol::kDefaultServerPort;
 };
 
 void print_version(const core::Version& version) {
@@ -86,6 +94,13 @@ void print_versions() {
         } else if (argument == "--proof-image" && index + 1 < arguments.size()) {
             ++index;
             options.proof_image_path = arguments[index];
+        } else if (argument == "--port" && index + 1 < arguments.size()) {
+            ++index;
+            const std::optional<std::uint64_t> port = parse_count(arguments[index]);
+            if (!port || *port == 0 || *port > std::numeric_limits<std::uint16_t>::max()) {
+                return std::nullopt;
+            }
+            options.server_port = static_cast<std::uint16_t>(*port);
         } else if (argument == "--graphics-api" && index + 1 < arguments.size()) {
             ++index;
             options.graphics_api = arguments[index];
@@ -116,7 +131,7 @@ void print_versions() {
 
 // Draws the proof scene on a window as fast as the computer can, without waiting for the display.
 [[nodiscard]] core::Result<core::FrameTimeSummary> measure_frame_times(const Options& options) {
-    auto window = platform::Window::open(platform::WindowOptions{"Lemuria Demo"});
+    auto window = platform::Window::open(platform::WindowOptions{std::string(kWindowTitle)});
     if (!window) {
         return tl::unexpected(window.error());
     }
@@ -163,8 +178,59 @@ void print_versions() {
     return demo_client::is_within_frame_budget(*summary) ? 0 : 1;
 }
 
+// Each click becomes the tile under the cursor, as the player saw it in the previous frame. A blocked tile
+// leaves the player where it is (CA-03).
+void handle_clicks(const platform::InputFrame& input, const lemuria::classic::ThreeQuarterCamera& camera,
+                   demo_client::DemoGame& game) {
+    for (const core::Vec2 click : input.clicks()) {
+        if (const auto tile = camera.tile_under(click)) {
+            static_cast<void>(game.click(*tile));
+        }
+    }
+}
+
+// The title changes only when the state of the connection changes, so a frame does not build text (CA-14).
+void show_status(platform::Window& window, std::string_view status, std::string_view& shown) {
+    if (status == shown) {
+        return;
+    }
+    shown = status;
+    const std::string title = std::string(kWindowTitle) + " - " + std::string(status);
+    if (const auto set = window.set_title(title); !set) {
+        std::cerr << set.error().message << '\n';
+    }
+}
+
+// Runs the game until the window is closed, or until the frame limit of the options.
+[[nodiscard]] core::Result<void> play(const Options& options, platform::Window& window,
+                                      platform::Renderer& renderer, demo_client::DemoGame& game) {
+    core::SceneDescription scene(demo_client::kGroundTileBudget, demo_client::kBoxBudget);
+    lemuria::classic::ThreeQuarterCamera camera(demo_client::kCameraSettings);
+    camera.focus_on(game.focus(), window.size());
+    core::FrameClock clock;
+    platform::InputFrame input;
+    std::string_view shown_status;
+    for (std::uint64_t frame = 0; !options.frame_limit || frame < *options.frame_limit; ++frame) {
+        window.poll_input(input);
+        if (input.quit_requested) {
+            break;
+        }
+        handle_clicks(input, camera, game);
+        game.frame(clock.advance(platform::monotonic_nanoseconds()));
+        show_status(window, game.status(), shown_status);
+
+        game.describe(scene);
+        camera.focus_on(game.focus(), input.window_size);
+        scene.view_projection = camera.view_projection();
+        if (const auto drawn = renderer.draw(scene); !drawn) {
+            return tl::unexpected(drawn.error());
+        }
+    }
+    return {};
+}
+
 [[nodiscard]] int run_game(const Options& options) {
-    auto window = platform::Window::open(platform::WindowOptions{"Lemuria Demo"});
+    auto window = platform::Window::open(platform::WindowOptions{std::string(kWindowTitle)});
     if (!window) {
         std::cerr << window.error().message << '\n';
         return 1;
@@ -176,31 +242,21 @@ void print_versions() {
         return 1;
     }
 
-    const demo_protocol::DemoMap map;
-    core::SceneDescription scene(demo_client::kGroundTileBudget, demo_client::kBoxBudget);
-    scene.background = core::color_from_rgb(demo_client::kDeepShadowRgb);
-    demo_client::add_ground(map, scene);
-    const auto start =
-        lemuria::classic::tile_center({demo_protocol::DemoMap::kSize / 2, demo_protocol::DemoMap::kSize / 2});
-    demo_client::add_character(start, demo_client::kOwnCharacterRgb, scene);
+    platform::TcpConnections connections;
+    demo_client::DemoAdapter adapter(connections, core::ConnectionAddress{"127.0.0.1", options.server_port});
+    auto game = demo_client::DemoGame::create(adapter);
+    if (!game) {
+        std::cerr << game.error().message << '\n';
+        return 1;
+    }
+    // A failure to connect also ends the session, and the title of the window shows it.
+    static_cast<void>((*game)->start());
 
-    lemuria::classic::ThreeQuarterCamera camera(demo_client::kCameraSettings);
-    platform::InputFrame input;
-    std::uint64_t frame = 0;
-    while (!options.frame_limit || frame < *options.frame_limit) {
-        window->poll_input(input);
-        if (input.quit_requested) {
-            break;
-        }
-        camera.focus_on(start, input.window_size);
-        scene.view_projection = camera.view_projection();
-
-        const auto drawn = renderer->draw(scene);
-        if (!drawn) {
-            std::cerr << drawn.error().message << '\n';
-            return 1;
-        }
-        ++frame;
+    const auto played = play(options, *window, *renderer, **game);
+    (*game)->end();
+    if (!played) {
+        std::cerr << played.error().message << '\n';
+        return 1;
     }
     return 0;
 }
@@ -211,7 +267,7 @@ int main(int argc, char** argv) {
     const auto options = parse_options(std::span<char*>(argv, static_cast<std::size_t>(argc)));
     if (!options) {
         std::cerr << "Usage: demo_client [--version] [--frames count] [--proof-image file] "
-                     "[--measure-frame-times] [--graphics-api name]\n";
+                     "[--measure-frame-times] [--graphics-api name] [--port number]\n";
         return 2;
     }
     if (options->show_version) {
