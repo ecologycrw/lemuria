@@ -101,7 +101,7 @@ sequenceDiagram
 - **Sem alocação depois de aquecer.** O quadro reutiliza a memória, e um teste mede isso (INV-13).
 - **Animação independente do FPS.** Animações de taxa fixa são interpoladas para ficar suaves em qualquer taxa de quadros.
 
-**Como é hoje, na demonstração:** a cada quadro, o programa lê a entrada da janela e transforma o clique no bloco sob o cursor. A `DemoGame` atualiza a sessão (o adaptador entrega o que a rede trouxe), move todos no mundo e envia o pedido de caminhada. Depois ela descreve a cena, a câmera acompanha o jogador e o desenho apresenta a imagem. A rede troca lotes inteiros com o quadro, e os lotes de envio reservam a memória desde o começo. O teste em `tests/architecture/frame_allocations` conta a memória que o quadro aquecido pede e exige zero. O que esse contador ainda não vê está na [TD-0014](TECH_DEBT.md).
+**Como é hoje, na demonstração:** a cada quadro, o programa lê a entrada da janela e transforma o clique no bloco sob o cursor. A `DemoGame` atualiza a sessão (o adaptador entrega o que a rede trouxe), move todos no mundo e envia o pedido de caminhada. Depois ela descreve a cena, a câmera acompanha o jogador e o desenho apresenta a imagem. A rede troca lotes inteiros com o quadro, e os lotes de envio reservam a memória desde o começo. Os passos entre ler a janela e desenhar ficam na `DemoFrame`, que o programa e o teste do quadro chamam do mesmo jeito. O teste em `tests/architecture/frame_allocations` conta a memória que o quadro aquecido pede e exige zero. O que esse contador ainda não vê está na [TD-0014](TECH_DEBT.md).
 
 ## Encaixes
 

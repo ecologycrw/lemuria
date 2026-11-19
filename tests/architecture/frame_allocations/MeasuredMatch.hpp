@@ -14,9 +14,8 @@
 
 #include "AllocationCounter.hpp"
 #include "DemoClient/DemoAdapter.hpp"
+#include "DemoClient/DemoFrame.hpp"
 #include "DemoClient/DemoGame.hpp"
-#include "DemoClient/DemoStyle.hpp"
-#include "DemoClient/GroundScene.hpp"
 #include "DemoProtocol/DemoMap.hpp"
 #include "DemoTestSupport/RealNetwork.hpp"
 #include "Lemuria/Classic/SessionPhase.hpp"
@@ -148,8 +147,9 @@ struct Measurement {
 inline constexpr std::array<std::uint64_t, kFramePartCount> kNoAllocationInAnyPart{};
 
 // The test server, the measured player (Alice), a second player who walks with her (Bob), and a third who
-// arrives and leaves (Carol). Alice's frame is the frame of the program with the window, except reading the
-// window: the click, the game, the scene, the camera and, when there is a renderer, the drawing.
+// arrives and leaves (Carol). Alice's frame runs the same steps as the program with the window (DemoFrame),
+// except reading the window: the click, the game, the scene, the camera and, when there is a renderer, the
+// drawing.
 class MeasuredMatch {
 public:
     explicit MeasuredMatch(platform::Renderer* renderer = nullptr)
@@ -244,7 +244,15 @@ private:
         ++frame_index_;
     }
 
-    // The frame of the program with the window, in the same order. While measuring, each part is counted
+    // The point of the screen where Alice sees the middle of the tile, so she clicks it as a player would.
+    [[nodiscard]] core::Vec2 screen_point_of(classic::TileCoord tile) const {
+        const std::optional<core::Vec2> point = core::project_to_screen(
+            alice_view_.camera().view_projection(), classic::tile_center(tile), kScreenSize);
+        REQUIRE(point.has_value());
+        return *point;
+    }
+
+    // The frame of the program with the window, through the same steps. While measuring, each part is counted
     // apart.
     void alice_frame(const core::FrameTime& time) {
         std::uint64_t frame_allocations = 0;
@@ -258,23 +266,25 @@ private:
             frame_allocations += allocations;
         };
 
-        part(FramePart::Click, [&] {
-            if (alice_click_) {
-                alice_clicks_refused_ += alice_.game().click(*alice_click_) ? 0 : 1;
-                alice_click_.reset();
-            }
-        });
-        part(FramePart::Game, [&] { alice_.game().frame(time); });
+        // The click arrives as a point of the screen, found before the frame, as the window gives it.
+        std::array<core::Vec2, 1> click{};
+        std::span<const core::Vec2> clicks;
+        if (alice_click_) {
+            click.front() = screen_point_of(*alice_click_);
+            clicks = click;
+            alice_click_.reset();
+        }
+
+        part(FramePart::Click,
+             [&] { alice_clicks_refused_ += clicks.size() - alice_view_.handle_clicks(clicks); });
+        part(FramePart::Game, [&] { alice_view_.advance(time); });
         part(FramePart::Scene, [&] {
-            static_cast<void>(alice_.game().status());
-            alice_.game().describe(scene_);
+            static_cast<void>(alice_view_.take_status_change());
+            alice_view_.describe_scene();
         });
-        part(FramePart::Camera, [&] {
-            camera_.focus_on(alice_.game().focus(), kScreenSize);
-            scene_.view_projection = camera_.view_projection();
-        });
+        part(FramePart::Camera, [&] { alice_view_.follow_player(kScreenSize); });
         part(FramePart::Drawing, [&] {
-            if (renderer_ != nullptr && !renderer_->draw(scene_).has_value()) {
+            if (renderer_ != nullptr && !renderer_->draw(alice_view_.scene()).has_value()) {
                 draw_failed_ = true;
             }
         });
@@ -291,8 +301,7 @@ private:
     Player bob_;
     std::unique_ptr<Player> carol_;
     platform::Renderer* renderer_;
-    core::SceneDescription scene_{demo_client::kGroundTileBudget, demo_client::kBoxBudget};
-    classic::ThreeQuarterCamera camera_{demo_client::kCameraSettings};
+    demo_client::DemoFrame alice_view_{alice_.game(), kScreenSize};
 
     classic::TileCoord alice_start_;
     classic::TileCoord alice_end_;

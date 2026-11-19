@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <optional>
 #include <string_view>
@@ -10,6 +12,7 @@
 #include <catch2/generators/catch_generators.hpp>
 
 #include "DemoClient/DemoAdapter.hpp"
+#include "DemoClient/DemoFrame.hpp"
 #include "DemoClient/DemoGame.hpp"
 #include "DemoClient/GroundScene.hpp"
 #include "DemoProtocol/DemoMap.hpp"
@@ -20,6 +23,7 @@
 #include "Lemuria/Classic/TileCoord.hpp"
 #include "Lemuria/Core/Connections.hpp"
 #include "Lemuria/Core/FrameClock.hpp"
+#include "Lemuria/Core/Math.hpp"
 #include "Lemuria/Core/SceneDescription.hpp"
 #include "ScriptedConnections.hpp"
 
@@ -193,6 +197,87 @@ TEST_CASE("the demo game enters the map, says the map is loaded and walks where 
     fixture.run(10.0);
 
     CHECK(fixture.game->world().own()->tile() == *destination);
+}
+
+TEST_CASE("a click on the screen walks the player to the tile it saw under the cursor, as in the program") {
+    constexpr core::Vec2 kScreen{1280.0F, 720.0F};
+    GameFixture fixture;
+    fixture.enter_map();
+    demo_client::DemoFrame frame(*fixture.game, kScreen);
+    const std::optional<classic::TileCoord> destination = walkable_tile_near_start();
+    REQUIRE(destination.has_value());
+    const auto point = core::project_to_screen(frame.camera().view_projection(),
+                                               classic::tile_center(*destination), kScreen);
+    REQUIRE(point.has_value());
+
+    CHECK(frame.handle_clicks(std::array{*point}) == 1);
+    std::uint64_t index = 100;
+    for (double passed = 1.0; passed < 4.0; passed += kFrameSeconds) {
+        frame.advance(core::FrameTime{kFrameSeconds, passed, index++});
+    }
+
+    CHECK(fixture.game->world().own()->tile() == *destination);
+}
+
+TEST_CASE("a click on a rock, or before the map, starts no walk") {
+    constexpr core::Vec2 kScreen{1280.0F, 720.0F};
+    GameFixture fixture;
+    demo_client::DemoFrame frame(*fixture.game, kScreen);
+    const core::Vec2 middle{kScreen.x / 2.0F, kScreen.y / 2.0F};
+
+    CHECK(frame.handle_clicks(std::array{middle}) == 0);
+
+    fixture.enter_map();
+    frame.follow_player(kScreen);
+    const DemoMap map;
+    // The rock closest to the player, so it is on the screen.
+    std::optional<classic::TileCoord> rock;
+    int rock_steps = 0;
+    for (int z = 0; z < DemoMap::kSize; ++z) {
+        for (int x = 0; x < DemoMap::kSize; ++x) {
+            const int steps = std::max(std::abs(x - kStart.x), std::abs(z - kStart.z));
+            if (map.kind_at(x, z) == protocol::TileKind::Stone && (!rock || steps < rock_steps)) {
+                rock = classic::TileCoord{x, z};
+                rock_steps = steps;
+            }
+        }
+    }
+    REQUIRE(rock.has_value());
+    const auto point =
+        core::project_to_screen(frame.camera().view_projection(), classic::tile_center(*rock), kScreen);
+    REQUIRE(point.has_value());
+    CHECK(frame.handle_clicks(std::array{*point}) == 0);
+}
+
+TEST_CASE("the frame gives the state of the connection only when it changes", "[0000-CA-14]") {
+    GameFixture fixture;
+    demo_client::DemoFrame frame(*fixture.game, {1280.0F, 720.0F});
+
+    CHECK(frame.take_status_change() == std::optional<std::string_view>("connecting to the test server"));
+    CHECK_FALSE(frame.take_status_change().has_value());
+
+    fixture.enter_map();
+
+    CHECK(frame.take_status_change() == std::optional<std::string_view>("on the map"));
+    CHECK_FALSE(frame.take_status_change().has_value());
+}
+
+TEST_CASE("the frame describes everyone on the map and keeps the player in the middle of the screen") {
+    constexpr core::Vec2 kScreen{1280.0F, 720.0F};
+    GameFixture fixture;
+    fixture.enter_map();
+    demo_client::DemoFrame frame(*fixture.game, kScreen);
+    const std::optional<classic::TileCoord> destination = walkable_tile_near_start();
+    REQUIRE(destination.has_value());
+    REQUIRE(fixture.game->click(*destination));
+    fixture.run(3.0);
+
+    frame.describe_scene();
+    frame.follow_player(kScreen);
+
+    CHECK(frame.scene().boxes.shapes().size() == rock_count(DemoMap{}) + 1);
+    CHECK(frame.camera().tile_under({kScreen.x / 2.0F, kScreen.y / 2.0F}) == destination);
+    CHECK(frame.scene().view_projection.values == frame.camera().view_projection().values);
 }
 
 TEST_CASE("the demo game draws the ground, the rocks and everyone on the map, and follows the player") {

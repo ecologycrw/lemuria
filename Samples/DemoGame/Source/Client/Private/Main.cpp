@@ -8,6 +8,7 @@
 #include <string_view>
 
 #include "DemoClient/DemoAdapter.hpp"
+#include "DemoClient/DemoFrame.hpp"
 #include "DemoClient/DemoGame.hpp"
 #include "DemoClient/DemoStyle.hpp"
 #include "DemoClient/GroundScene.hpp"
@@ -18,8 +19,6 @@
 #include "DemoProtocol/Protocol.hpp"
 #include "Lemuria/Classic/FrameworkInfo.hpp"
 #include "Lemuria/Classic/SessionPhase.hpp"
-#include "Lemuria/Classic/ThreeQuarterCamera.hpp"
-#include "Lemuria/Classic/TileCoord.hpp"
 #include "Lemuria/Core/Connections.hpp"
 #include "Lemuria/Core/FrameClock.hpp"
 #include "Lemuria/Core/FrameTimeMeter.hpp"
@@ -179,51 +178,34 @@ void print_versions() {
     return demo_client::is_within_frame_budget(*summary) ? 0 : 1;
 }
 
-// Each click becomes the tile under the cursor, as the player saw it in the previous frame. A blocked tile
-// leaves the player where it is (CA-03).
-void handle_clicks(const platform::InputFrame& input, const lemuria::classic::ThreeQuarterCamera& camera,
-                   demo_client::DemoGame& game) {
-    for (const core::Vec2 click : input.clicks()) {
-        if (const auto tile = camera.tile_under(click)) {
-            static_cast<void>(game.click(*tile));
-        }
-    }
-}
-
 // The title changes only when the state of the connection changes, so a frame does not build text (CA-14).
-void show_status(platform::Window& window, std::string_view status, std::string_view& shown) {
-    if (status == shown) {
-        return;
-    }
-    shown = status;
+void show_status(platform::Window& window, std::string_view status) {
     const std::string title = std::string(kWindowTitle) + " - " + std::string(status);
     if (const auto set = window.set_title(title); !set) {
         std::cerr << set.error().message << '\n';
     }
 }
 
-// Runs the game until the window is closed, or until the frame limit of the options.
+// Runs the game until the window is closed, or until the frame limit of the options. The steps between
+// reading the window and drawing are the ones the test of the warm frame measures (CA-18).
 [[nodiscard]] core::Result<void> play(const Options& options, platform::Window& window,
                                       platform::Renderer& renderer, demo_client::DemoGame& game) {
-    core::SceneDescription scene(demo_client::kGroundTileBudget, demo_client::kBoxBudget);
-    lemuria::classic::ThreeQuarterCamera camera(demo_client::kCameraSettings);
-    camera.focus_on(game.focus(), window.size());
+    demo_client::DemoFrame frame(game, window.size());
     core::FrameClock clock;
     platform::InputFrame input;
-    std::string_view shown_status;
-    for (std::uint64_t frame = 0; !options.frame_limit || frame < *options.frame_limit; ++frame) {
+    for (std::uint64_t count = 0; !options.frame_limit || count < *options.frame_limit; ++count) {
         window.poll_input(input);
         if (input.quit_requested) {
             break;
         }
-        handle_clicks(input, camera, game);
-        game.frame(clock.advance(platform::monotonic_nanoseconds()));
-        show_status(window, game.status(), shown_status);
-
-        game.describe(scene);
-        camera.focus_on(game.focus(), input.window_size);
-        scene.view_projection = camera.view_projection();
-        if (const auto drawn = renderer.draw(scene); !drawn) {
+        frame.handle_clicks(input.clicks());
+        frame.advance(clock.advance(platform::monotonic_nanoseconds()));
+        if (const auto status = frame.take_status_change()) {
+            show_status(window, *status);
+        }
+        frame.describe_scene();
+        frame.follow_player(input.window_size);
+        if (const auto drawn = renderer.draw(frame.scene()); !drawn) {
             return tl::unexpected(drawn.error());
         }
     }
