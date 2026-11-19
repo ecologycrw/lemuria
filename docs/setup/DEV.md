@@ -41,7 +41,9 @@ Tudo passa por um comando só. No Linux, use `python3` no lugar de `py`.
 | Análise estática | `py tools/dev.py tidy` |
 | Checagens do repositório | `py tools/dev.py checks` |
 | Testes das checagens e dos hooks | `py tools/dev.py pytests` |
-| Abrir a GPU sem janela | `py tools/dev.py gpu-test` |
+| Abrir a GPU sem janela e conferir a imagem de prova | `py tools/dev.py gpu-test` |
+| Gerar a prova visual, com os números da imagem e a fluidez | `py tools/dev.py visual` |
+| Abrir a demonstração: o servidor de teste e duas janelas do jogo (só no Windows) | `py tools/dev.py demo` |
 
 O `tools/dev.py` encontra o Visual Studio sozinho, então os comandos funcionam em qualquer terminal.
 

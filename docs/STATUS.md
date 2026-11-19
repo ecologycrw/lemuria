@@ -1,19 +1,19 @@
 ---
-fase: entre-fatias
-spec-atual:
-branch: main
-atualizado-em: 2026-11-18
+fase: fatia
+spec-atual: 0000
+branch: fatia/0000-primeiros-passos
+atualizado-em: 2026-11-19
 ---
 
 # Status
 
 ## Agora
 
-**Preparação concluída.** O repositório tem os documentos, o guia visual, o esqueleto do código, as travas automáticas, o ambiente de IA e a `main` protegida. Nenhuma funcionalidade da engine foi construída ainda.
+**Fatia 0 (Primeiros passos) fechada, esperando o teste do dono.** As 34 tarefas e a revisão estão concluídas, e o PR da branch `fatia/0000-primeiros-passos` está aberto. O comando `py tools/dev.py demo` abre o servidor de teste e duas janelas do jogo: cada jogador vê o outro no mapa, e o título da janela mostra o estado da conexão. A prova visual gera a mesma imagem com Vulkan e Direct3D 12, com todos os números dentro das faixas. O [relatório da fatia](../specs/0000-primeiros-passos/report.md) traz as provas e o passo a passo do teste.
 
 ## Próxima ação
 
-Abrir uma sessão nova só com o Lemuria e rodar `/planejar` para a fatia 0 (Primeiros passos).
+O dono testa seguindo a seção "O que você deve testar" do [relatório](../specs/0000-primeiros-passos/report.md#o-que-você-deve-testar), aprova a imagem da cena de prova se ela agradar e confere se o check da CI ficou verde no PR. Depois, o dono conta o que achou, e a `/retrospectiva` roda no mesmo PR, antes do merge.
 
 ## Bloqueios
 
@@ -33,3 +33,5 @@ Nenhum.
 | 2026-11-18 | Arquivos C++ e pastas de include passam a usar `PascalCase` ([ADR 0015](adr/0015-arquivos-cpp-em-pascalcase.md)) |
 | 2026-11-18 | Guia visual e regras de prova visual definidos ([ADR 0016](adr/0016-direcao-visual-e-prova-visual.md)) |
 | 2026-11-18 | Auditoria do ambiente: guia visual e imagens aprovadas protegidos, prova visual exigida pelas checagens e licenças das bibliotecas registradas |
+| 2026-11-18 | Spec e plano da fatia 0 aprovados pelo dono, com TCP e a preparação para oferecer o GNS como opção de conexão |
+| 2026-11-19 | Fatia 0 fechada: 34 tarefas, revisão independente, relatório escrito e PR aberto para o teste do dono |

@@ -2,7 +2,7 @@
 
 > Documento vivo: descreve como o sistema **é agora** e para onde vai. É atualizado no mesmo PR que muda o que ele descreve. Os porquês das decisões estão nos [ADRs](adr/README.md).
 >
-> **Como é agora:** existe o esqueleto do código, com as travas automáticas, e nenhuma funcionalidade da engine. Exceto na seção "Estrutura do repositório", tudo abaixo descreve o destino.
+> **Como é agora (fatia 0):** a engine abre uma janela e desenha o chão em blocos e formas simples com a SDL GPU. O Classic tem a câmera 3/4, a grade, o cálculo de caminho, o clicar para andar, a sessão, o mundo, a antecipação e a correção. O Núcleo abre conexões TCP em segundo plano, e o jogo de demonstração conversa com o servidor de teste por um adaptador próprio. Conteúdo em arquivo, interface, som, luzes e efeitos ainda não existem: as seções sobre eles descrevem o destino.
 
 ## Visão geral
 
@@ -42,12 +42,14 @@ As três camadas ficam visíveis na raiz do repositório ([ADR 0014](adr/0014-or
 |---|---|---|---|
 | `Engine/Source/Runtime/Core/` | a base da engine | `lemuria_core` | Núcleo |
 | `Engine/Source/Runtime/PlatformSDL/` | a camada de plataforma | `lemuria_platform_sdl` | Núcleo |
+| `Engine/Shaders/` | os shaders da engine, em HLSL, compilados no build para SPIR-V e DXIL ([ADR 0019](adr/0019-shaders-em-hlsl.md)) | compilados com `lemuria_platform_sdl` | Núcleo |
 | `Frameworks/Classic/` | o framework oficial, opcional | `lemuria_classic` | Classic |
 | `Samples/DemoGame/Source/Protocol/` | as mensagens da demonstração | `demo_protocol` | Jogo |
-| `Samples/DemoGame/Source/Client/` | o jogo de demonstração | `demo_client` | Jogo |
-| `Samples/DemoGame/Source/TestServer/` | o servidor de teste | `test_server` | Jogo |
+| `Samples/DemoGame/Source/Client/` | o jogo de demonstração: a biblioteca, que os testes usam sem abrir janela, e o programa com janela | `demo_client_lib` e `demo_client` | Jogo |
+| `Samples/DemoGame/Source/TestServer/` | o servidor de teste: as regras e as conexões numa biblioteca, que os testes usam no mesmo processo, e o programa | `test_server_lib` e `test_server` | Jogo |
+| `Samples/DemoGame/Source/TestSupport/` | o que os testes da demonstração com conexões reais compartilham | `demo_test_support` | Jogo |
 | `tools/` | `dev.py` (o comando único) e `checks/` (as checagens) | — | Ferramentas |
-| `tests/` | `architecture/` (o framework de exemplo e os programas com erro proposital para os sanitizers) e `hooks/` (testes dos hooks) | — | Testes do repositório |
+| `tests/` | `architecture/` (o framework de exemplo, os programas com erro proposital para os sanitizers e o teste que conta a memória pedida pelo quadro) e `hooks/` (testes dos hooks) | — | Testes do repositório |
 | `cmake/`, `docs/`, `templates/` | regras de build, documentos e modelos | — | Infraestrutura |
 
 Todo módulo tem o mesmo formato:
@@ -60,12 +62,14 @@ Core/
 └─ CMakeLists.txt
 ```
 
+Cada módulo tem uma página própria em `docs/modules/`: [Núcleo](modules/core.md), [Plataforma](modules/platform-sdl.md), [Classic](modules/classic.md) e [jogo de demonstração](modules/demo-game.md).
+
 Uma pasta só nasce quando tiver uso. Quando forem necessárias, estas pastas ficam em:
 
 | Pasta | O que vai guardar |
 |---|---|
 | `Engine/Source/Programs/` | programas próprios da engine, como importadores de conteúdo |
-| `Engine/Shaders/` e `Engine/Content/` | shaders e conteúdo padrão da engine |
+| `Engine/Content/` | o conteúdo padrão da engine |
 | `Samples/DemoGame/Content/` e `Samples/DemoGame/Config/` | a arte e as configurações do jogo de demonstração |
 | `tests/visual/approved/` | as imagens que o dono aprovou como referência da [prova visual](VISUAL.md#prova-visual) |
 
@@ -99,6 +103,8 @@ sequenceDiagram
 - **Sem alocação depois de aquecer.** O quadro reutiliza a memória, e um teste mede isso (INV-13).
 - **Animação independente do FPS.** Animações de taxa fixa são interpoladas para ficar suaves em qualquer taxa de quadros.
 
+**Como é hoje, na demonstração:** a cada quadro, o programa lê a entrada da janela e transforma o clique no bloco sob o cursor. A `DemoGame` atualiza a sessão (o adaptador entrega o que a rede trouxe), move todos no mundo e envia o pedido de caminhada. Depois ela descreve a cena, a câmera acompanha o jogador e o desenho apresenta a imagem. A rede troca lotes inteiros com o quadro, e os lotes de envio reservam a memória desde o começo. Os passos entre ler a janela e desenhar ficam na `DemoFrame`, que o programa e o teste do quadro chamam do mesmo jeito. O teste em `tests/architecture/frame_allocations` conta a memória que o quadro aquecido pede e exige zero. O que esse contador ainda não vê está na [TD-0014](TECH_DEBT.md).
+
 ## Encaixes
 
 Os encaixes são os pontos que o desenvolvedor pode trocar sem mexer na engine.
@@ -127,7 +133,9 @@ O desenho precisa aceitar servidores que funcionam de formas diferentes:
 | Uma mensagem chega antes de o mapa terminar de carregar | Os eventos ficam na fila até o mundo estar pronto para recebê-los |
 | Dados inválidos ou maliciosos chegam da rede | O adaptador valida tudo antes de gerar um evento (INV-12) |
 
-O contrato detalhado nasce na fatia 0. Ele é comparado com o fluxo real de um servidor externo em toda fatia que o alterar, e é provado por um adaptador de verdade depois da fatia de caçar ([TD-0003](TECH_DEBT.md)).
+O contrato detalhado está no [ADR 0017](adr/0017-contrato-do-adaptador.md), e as conexões, no [ADR 0018](adr/0018-conexoes-de-rede.md). No código, o Núcleo oferece `Connections`: abrir, enviar, fechar e `poll`, que entrega o que aconteceu em cada conexão. O Classic oferece o `ProtocolAdapter`, o descritor de capacidades (`AdapterCapabilities`), os eventos (`GameEvent`), os pedidos (`GameRequest`) e a sessão (`GameSession`), que vai da conexão até o mundo. O adaptador da demonstração (`DemoAdapter`) é o exemplo completo.
+
+O contrato é comparado com o fluxo real de um servidor externo em toda fatia que o alterar, e é provado por um adaptador de verdade na fatia 6 ([TD-0003](TECH_DEBT.md)).
 
 ## Conteúdo
 
@@ -140,13 +148,14 @@ O contrato detalhado nasce na fatia 0. Ele é comparado com o fluxo real de um s
 ## Gráficos
 
 - **Plataforma:** janela, entrada, arquivos e GPU ficam atrás de `lemuria_platform_sdl`, com SDL3 e SDL GPU ([ADR 0006](adr/0006-sdl3-plataforma-e-graficos.md)).
+- **Fronteira do desenho:** o jogo, o Classic e o Núcleo só conhecem a descrição da cena. A partir da fatia 2, só uma camada interna fala com a SDL GPU, para que a API gráfica possa ser trocada no futuro ([ADR 0020](adr/0020-fronteira-do-desenho.md)).
 - **Destino da renderização:** forward+ (clustered forward), adequado a muita transparência aditiva e a muitas luzes pequenas.
 - **Personagens:** skinning na GPU e desenho em lote (instancing) por peça de equipamento.
 - **Efeitos:** partículas na GPU, com orçamento.
 - **Escala:** menos detalhe para personagens, animações e efeitos distantes, e uma prioridade para decidir o que desenhar quando o orçamento acabar (INV-14).
 - **Qualidade:** níveis baixo, médio e alto, com redução automática para segurar a meta de FPS.
 
-Os testes de desenho rodam sem placa de vídeo na CI, com renderizadores de software.
+**Como é hoje:** um único passe desenha o chão e as formas simples em lote. Luzes, sombras e efeitos chegam na fatia 2. Os testes de desenho rodam sem placa de vídeo na CI do Linux, com um renderizador por software, e a prova visual compara as imagens com uma tolerância medida ([ADR 0021](adr/0021-prova-visual-e-tolerancia.md)).
 
 ## Interface
 
@@ -161,6 +170,11 @@ O som fica atrás da camada de plataforma. A biblioteca é decidida na fatia que
 ## Servidor de teste
 
 Um programa mínimo em `Samples/DemoGame/Source/TestServer/`, usado só nos testes e na demonstração ([ADR 0003](adr/0003-engine-so-de-cliente.md)). Ele fala o protocolo próprio da demonstração e implementa apenas o que as fatias precisam provar.
+
+- **Como é hoje:** as regras e as conexões ficam na biblioteca `test_server_lib`, que os testes rodam no mesmo processo. O programa `test_server` é o que `py tools/dev.py demo` abre.
+- Ele aceita conexões só do próprio computador e coloca cada jogador no bloco livre mais perto do centro do mapa.
+- Ele confere cada pedido de caminhada (velocidade, passos vizinhos e blocos permitidos) e corrige o que recusar.
+- Ele proíbe uma faixa de trilha que o cliente acredita ser livre, para a demonstração mostrar uma correção.
 
 ## Invariantes
 

@@ -4,6 +4,8 @@ from support import TempRepositoryTest
 
 from lemuria_checks import cpp_rules_check
 
+ALLOCATION_COUNTER = "tests/architecture/frame_allocations"
+
 
 class CppRulesTests(TempRepositoryTest):
     def findings_for(self, code: str, path: str = "Engine/Source/Runtime/Core/Private/a.cpp") -> list:
@@ -67,6 +69,30 @@ class CppRulesTests(TempRepositoryTest):
 
     def test_the_sanitizer_canaries_are_exempt(self) -> None:
         self.assertEqual(self.findings_for("int* a = new int(1);\n", "tests/architecture/sanitizer_canary/a.cpp"), [])
+
+    def test_the_allocation_counter_may_replace_the_allocation_functions(self) -> None:
+        code = (
+            "void* operator new(std::size_t size) { return std::malloc(size); }\n"
+            "void operator delete(void* pointer) noexcept { std::free(pointer); }\n"
+        )
+        self.assertEqual(self.findings_for(code, f"{ALLOCATION_COUNTER}/AllocationCounter.cpp"), [])
+
+    def test_the_allocation_counter_follows_every_other_rule(self) -> None:
+        cases = (
+            ("void f() { strcpy(a, b); }\n", "C string functions"),
+            ("auto a = rand();\n", "INV-05"),
+            ("auto a = std::chrono::steady_clock::now();\n", "INV-05"),
+            ("auto p = reinterpret_cast<const H*>(bytes);\n", "INV-12"),
+        )
+        for code, expected in cases:
+            with self.subTest(code=code):
+                self.assert_refused(self.findings_for(code, f"{ALLOCATION_COUNTER}/AllocationCounter.cpp"), expected)
+
+    def test_the_memory_exemption_does_not_reach_other_folders(self) -> None:
+        for path in ("tests/architecture/frame_allocations_other/a.cpp", "tests/architecture/a.cpp",
+                     "tests/frame_allocations/a.cpp", "Frameworks/Classic/Tests/frame_allocations/a.cpp"):
+            with self.subTest(path=path):
+                self.assert_refused(self.findings_for("int* a = new int(1);\n", path), "'new' is forbidden")
 
 
 if __name__ == "__main__":

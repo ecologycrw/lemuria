@@ -10,6 +10,11 @@
       "default-features": false,
       "features": ["vulkan"]
     },
+    "sdl3-net",
+    {
+      "name": "shaderc",
+      "host": true
+    },
     "catch2",
     "tl-expected"
   ]

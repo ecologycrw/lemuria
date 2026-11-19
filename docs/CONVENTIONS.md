@@ -60,6 +60,7 @@ Formato: `tipo(escopo): descrição curta em inglês`
 - **Dados externos passam por um leitor com limites.** Nunca transforme bytes de rede ou de arquivo em struct com `reinterpret_cast` ou `memcpy` direto.
 - **Sem estado global mutável.**
 - **Tempo e sorteios** vêm das fontes injetadas. `std::chrono::system_clock`, `steady_clock`, `rand` e `std::random_device` são proibidos fora da camada de plataforma.
+- **O quadro não pede memória (INV-13).** Reserve a memória ao criar o objeto e reutilize-a. Troque contêineres com o `swap` do próprio contêiner, nunca com `std::swap` de uma struct que os contém, e não crie um texto, nem vazio, a cada quadro. Na build de desenvolvimento do MSVC, mover um contêiner e criar um `std::string` pedem memória. O teste de `tests/architecture/frame_allocations` mostra em que parte do quadro a memória foi pedida.
 
 ## Antipadrões proibidos
 
@@ -97,6 +98,13 @@ A IA imita o código que já existe. Por isso, os melhores exemplos de cada padr
 | ler dados externos com validação e devolver erros por valor | `Engine/Source/Runtime/Core/Private/Version.cpp` |
 | testar uma leitura com dados inválidos | `Engine/Source/Runtime/Core/Tests/VersionTest.cpp` |
 | esconder uma biblioteca externa atrás da camada de plataforma | `Engine/Source/Runtime/PlatformSDL/Private/PlatformInfo.cpp` |
+| trabalhar em segundo plano e conversar com o quadro por lotes, sem pedir memória | `Engine/Source/Runtime/PlatformSDL/Private/TcpMailbox.cpp` |
+| cortar os bytes da rede em mensagens e ler cada uma com limites, com os dois níveis de erro | `Samples/DemoGame/Source/Protocol/Private/Framing.cpp` e `MessageCodec.cpp` |
+| escrever um adaptador de protocolo | `Samples/DemoGame/Source/Client/Private/DemoAdapter.cpp` |
+| preencher a descrição da cena | `Samples/DemoGame/Source/Client/Private/GroundScene.cpp` |
+| testar o movimento com tempo injetado | `Frameworks/Classic/Tests/WorldMovementTest.cpp` |
+| testar um servidor que se comporta mal | `Frameworks/Classic/Tests/MisbehavingServerTest.cpp` |
+| testar com conexões de verdade, esperando por condição com limite | `Samples/DemoGame/Source/Client/Tests/RealMatch.hpp` e `TwoPlayersTest.cpp` |
 
 ## Testes
 

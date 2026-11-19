@@ -1,5 +1,12 @@
 lemuria_add_library(lemuria_core
-    SOURCES Private/Version.cpp
+    SOURCES
+        Private/Connections.cpp
+        Private/FrameClock.cpp
+        Private/FrameTimeMeter.cpp
+        Private/Math.cpp
+        Private/SceneDescription.cpp
+        Private/SeededRandom.cpp
+        Private/Version.cpp
     PUBLIC_DEPS tl::expected)
 
 target_compile_definitions(lemuria_core PRIVATE

@@ -13,7 +13,9 @@ Usage: py tools/dev.py <command>  (use python3 on Linux)
   tidy       runs the static analysis
   checks     runs the repository checks in tools/checks
   pytests    runs the tests of the checks and of the Git hooks
-  gpu-test   opens the GPU, or a software renderer, without a window
+  gpu-test   opens the GPU, or a software renderer, without a window, and checks the proof image
+  visual     draws the proof image, checks its numbers and measures how smooth it runs
+  demo       opens the test server and two windows of the game (Windows only)
   mutation   runs the mutation tests (Linux only)
   vcpkg-baseline  prints the vcpkg version pinned by this repository
 
@@ -27,7 +29,9 @@ import concurrent.futures
 import json
 import os
 import platform
+import re
 import shutil
+import socket
 import subprocess
 import sys
 import time
@@ -39,6 +43,13 @@ IS_WINDOWS = platform.system() == "Windows"
 SYSTEM = "windows" if IS_WINDOWS else "linux"
 TIDY_FOLDERS = ("Engine", "Frameworks", "Samples")
 MUTATION_TEST_PROGRAMS = ("Engine/Source/Runtime/Core/Tests/core_tests",)
+VISUAL_FOLDER = ROOT / "build" / "visual"
+
+# The port of the demonstration: demo_protocol::kDefaultServerPort, in Samples/DemoGame/Source/Protocol.
+DEMO_PORT = 24000
+DEMO_WINDOWS = 2
+SERVER_START_SECONDS = 10.0
+FRAME_TIMES = re.compile(r"average (?P<average>[\d.]+) ms, worst 1% (?P<worst>[\d.]+) ms \(budget (?P<budget>[\d.]+) ms\)")
 
 
 class StepFailed(Exception):
@@ -188,9 +199,135 @@ def pytests() -> None:
             run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(script)], environment)
 
 
+def graphics_apis() -> tuple[str, ...]:
+    """The first one draws the image that is measured and compared with the approved image."""
+    return ("direct3d12", "vulkan") if IS_WINDOWS else ("vulkan",)
+
+
+def demo_program(folder: str, name: str) -> Path:
+    program = f"{name}.exe" if IS_WINDOWS else name
+    return ROOT / "build" / preset("dev") / "Samples" / "DemoGame" / "Source" / folder / program
+
+
+def run_client(*arguments: str) -> subprocess.CompletedProcess[str]:
+    path = demo_program("Client", "demo_client")
+    return subprocess.run([str(path), *arguments], cwd=ROOT, capture_output=True, text=True, errors="replace", check=False)
+
+
+def draw_proof_image(api: str, path: Path) -> None:
+    completed = run_client("--proof-image", str(path), "--graphics-api", api)
+    if completed.returncode != 0:
+        raise StepFailed(f"Could not draw the proof image with {api}: {completed.stderr.strip()}")
+
+
+def draw_repeatable_proof_image(api: str) -> Path:
+    """Draws the image twice, because the same scene must always give the same file."""
+    image = VISUAL_FOLDER / f"proof_scene_{api}.png"
+    repeated = VISUAL_FOLDER / f"proof_scene_{api}_repeated.png"
+    draw_proof_image(api, image)
+    draw_proof_image(api, repeated)
+    if image.read_bytes() != repeated.read_bytes():
+        raise StepFailed(f"The proof image changed between two runs with {api}.")
+    repeated.unlink()
+    return image
+
+
+def describe_frame_times(output: str) -> list[str]:
+    """Turns the answer of the client into the words the owner of the product reads."""
+    match = FRAME_TIMES.search(output)
+    if match is None:
+        raise StepFailed(f"Could not read the frame times: {output.strip()}")
+
+    def line(label: str, value: str) -> str:
+        status = "OK" if float(value) <= float(match["budget"]) else "FORA"
+        limit = match["budget"].replace(".", ",")
+        return f"  {status:<6}{label}: {value.replace('.', ',')} ms (limite: {limit} ms)"
+
+    return [line("Tempo médio do quadro", match["average"]), line("Tempo do pior 1% dos quadros", match["worst"])]
+
+
+def check_frame_times(api: str) -> None:
+    completed = run_client("--measure-frame-times", "--graphics-api", api)
+    if not completed.stdout.strip():
+        raise StepFailed(f"Could not measure the frame times with {api}: {completed.stderr.strip()}")
+    print(f"Fluidez com {api}:", *describe_frame_times(completed.stdout), sep="\n", flush=True)
+    if completed.returncode != 0:
+        raise StepFailed(f"The frames took too long with {api}.")
+
+
+def check_image(*arguments: str) -> None:
+    run([sys.executable, "tools/checks/run.py", *arguments])
+
+
+def visual_proof(measure_smoothness: bool) -> None:
+    VISUAL_FOLDER.mkdir(parents=True, exist_ok=True)
+    images = [draw_repeatable_proof_image(api) for api in graphics_apis()]
+    print(f"Imagem da prova visual: {images[0]}", flush=True)
+
+    check_image("measure-image", "--image", str(images[0]))
+    for other_image in images[1:]:
+        check_image("compare-image", "--image", str(other_image), "--reference", str(images[0]))
+    check_image("compare-image", "--image", str(images[0]))
+
+    if measure_smoothness:
+        for api in graphics_apis():
+            check_frame_times(api)
+
+
 def gpu_test() -> None:
     build("dev")
     run(["ctest", "--test-dir", f"build/{preset('dev')}", "-L", "gpu", "--output-on-failure"], build_environment())
+    visual_proof(measure_smoothness=False)
+
+
+def visual() -> None:
+    """Smoothness needs a real window, which only the Windows build has (docs/TECH_DEBT.md, TD-0006)."""
+    build("dev")
+    visual_proof(measure_smoothness=IS_WINDOWS)
+
+
+def is_listening(port: int) -> bool:
+    """Whether a program on this computer accepts connections on the port."""
+    try:
+        with socket.create_connection(("127.0.0.1", port), timeout=0.5):
+            return True
+    except OSError:
+        return False
+
+
+def start_program(command: Sequence[str], creation_flag: str) -> subprocess.Popen[bytes]:
+    """Starts a program that keeps running after this command ends. The flags exist only on Windows."""
+    return subprocess.Popen(list(command), cwd=ROOT, creationflags=getattr(subprocess, creation_flag, 0))
+
+
+def wait_until_listening(port: int, server: subprocess.Popen[bytes]) -> None:
+    give_up_at = time.monotonic() + SERVER_START_SECONDS
+    while not is_listening(port):
+        if server.poll() is not None:
+            raise StepFailed(f"The test server closed as soon as it started, with exit code {server.returncode}.")
+        if time.monotonic() > give_up_at:
+            raise StepFailed(f"The test server did not start listening on port {port}.")
+        time.sleep(0.1)
+
+
+def demo() -> None:
+    """Opens the test server in a window of its own, so the owner can close it, and two windows of the game.
+
+    The game opens real windows only in the Windows build (docs/TECH_DEBT.md, TD-0006).
+    """
+    if not IS_WINDOWS:
+        raise StepFailed("The demo opens windows, which only the Windows build has (docs/TECH_DEBT.md, TD-0006).")
+    build("dev")
+    if is_listening(DEMO_PORT):
+        raise StepFailed(f"Port {DEMO_PORT} is already in use. Close the test server that is still open and try again.")
+    server = start_program([str(demo_program("TestServer", "test_server")), "--port", str(DEMO_PORT)],
+                           "CREATE_NEW_CONSOLE")
+    wait_until_listening(DEMO_PORT, server)
+    for _ in range(DEMO_WINDOWS):
+        start_program([str(demo_program("Client", "demo_client")), "--port", str(DEMO_PORT)], "CREATE_NO_WINDOW")
+    print("A demonstração está aberta: o servidor de teste numa janela própria e o jogo em duas janelas.",
+          "As duas janelas do jogo abrem no mesmo lugar: arraste uma delas para o lado para ver as duas.",
+          "Para encerrar, feche as janelas do jogo e a janela do servidor de teste.", sep="\n", flush=True)
 
 
 def mutation() -> None:
@@ -258,7 +395,7 @@ def main(arguments: Sequence[str]) -> int:
     parser = argparse.ArgumentParser(description="Builds and verifies the Lemuria.")
     parser.add_argument("command", choices=[
         "verify", "quick", "configure", "build", "test", "sanitize", "format", "tidy", "checks", "pytests",
-        "gpu-test", "mutation", "vcpkg-baseline",
+        "gpu-test", "visual", "demo", "mutation", "vcpkg-baseline",
     ])
     parser.add_argument("--fix", action="store_true", help="format: correct the files")
     parser.add_argument("--no-static", action="store_true", help="verify: skip formatting and static analysis")
@@ -267,7 +404,7 @@ def main(arguments: Sequence[str]) -> int:
 
     simple: dict[str, Callable[[], None]] = {
         "configure": configure, "build": build, "test": test, "sanitize": sanitize, "tidy": tidy,
-        "pytests": pytests, "gpu-test": gpu_test, "mutation": mutation,
+        "pytests": pytests, "gpu-test": gpu_test, "visual": visual, "demo": demo, "mutation": mutation,
     }
     if options.command == "verify":
         return run_steps(BUILD_ONLY_STEPS if options.no_static else VERIFY_STEPS)

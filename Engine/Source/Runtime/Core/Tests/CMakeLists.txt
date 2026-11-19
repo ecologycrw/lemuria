@@ -1,3 +1,11 @@
 lemuria_add_tests(core_tests
-    SOURCES ResultTest.cpp VersionTest.cpp
+    SOURCES
+        ConnectionsTest.cpp
+        FrameClockTest.cpp
+        FrameTimeMeterTest.cpp
+        MathTest.cpp
+        ResultTest.cpp
+        SceneDescriptionTest.cpp
+        SeededRandomTest.cpp
+        VersionTest.cpp
     DEPS lemuria_core)

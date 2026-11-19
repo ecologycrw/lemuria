@@ -4,17 +4,16 @@
 
 ## Concluídas
 
-*(nenhuma ainda)*
+- **Preparação.** Documentos, esqueleto do código com as travas automáticas, ambiente de IA e GitHub.
 
 ## Agora
 
-**Preparação.** Documentos, esqueleto do código com as travas automáticas, ambiente de IA e GitHub. Ver o [STATUS.md](STATUS.md).
+**Fatia 0: Primeiros passos.** Uma janela com chão em blocos, câmera 3/4 e clicar para andar, ligada ao servidor de teste; dois clientes se veem no mesmo mapa. A engine gera a imagem de uma cena fixa para conferência e mede a fluidez ([guia visual](VISUAL.md)). Ver a [spec](../specs/0000-primeiros-passos/spec.md).
 
 ## Próximas
 
 | Fatia | Nome | O que entrega, do ponto de vista de quem testa |
 |---|---|---|
-| 0 | Primeiros passos | Uma janela com chão em blocos, câmera 3/4 e clicar para andar, ligada ao servidor de teste; dois clientes se veem no mesmo mapa. A engine gera a imagem de uma cena fixa para conferência e mede a fluidez ([guia visual](VISUAL.md)) |
 | 1 | Personagem vivo | Um personagem de verdade, importado do glTF, com animação suave em qualquer taxa de quadros. Aqui se decide de onde vem a arte |
 | 2 | Luz e clima | O mapa ganha chão pintado, manchas de sombra, luzes de fogo que tremulam, neblina leve e cantos mais escuros, e a cena de prova cumpre todas as faixas do [guia visual](VISUAL.md#números-da-imagem) |
 | 3 | Equipamento | Peças trocáveis (elmo, armadura, armas), asas e brilho de item por nível |

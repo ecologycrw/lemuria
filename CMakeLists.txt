@@ -10,6 +10,7 @@ include(LemuriaSanitizers)
 include(LemuriaModule)
 
 find_package(SDL3 CONFIG REQUIRED)
+find_package(SDL3_net CONFIG REQUIRED)
 find_package(tl-expected CONFIG REQUIRED)
 find_package(Catch2 3 CONFIG REQUIRED)
 

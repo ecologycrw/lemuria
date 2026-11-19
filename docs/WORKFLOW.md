@@ -132,7 +132,7 @@ flowchart LR
 | Históricos ("por que foi assim") | specs, reports, ADRs | não são editados; um ADR novo substitui o antigo e diz isso |
 | Ambiente (as travas) | `AGENTS.md`, `CLAUDE.md`, `.claude/`, hooks, CI | só por proposta aprovada |
 
-A documentação de um sistema nasce com a primeira fatia que cria esse sistema, a partir do modelo `templates/module.md`.
+A documentação de um sistema nasce com a primeira fatia que cria esse sistema, a partir do modelo `templates/module.md`, e fica em `docs/modules/`.
 
 ## Consolidação
 
