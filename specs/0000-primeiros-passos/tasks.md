@@ -28,7 +28,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T14: Medição dos números da imagem em `tools/checks` (CA-20). Verificação: testes em `tools/checks/tests` e números da cena de prova dentro das faixas.
 - [x] T15: Comparação com a imagem aprovada, tolerância medida e ADR 0021 (CA-21, CA-22). Verificação: testes em `tools/checks/tests` e comparação entre Direct3D 12 e Vulkan.
 - [x] T16: Estatísticas e medidor de fluidez (CA-23). Verificação: teste com a etiqueta `[0000-CA-23]` e medição real na cena de prova.
-- [ ] T17: Comando `py tools/dev.py visual`, com o `gpu-test` rodando também a prova visual. Verificação: o comando mostra a imagem, os números e a fluidez.
+- [x] T17: Comando `py tools/dev.py visual`, com o `gpu-test` rodando também a prova visual. Verificação: o comando mostra a imagem, os números e a fluidez.
 
 ## Etapa 4: Contrato e mundo
 
@@ -119,6 +119,15 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - **Os testes detectam erros:** os 14 defeitos colocados de propósito no código foram reprovados.
 - **Limite da medição:** o resultado vale para este computador, na build de desenvolvimento (TD-0011), e não comprova o piso de hardware (TD-0002).
 
+**T17, comando `py tools/dev.py visual`.**
+
+- **O que o comando faz:** desenha a imagem duas vezes com cada API gráfica, confere se saíram iguais, mostra o caminho da imagem e os números, compara as APIs entre si e com a imagem aprovada, e mede a fluidez.
+- **O que a imagem mostra:** abri `build/visual/proof_scene_direct3d12.png`. É a mesma cena da T14, com o chão escuro e quente, a trilha, as pedras em grupos e os dois personagens fáceis de diferenciar.
+- **Windows:** todos os números ficaram dentro das faixas, Vulkan e Direct3D 12 tiveram 0 pontos diferentes, e a fluidez ficou em 0,41 ms de média e até 2,89 ms no pior 1%.
+- **Ambiente igual ao da CI do Linux:** `gpu-test` e `visual` passaram com o renderizador por software, limitados a 6 núcleos. A imagem do Linux teve 17 pontos diferentes da imagem do Windows, dentro da tolerância.
+- **Ainda sem imagem aprovada:** o comando avisa e não falha. O dono aprova a imagem no fim da fatia.
+- **Os testes detectam erros:** os 23 defeitos colocados de propósito numa cópia do `tools/dev.py` foram reprovados.
+
 ## Revisão
 
 *(preenchido pelo `/revisar`)*
@@ -126,12 +135,13 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T17. As etapas 1 e 2 e as tarefas T13 a T16 estão concluídas.
+- Próxima tarefa: T18, a primeira da etapa 4. As etapas 1, 2 e 3 estão concluídas.
+- A TD-0007 foi resolvida pelo comando `py tools/dev.py visual` e saiu de `docs/TECH_DEBT.md`. O report da fatia precisa registrar essa resolução.
 - A fluidez é medida com `demo_client --measure-frame-times [--graphics-api nome]`. O comando abre uma janela visível por alguns segundos e termina com código 1 se passar do limite de 16,6 ms. A CI do Linux não tem janela de verdade, então essa medição fica só no computador de desenvolvimento.
 - Não encerre o turno com um build em segundo plano: o hook `stop-check` compila ao mesmo tempo e os dois builds entram em conflito.
 - A comparação roda com `py tools/checks/run.py compare-image --image arquivo.png`. Sem `--reference`, ela usa `tests/visual/approved/proof_scene.png`, e só o dono coloca a imagem nessa pasta.
 - A TD-0005 foi resolvida pelo ADR 0021 e saiu de `docs/TECH_DEBT.md`. O report da fatia precisa registrar essa resolução.
-- A CA-22 ainda depende da T17, que faz o `gpu-test` rodar a prova visual na CI do Linux.
+- A CA-22 passou num ambiente igual ao da CI do Linux. A prova definitiva é o check verde da CI, quando o PR da fatia for aberto.
 - O volume `lemuria-t15-cache` do Docker guarda as bibliotecas compiladas no ambiente igual ao da CI (cerca de 6 GB). Peça ao dono para removê-lo no fim da fatia. Ao usar o Docker, limite o contêiner a 6 dos 12 núcleos, a pedido do dono.
 - A medição roda com `py tools/checks/run.py measure-image --image arquivo.png`. O leitor de PNG fica em `tools/checks/lemuria_checks/png_reader.py` e pode ser usado pela comparação da T15.
 - O dono escolheu separar o desenho por etapas ([ADR 0020](../../docs/adr/0020-fronteira-do-desenho.md)). Nesta fatia, nenhum tipo de API gráfica pode aparecer em cabeçalhos públicos. A separação interna fica para a fatia 2 (TD-0009).
