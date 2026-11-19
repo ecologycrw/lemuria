@@ -43,6 +43,13 @@ Formato de cada entrada (o modelo completo fica em `templates/proposal.md`):
 - Prioridade sugerida: baixa
 - Status: aberta
 
+### P-0005: mostrar como texto as falhas que hoje abrem uma janela do Windows nos testes
+- Origem: feedback do dono, na revisão da fatia 0
+- Tipo: trava
+- Evidência: numa rodada de defeitos colocados de propósito, o programa `platform_sdl_tests` abriu a janela "Debug Assertion Failed" e ficou parado até o dono clicar em "Anular". O dono mandou a foto da janela e perguntou: "É possível tirar screenshot da janela de exceção que aparece no windows ?". Nada no repositório desliga essa janela (não há `_CrtSetReportMode`, `_set_abort_behavior` nem `SetErrorMode`), e a CI do Windows roda os mesmos testes em `python tools/dev.py verify --no-static`. Se um defeito real causar uma falha dessas, o teste pode ficar parado até o tempo limite, sem mostrar a mensagem. A sugestão é que os programas de teste escrevam a falha como texto e terminem na hora, para ela aparecer na saída do `verify` e na CI. Isso provavelmente mexe em `cmake/` ou em `tools/dev.py`, que são travas
+- Prioridade sugerida: média
+- Status: aberta
+
 ## Processadas
 
 *(nenhuma)*
