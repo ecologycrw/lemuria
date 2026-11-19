@@ -13,6 +13,7 @@ from . import (
     architecture_check,
     cpp_rules_check,
     docs_check,
+    image_comparison,
     image_measures,
     pr_summary,
     structure_check,
@@ -32,10 +33,13 @@ CHECKS: dict[str, Callable[[Path], list[Finding]]] = {
 
 def main(arguments: Sequence[str]) -> int:
     parser = argparse.ArgumentParser(prog="tools/checks/run.py", description="Runs the repository checks.")
-    parser.add_argument("commands", nargs="+", choices=[*CHECKS, "all", "pr-summary", "measure-image"])
+    parser.add_argument(
+        "commands", nargs="+", choices=[*CHECKS, "all", "pr-summary", "measure-image", "compare-image"]
+    )
     parser.add_argument("--root", type=Path, help="the repository folder")
     parser.add_argument("--base", default="origin/main", help="pr-summary: the branch to compare with")
-    parser.add_argument("--image", type=Path, help="measure-image: the PNG file to measure")
+    parser.add_argument("--image", type=Path, help="measure-image and compare-image: the PNG file to check")
+    parser.add_argument("--reference", type=Path, help="compare-image: the image to compare with")
     options = parser.parse_args(arguments)
 
     if "measure-image" in options.commands:
@@ -47,6 +51,11 @@ def main(arguments: Sequence[str]) -> int:
     if root is None:
         print(f"Could not find the repository root ({MARKER_FILE}).")
         return 2
+
+    if "compare-image" in options.commands:
+        if options.image is None:
+            parser.error("compare-image needs --image")
+        return image_comparison.run(options.image, options.reference or root / image_comparison.APPROVED_IMAGE)
 
     if "pr-summary" in options.commands:
         return pr_summary.run(root, options.base)

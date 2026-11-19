@@ -24,3 +24,4 @@ Cada ADR registra uma decisão importante, o motivo e as alternativas. Um ADR ac
 | [0018](0018-conexoes-de-rede.md) | Conexões de rede com SDL3_net e caminho para o GNS | aceita |
 | [0019](0019-shaders-em-hlsl.md) | Shaders em HLSL, compilados durante o build | aceita |
 | [0020](0020-fronteira-do-desenho.md) | Fronteira do desenho e troca futura da API gráfica | aceita |
+| [0021](0021-prova-visual-e-tolerancia.md) | Onde a prova visual roda e qual é a tolerância da comparação | aceita |

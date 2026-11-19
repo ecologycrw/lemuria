@@ -26,7 +26,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 - [x] T13: Cena de prova e imagem em arquivo (CA-19). Verificação: teste com a etiqueta `[0000-CA-19]`, com duas imagens idênticas.
 - [x] T14: Medição dos números da imagem em `tools/checks` (CA-20). Verificação: testes em `tools/checks/tests` e números da cena de prova dentro das faixas.
-- [ ] T15: Comparação com a imagem aprovada, tolerância medida e ADR 0021 (CA-21, CA-22). Verificação: testes em `tools/checks/tests` e comparação entre Direct3D 12 e Vulkan.
+- [x] T15: Comparação com a imagem aprovada, tolerância medida e ADR 0021 (CA-21, CA-22). Verificação: testes em `tools/checks/tests` e comparação entre Direct3D 12 e Vulkan.
 - [ ] T16: Estatísticas e medidor de fluidez (CA-23). Verificação: teste com a etiqueta `[0000-CA-23]` e medição real na cena de prova.
 - [ ] T17: Comando `py tools/dev.py visual`, com o `gpu-test` rodando também a prova visual. Verificação: o comando mostra a imagem, os números e a fluidez.
 
@@ -93,6 +93,19 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - **Ponto de atenção:** a sombra profunda está perto do limite inferior de 12%. Uma mudança no mapa ou nas cores pode reprovar a imagem.
 - **Os testes detectam erros:** 25 de 26 defeitos colocados de propósito numa cópia do código foram reprovados. O defeito restante não muda nenhum resultado, porque só troca a escolha entre dois valores iguais.
 
+**T15, comparação entre os renderizadores.** O renderizador por software foi medido num ambiente igual ao da CI (Ubuntu 24.04, Clang 18 e Mesa 25.2.8), criado com o Docker, com a autorização do dono.
+
+| Comparação | Pontos diferentes (acima de 2 unidades) | Resultado |
+|---|---|---|
+| Vulkan e Direct3D 12, na mesma placa de vídeo | 0 de 921.600 | aceita |
+| Placa de vídeo e renderizador por software | 17 de 921.600 (0,002%) | aceita |
+| Menor mudança real medida (personagens 5% mais baixos) | 832 de 921.600 (0,090%) | recusada |
+
+- **O que a imagem do Linux mostra:** a mesma cena do Windows, sem diferença visível. O chão, a trilha, as pedras e os dois personagens estão nos mesmos lugares. Os números da imagem são os mesmos da T14.
+- **Repetição no Linux:** as duas imagens geradas saíram idênticas byte a byte, e os testes `[0000-CA-19]` passaram com o renderizador por software.
+- **Tolerância:** até 2 unidades de cor por canal e até 0,01% de pontos diferentes ([ADR 0021](../../docs/adr/0021-prova-visual-e-tolerancia.md)). As 10 mudanças reais medidas foram recusadas.
+- **Os testes detectam erros:** os 18 defeitos colocados de propósito numa cópia do código foram reprovados.
+
 ## Revisão
 
 *(preenchido pelo `/revisar`)*
@@ -100,7 +113,11 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T15. As etapas 1 e 2, a T13 e a T14 estão concluídas.
+- Próxima tarefa: T16. As etapas 1 e 2 e as tarefas T13 a T15 estão concluídas.
+- A comparação roda com `py tools/checks/run.py compare-image --image arquivo.png`. Sem `--reference`, ela usa `tests/visual/approved/proof_scene.png`, e só o dono coloca a imagem nessa pasta.
+- A TD-0005 foi resolvida pelo ADR 0021 e saiu de `docs/TECH_DEBT.md`. O report da fatia precisa registrar essa resolução.
+- A CA-22 ainda depende da T17, que faz o `gpu-test` rodar a prova visual na CI do Linux.
+- O volume `lemuria-t15-cache` do Docker guarda as bibliotecas compiladas no ambiente igual ao da CI (cerca de 6 GB). Peça ao dono para removê-lo no fim da fatia.
 - A medição roda com `py tools/checks/run.py measure-image --image arquivo.png`. O leitor de PNG fica em `tools/checks/lemuria_checks/png_reader.py` e pode ser usado pela comparação da T15.
 - O dono escolheu separar o desenho por etapas ([ADR 0020](../../docs/adr/0020-fronteira-do-desenho.md)). Nesta fatia, nenhum tipo de API gráfica pode aparecer em cabeçalhos públicos. A separação interna fica para a fatia 2 (TD-0009).
 - O cliente já aceita `--proof-image arquivo`, `--graphics-api nome` e `--frames quantidade`. A cena de prova fica em `DemoClient/ProofScene.hpp`, e `DemoClient/ProofImage.hpp` desenha essa cena numa imagem em memória.
