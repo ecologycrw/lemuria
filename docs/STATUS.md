@@ -9,11 +9,11 @@ atualizado-em: 2026-11-19
 
 ## Agora
 
-**Fatia 0 (Primeiros passos) em construção.** As etapas 1 (Fundações), 2 (Desenho), 3 (Prova visual) e 4 (Contrato e mundo) estão concluídas: a janela mostra o chão em blocos com Vulkan e Direct3D 12, `py tools/dev.py visual` gera a imagem de prova, e o framework passa nos cenários de servidor "mal-educado" com dois adaptadores que funcionam de jeitos diferentes. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
+**Fatia 0 (Primeiros passos) em construção, com 30 de 34 tarefas concluídas.** As etapas 1 (Fundações), 2 (Desenho), 3 (Prova visual), 4 (Contrato e mundo) e 5 (Protocolo e servidor) estão concluídas, assim como as tarefas T29 e T30 da etapa 6 (Jogo completo). O servidor de teste e dois clientes com janela já funcionam juntos: cada cliente vê o outro no mapa, e o título da janela mostra o estado da conexão. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
 
 ## Próxima ação
 
-Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T28, o programa do servidor de teste, na etapa 5 (Protocolo e servidor).
+Rodar `/implementar` numa sessão nova, na branch `fatia/0000-primeiros-passos`, para continuar da tarefa T31 (teste de ponta a ponta com dois clientes), na etapa 6 (Jogo completo). Depois vêm a T32, a T33 (que muda o `tools/dev.py`, uma trava, e pede a confirmação do dono) e a T34.
 
 ## Bloqueios
 
