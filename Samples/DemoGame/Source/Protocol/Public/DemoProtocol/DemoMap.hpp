@@ -13,6 +13,12 @@ public:
     static constexpr int kSize = 64;
     static constexpr std::uint64_t kDefaultSeed = 20261118;
 
+    // The number of the map in the messages.
+    static constexpr std::uint32_t kId = 1;
+
+    // Players start around this tile, on both axes, and the area around it is always free of rocks.
+    static constexpr int kSpawnCenter = kSize / 2;
+
     explicit DemoMap(std::uint64_t seed = kDefaultSeed);
 
     [[nodiscard]] bool contains(int x, int z) const noexcept;

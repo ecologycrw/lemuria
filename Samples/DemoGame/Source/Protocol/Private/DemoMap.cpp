@@ -36,7 +36,7 @@ constexpr int kTrailFirstZ = 27;
 constexpr int kTrailLastZ = 28;
 
 // The area around the starting point is always free of rocks.
-constexpr int kSpawnCenter = DemoMap::kSize / 2;
+constexpr int kSpawnCenter = DemoMap::kSpawnCenter;
 constexpr int kSpawnRadius = 4;
 
 [[nodiscard]] std::size_t tile_index(int x, int z) noexcept {
