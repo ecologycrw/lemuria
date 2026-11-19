@@ -2,7 +2,7 @@
 fase: fatia
 spec-atual: 0000
 branch: fatia/0000-primeiros-passos
-atualizado-em: 2026-11-18
+atualizado-em: 2026-11-19
 ---
 
 # Status
@@ -13,7 +13,7 @@ atualizado-em: 2026-11-18
 
 ## Próxima ação
 
-Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T23, o mundo e as entidades, na etapa 4 (Contrato e mundo).
+Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T24, o movimento, a antecipação e a correção, na etapa 4 (Contrato e mundo).
 
 ## Bloqueios
 

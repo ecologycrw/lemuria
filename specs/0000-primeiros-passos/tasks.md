@@ -37,7 +37,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T20: Grade e cálculo de caminho no Classic (CA-03). Verificação: testes com a etiqueta `[0000-CA-03]`.
 - [x] T21: Eventos, pedidos, capacidades e contrato do adaptador no Classic (CA-15, CA-16). Verificação: adaptador de teste compila e passa nos testes.
 - [x] T22: Sessão e entrada no mapa, com fila de retenção, época de mapa e prazos (CA-13, CA-14). Verificação: testes com as etiquetas `[0000-CA-13]` e `[0000-CA-14]`.
-- [ ] T23: Mundo e entidades, com números temporários (CA-12). Verificação: testes com a etiqueta `[0000-CA-12]`.
+- [x] T23: Mundo e entidades, com números temporários (CA-12). Verificação: testes com a etiqueta `[0000-CA-12]`.
 - [ ] T24: Movimento, antecipação e correção (CA-04, CA-05, CA-06, CA-07). Verificação: testes com as etiquetas correspondentes, com tempo injetado.
 - [ ] T25: Cenários de servidor "mal-educado" e adaptadores com capacidades diferentes (CA-15, CA-16). Verificação: testes com as etiquetas `[0000-CA-15]` e `[0000-CA-16]`.
 
@@ -135,7 +135,11 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T23. As etapas 1, 2 e 3 e as tarefas T18 a T22 estão concluídas.
+- Próxima tarefa: T24. As etapas 1, 2 e 3 e as tarefas T18 a T23 estão concluídas.
+- O mundo fica em `lemuria::classic::World`. Em `on_map_entered`, o jogo chama `enter_map`. Quando o mapa carregar, chama `set_grid` e só depois `finish_map_load`, porque o mundo recusa eventos enquanto não tem a grade.
+- A T24 precisa tratar `OwnWalkConfirmed`, que o mundo ainda recusa e conta. `EntityWalked` hoje só guarda o destino, e o personagem ainda não anda.
+- O jogador nunca é removido do mundo enquanto há um mapa, e sempre tem lugar reservado. Quando o mundo enche, novos personagens são recusados e contados.
+- A T23 passou por 59 defeitos colocados de propósito numa cópia do código. Um deles sobreviveu na primeira rodada e revelou uma falta de teste para áreas que começam antes do mapa. O teste foi criado, e agora os 59 são reprovados.
 - A sessão fica em `lemuria::classic::GameSession`. O jogo implementa `SessionListener`: em `on_map_entered`, remove tudo do mundo, carrega o mapa e chama `finish_map_load` com o bilhete recebido. Um bilhete de um carregamento antigo não muda nada.
 - A T22 prova a parte da sessão de CA-13 e CA-14. A remoção dos personagens ao trocar de mapa precisa de um teste com o mundo, na T23. O aviso de queda no título da janela vem na T30.
 - Eventos que chegam antes do primeiro mapa são descartados e contados. Se a fila de retenção encher, a sessão termina com `TooManyHeldEvents`, porque o mundo deixaria de ser confiável.

@@ -9,4 +9,5 @@ lemuria_add_tests(classic_tests
         ThreeQuarterCameraTest.cpp
         TileGridTest.cpp
         WalkStepsTest.cpp
+        WorldTest.cpp
     DEPS lemuria_classic)
