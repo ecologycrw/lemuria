@@ -13,7 +13,7 @@ atualizado-em: 2026-11-18
 
 ## Próxima ação
 
-Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T22, a sessão e a entrada no mapa, na etapa 4 (Contrato e mundo).
+Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T23, o mundo e as entidades, na etapa 4 (Contrato e mundo).
 
 ## Bloqueios
 

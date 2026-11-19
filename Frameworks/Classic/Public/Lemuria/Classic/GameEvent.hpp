@@ -24,6 +24,9 @@ enum class SessionEndReason : std::uint8_t {
 
     // The bytes broke the format of the messages, and there is no way to find the next message.
     InvalidData,
+
+    // More events arrived during a map load than the session can hold, so its world can no longer be trusted.
+    TooManyHeldEvents,
 };
 
 enum class EntityLeaveReason : std::uint8_t {

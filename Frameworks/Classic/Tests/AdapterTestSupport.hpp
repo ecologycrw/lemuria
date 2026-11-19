@@ -294,4 +294,64 @@ private:
     bool has_ended_ = false;
 };
 
+inline constexpr AdapterCapabilities kScriptedCapabilities{
+    .connection_kind = core::kTcpConnectionKind,
+    .walk_requests = WalkRequestMode::Steps,
+    .max_steps_per_request = 8,
+};
+
+// An adapter whose events are written by each test, for testing what the framework does with them.
+class ScriptedAdapter final : public ProtocolAdapter {
+public:
+    explicit ScriptedAdapter(const AdapterCapabilities& capabilities = kScriptedCapabilities)
+        : capabilities_(capabilities) {}
+
+    [[nodiscard]] const AdapterCapabilities& capabilities() const noexcept override { return capabilities_; }
+
+    void arrive(const GameEvent& event) { script_.push_back(event); }
+
+    [[nodiscard]] core::Result<void> begin_session() override {
+        if (refuses_to_begin) {
+            return core::make_error("the server does not exist");
+        }
+        return {};
+    }
+
+    void poll(GameEventSink& events) override {
+        ++poll_count;
+        const std::vector<GameEvent> script = std::exchange(script_, {});
+        for (const GameEvent& event : script) {
+            events.deliver(event);
+        }
+        if (end_is_pending_) {
+            end_is_pending_ = false;
+            events.deliver(SessionEnded{SessionEndReason::ClosedByPlayer});
+        }
+    }
+
+    [[nodiscard]] core::Result<void> send_request(const GameRequest& request) override {
+        if (refuses_to_send) {
+            return core::make_error("the connection is closed");
+        }
+        requests.push_back(request);
+        return {};
+    }
+
+    void end_session() noexcept override {
+        ++end_requests;
+        end_is_pending_ = true;
+    }
+
+    std::vector<GameRequest> requests;
+    int poll_count = 0;
+    int end_requests = 0;
+    bool refuses_to_begin = false;
+    bool refuses_to_send = false;
+
+private:
+    AdapterCapabilities capabilities_;
+    std::vector<GameEvent> script_;
+    bool end_is_pending_ = false;
+};
+
 } // namespace lemuria::classic::testing

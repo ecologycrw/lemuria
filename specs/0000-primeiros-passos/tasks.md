@@ -36,7 +36,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T19: Conexões TCP em segundo plano com o SDL3_net (CA-14, CA-16, CA-17). Verificação: testes em `Engine/Source/Runtime/PlatformSDL/Tests`.
 - [x] T20: Grade e cálculo de caminho no Classic (CA-03). Verificação: testes com a etiqueta `[0000-CA-03]`.
 - [x] T21: Eventos, pedidos, capacidades e contrato do adaptador no Classic (CA-15, CA-16). Verificação: adaptador de teste compila e passa nos testes.
-- [ ] T22: Sessão e entrada no mapa, com fila de retenção, época de mapa e prazos (CA-13, CA-14). Verificação: testes com as etiquetas `[0000-CA-13]` e `[0000-CA-14]`.
+- [x] T22: Sessão e entrada no mapa, com fila de retenção, época de mapa e prazos (CA-13, CA-14). Verificação: testes com as etiquetas `[0000-CA-13]` e `[0000-CA-14]`.
 - [ ] T23: Mundo e entidades, com números temporários (CA-12). Verificação: testes com a etiqueta `[0000-CA-12]`.
 - [ ] T24: Movimento, antecipação e correção (CA-04, CA-05, CA-06, CA-07). Verificação: testes com as etiquetas correspondentes, com tempo injetado.
 - [ ] T25: Cenários de servidor "mal-educado" e adaptadores com capacidades diferentes (CA-15, CA-16). Verificação: testes com as etiquetas `[0000-CA-15]` e `[0000-CA-16]`.
@@ -135,7 +135,12 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T22. As etapas 1, 2 e 3 e as tarefas T18 a T21 estão concluídas.
+- Próxima tarefa: T23. As etapas 1, 2 e 3 e as tarefas T18 a T22 estão concluídas.
+- A sessão fica em `lemuria::classic::GameSession`. O jogo implementa `SessionListener`: em `on_map_entered`, remove tudo do mundo, carrega o mapa e chama `finish_map_load` com o bilhete recebido. Um bilhete de um carregamento antigo não muda nada.
+- A T22 prova a parte da sessão de CA-13 e CA-14. A remoção dos personagens ao trocar de mapa precisa de um teste com o mundo, na T23. O aviso de queda no título da janela vem na T30.
+- Eventos que chegam antes do primeiro mapa são descartados e contados. Se a fila de retenção encher, a sessão termina com `TooManyHeldEvents`, porque o mundo deixaria de ser confiável.
+- Só as esperas pelo servidor e pelo carregamento do mapa têm prazo. A escolha de personagem depende do jogador, e o silêncio do servidor dentro do mundo é normal.
+- A T22 passou por 79 defeitos colocados de propósito numa cópia do código, e os testes reprovaram todos.
 - O contrato do adaptador fica em `Lemuria/Classic/ProtocolAdapter.hpp`, com `GameEvent.hpp`, `GameRequest.hpp` e `AdapterCapabilities.hpp`. A sessão da T22 deve chamar `check_capabilities` antes de usar um adaptador.
 - Eventos e pedidos são valores simples, sem memória própria, então a fila de retenção da T22 pode guardá-los sem alocar. O limite de passos por evento ou pedido é `WalkSteps::kCapacity` (32).
 - O adaptador e a conexão de teste ficam em `Frameworks/Classic/Tests/AdapterTestSupport.hpp`, para as tarefas T22 a T25 reutilizarem.
