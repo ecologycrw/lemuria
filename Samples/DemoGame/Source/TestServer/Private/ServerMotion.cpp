@@ -45,20 +45,22 @@ bool ServerMotion::is_walking_at(double time) const noexcept {
     return tile_at(time) != destination();
 }
 
-std::optional<double> ServerMotion::arrival_on_route(Tile tile) const noexcept {
+std::optional<double> ServerMotion::arrival_ahead(Tile tile, double time) const noexcept {
     Tile previous = origin_;
     double arrival = start_time_;
-    if (tile == origin_) {
-        return arrival;
-    }
+    std::optional<double> found = tile == origin_ ? std::optional<double>(arrival) : std::nullopt;
     for (const Tile step : steps_.view()) {
         arrival += step_length(previous, step) / tiles_per_second_;
-        if (step == tile) {
-            return arrival;
+        if (arrival <= time) {
+            // The player already reached this step, so the tiles before it were left behind.
+            found.reset();
+        }
+        if (!found && step == tile) {
+            found = arrival;
         }
         previous = step;
     }
-    return std::nullopt;
+    return found;
 }
 
 } // namespace test_server

@@ -19,11 +19,12 @@ namespace {
     return (diagonal_steps * std::numbers::sqrt2) + straight_steps;
 }
 
-// The earliest time the player can be at the start of the walk: along its route when the start is on it, or
-// straight from where it is when it is not.
+// The earliest time the player can be at the start of the walk: along its route when the start is still ahead
+// on it, or straight from where it is when it is not. A tile already left behind is measured like any other
+// tile off the route, so a player can never go back along its walk for free.
 [[nodiscard]] tl::expected<double, WalkRefusal>
 earliest_start(Tile origin, const ServerMotion& motion, double now, const WalkLimits& limits) noexcept {
-    if (const std::optional<double> arrival = motion.arrival_on_route(origin)) {
+    if (const std::optional<double> arrival = motion.arrival_ahead(origin, now)) {
         return *arrival;
     }
     const Tile current = motion.tile_at(now);

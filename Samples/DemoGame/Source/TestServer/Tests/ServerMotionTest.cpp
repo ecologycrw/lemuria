@@ -78,10 +78,37 @@ TEST_CASE("a player is walking until it reaches the end of its walk") {
 TEST_CASE("the server knows when a player reaches each tile of its route") {
     const ServerMotion motion = walking({{3, 2}, {4, 3}});
 
-    CHECK(motion.arrival_on_route({2, 2}) == Approx(kStart));
-    CHECK(motion.arrival_on_route({3, 2}) == Approx(kStart + 0.25));
-    CHECK(motion.arrival_on_route({4, 3}) == Approx(kStart + 0.25 + (std::numbers::sqrt2 / kSpeed)));
-    CHECK_FALSE(motion.arrival_on_route({9, 9}).has_value());
+    CHECK(motion.arrival_ahead({2, 2}, kStart) == Approx(kStart));
+    CHECK(motion.arrival_ahead({3, 2}, kStart) == Approx(kStart + 0.25));
+    CHECK(motion.arrival_ahead({4, 3}, kStart) == Approx(kStart + 0.25 + (std::numbers::sqrt2 / kSpeed)));
+    CHECK_FALSE(motion.arrival_ahead({9, 9}, kStart).has_value());
+}
+
+TEST_CASE("the tile a player stands on is still ahead, but the tiles it left behind are not") {
+    const ServerMotion motion = walking({{3, 2}, {4, 2}, {5, 2}});
+
+    SECTION("while walking") {
+        CHECK_FALSE(motion.arrival_ahead({2, 2}, kStart + 0.6).has_value());
+        CHECK_FALSE(motion.arrival_ahead({3, 2}, kStart + 0.6).has_value());
+        CHECK(motion.arrival_ahead({4, 2}, kStart + 0.6) == Approx(kStart + 0.5));
+        CHECK(motion.arrival_ahead({5, 2}, kStart + 0.6) == Approx(kStart + 0.75));
+    }
+    SECTION("long after the end of the walk") {
+        CHECK_FALSE(motion.arrival_ahead({2, 2}, kStart + 100.0).has_value());
+        CHECK_FALSE(motion.arrival_ahead({4, 2}, kStart + 100.0).has_value());
+        CHECK(motion.arrival_ahead({5, 2}, kStart + 100.0) == Approx(kStart + 0.75));
+    }
+    SECTION("before the walk starts") {
+        CHECK(motion.arrival_ahead({2, 2}, kStart - 0.2) == Approx(kStart));
+    }
+}
+
+TEST_CASE("a route that passes a tile twice is ahead only at the next pass") {
+    const ServerMotion motion = walking({{3, 2}, {2, 2}, {2, 3}});
+
+    CHECK(motion.arrival_ahead({2, 2}, kStart) == Approx(kStart));
+    CHECK(motion.arrival_ahead({2, 2}, kStart + 0.3) == Approx(kStart + 0.5));
+    CHECK_FALSE(motion.arrival_ahead({3, 2}, kStart + 0.5).has_value());
 }
 
 TEST_CASE("a walk without steps leaves the player standing") {
@@ -92,7 +119,7 @@ TEST_CASE("a walk without steps leaves the player standing") {
     CHECK(motion.tile_at(kStart + 5.0) == Tile{3, 2});
     CHECK(motion.destination() == Tile{3, 2});
     CHECK_FALSE(motion.is_walking_at(kStart + 0.3));
-    CHECK_FALSE(motion.arrival_on_route({4, 2}).has_value());
+    CHECK_FALSE(motion.arrival_ahead({4, 2}, kStart + 0.3).has_value());
 }
 
 TEST_CASE("a new walk replaces the previous one") {
@@ -102,5 +129,5 @@ TEST_CASE("a new walk replaces the previous one") {
 
     CHECK(motion.tile_at(kStart + 1.0) == Tile{3, 2});
     CHECK(motion.tile_at(kStart + 1.25) == Tile{3, 3});
-    CHECK_FALSE(motion.arrival_on_route({4, 2}).has_value());
+    CHECK_FALSE(motion.arrival_ahead({4, 2}, kStart + 1.0).has_value());
 }

@@ -33,8 +33,9 @@ public:
 
     [[nodiscard]] bool is_walking_at(double time) const noexcept;
 
-    // When the player reaches a tile of the current walk, or nothing when the tile is not on it.
-    [[nodiscard]] std::optional<double> arrival_on_route(Tile tile) const noexcept;
+    // When the player reaches a tile of the current walk that is still ahead at this time, counting the tile
+    // it stands on. Nothing when the tile is not on the walk or was already left behind.
+    [[nodiscard]] std::optional<double> arrival_ahead(Tile tile, double time) const noexcept;
 
     [[nodiscard]] double tiles_per_second() const noexcept { return tiles_per_second_; }
 

@@ -157,6 +157,24 @@ TEST_CASE("a walk off the route is measured from where the player is now", "[000
     require_refused(check(WalkRequest{{5, 3}, {}}, motion, 0.0), WalkRefusal::OriginTooFar);
 }
 
+TEST_CASE("a walk that starts on a tile the player already passed is measured from where it is now",
+          "[0000-CA-08]") {
+    const ServerMotion motion = walking_four_steps();
+
+    SECTION("more than a step behind is too far, even long after the walk") {
+        require_refused(check(WalkRequest{kStart, steps_of({{1, 2}})}, motion, 10.0),
+                        WalkRefusal::OriginTooFar);
+        require_refused(check(WalkRequest{{4, 2}, {}}, motion, 10.0), WalkRefusal::OriginTooFar);
+        require_refused(check(WalkRequest{kStart, {}}, motion, 0.6), WalkRefusal::OriginTooFar);
+    }
+    SECTION("one step behind is accepted, paying for the step back") {
+        const auto checked = check(WalkRequest{{5, 2}, steps_of({{5, 3}})}, motion, 10.0);
+
+        REQUIRE(checked.has_value());
+        CHECK(*checked == Approx(10.25));
+    }
+}
+
 TEST_CASE("the next part sent before the player could finish the previous one is too fast", "[0000-CA-08]") {
     const ServerMotion motion = walking_four_steps();
 
