@@ -155,7 +155,45 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 
 ## Revisão
 
-*(preenchido pelo `/revisar`)*
+**Primeira rodada, em 2026-11-19, com o revisor independente.** Ele achou 0 críticos, 3 importantes e 8 menores. Ele abriu as duas imagens da cena de prova, mediu os números de novo (todos dentro das faixas) e rodou o `verify`, que passou. Conferi cada achado no código.
+
+| # | Gravidade | Achado | Procedia? | O que foi feito |
+|---|---|---|---|---|
+| 1 | importante | O servidor de teste aceitava como origem um bloco que o jogador já tinha deixado para trás na rota, e o jogador podia voltar a caminhada inteira de uma vez | sim | Corrigido: só contam como rota o bloco em que o jogador está e os blocos à frente; os outros pagam a distância a partir de onde ele está, com a tolerância de origem. Testes novos com a etiqueta `[0000-CA-08]`. Os 5 defeitos colocados de propósito foram reprovados |
+| 2 | importante | A checagem de camadas (INV-02) não reconhece os alvos `demo_client_lib`, `test_server_lib` e `demo_test_support`, nem os cabeçalhos `TestServer/` | sim, conferido rodando os padrões | Não corrigido: `tools/checks/` é trava e precisa da aprovação do dono |
+| 3 | importante | Testes fracos nas tarefas T28, T29 e T30 | sim, em parte | Ver abaixo |
+| 4 | menor | A posição de entrada no mapa não era conferida contra a grade (INV-12) | sim | Corrigido: `World::set_grid` recusa um mapa que não contém o jogador, e a demonstração encerra a sessão com um título claro. Testes com a etiqueta `[0000-CA-11]` |
+| 5 | menor | O cliente escondia um erro de configuração ao iniciar a sessão | sim | Corrigido: o programa mostra o erro e termina. Sem teste automático, porque o programa com janela não roda nos testes |
+| 6 | menor | Um mapa desconhecido aparecia no título como "disconnected" | sim | Corrigido, com o título conferido no teste |
+| 7 | menor | Toda configuração regravava os shaders embutidos e recompilava o renderizador | sim, visto nesta sessão | Corrigido: o arquivo só é regravado quando muda. Depois de reconfigurar, o build mostrou "no work to do" |
+| 8 | menor | Código de teste repetido | sim | Em parte: o jogador e a partida com conexões de verdade foram para `RealMatch.hpp`, usado por `TwoPlayersTest.cpp` e pelo novo `DemoRulesTest.cpp`. Continuam as cópias em `ServerHostTest.cpp` (com limites próprios) e em `tests/architecture/frame_allocations/MeasuredMatch.hpp`, que é trava |
+| 9 | menor | As regras de movimento repetem o que o adaptador declara, sem conferência | sim | Registrado como TD-0021 |
+| 10 | menor | Com Vulkan e a janela minimizada, o laço do cliente provavelmente não pausa | provável, não confirmado | Registrado como TD-0022 |
+| 11 | menor | O clique vem em coordenadas da janela e o tamanho em pixels; hoje coincidem | sim, ainda sem efeito | Registrado como TD-0023 |
+
+**Achado 3, o que foi feito:**
+
+- **Servidor de teste (T28):**
+  - novo teste: nada do que um cliente envia depois do fim da conexão é tratado;
+  - o teste de saída confere que uma saída normal não conta como conexão quebrada;
+  - o programa `test_server` recusa, com a mensagem de uso, a porta 0, a 65536, uma porta com letras, uma porta negativa, `--port` sem valor e uma opção desconhecida. Um servidor que abrisse mesmo assim estoura o limite de 10 s do teste.
+- **Adaptador (T29):** novo teste: um aviso inicial que não consegue sair encerra a sessão como conexão perdida. A conexão roteirizada ganhou `refuses_sends`.
+- **Cliente (T30):** os testes cobrem todos os textos de estado do título e a câmera antes de o jogador chegar.
+- **Ponta a ponta, com os valores reais da demonstração (`DemoRulesTest.cpp`):**
+  - clicar no meio de um passo;
+  - uma caminhada de 20 blocos, mais longa que um pedido;
+  - a correção na faixa proibida, em que os dois jogadores veem o personagem onde o servidor decidiu (`[0000-CA-06]`).
+- **O que ficou sem teste, e por quê:**
+  - **Limite de conexões aceitas por rodada (16):** o sistema guarda menos de 20 conexões na fila antes de o servidor aceitá-las. Com 2 conexões a fila funcionou, com 20 não, então não dá para deixar mais de 16 esperando de forma confiável.
+  - **Limite de leituras por rodada:** o teste não tem como garantir que os bytes já chegaram todos antes da rodada.
+  - **Falha de escrita do servidor:** depende de quando o sistema percebe a queda, e o teste ficaria instável (a mesma razão da TD-0013).
+  - **Unidade do tempo no programa `test_server`:** exigiria rodar o programa como um processo separado. O teste manual da demonstração cobre isso.
+  - **O laço do programa com janela:** o teste de alocação (`MeasuredMatch.hpp`) reescreve esse quadro em vez de chamar o mesmo código. Corrigir exige mexer nessa trava, o que precisa da aprovação do dono.
+- **Rodada de defeitos colocados de propósito:** 12 defeitos, 11 reprovados. O que sobreviveu foi zerar a tolerância de origem do servidor da demonstração. Depois da correção do achado 1, o cliente nunca pede uma caminhada a partir de um bloco que o servidor já deixou para trás, porque o servidor está sempre um pouco atrás do cliente. A tolerância fica como margem para redes de verdade.
+
+**Verificação depois das correções:** `py tools/dev.py verify` passou, com formatação, build e testes (17 de 17 grupos), sanitizers (18 de 18), análise estática sem problemas, checagens e testes das travas. Os testes com a etiqueta `gpu` também passaram (20 de 20 grupos com `ctest`).
+
+**Pendente com o dono:** a aprovação para mexer em duas travas: a checagem de camadas (achado 2) e o teste de alocação do quadro, para que ele use o mesmo quadro do programa (achados 3 e 8).
 
 ## Notas para a próxima sessão
 
@@ -171,7 +209,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - O comando `py tools/dev.py demo` (T33) compila, confere se a porta 24000 está livre, abre o servidor de teste numa janela própria (no Windows 11, ela abre no Terminal do Windows), espera até 10 s o servidor aceitar conexões e abre duas janelas do jogo, sem console. Depois ele termina, e os programas continuam abertos. No Linux, ele recusa com o motivo (TD-0006). Os testes ficam em `tools/checks/tests/test_dev_demo.py` e passaram por 17 defeitos colocados de propósito numa cópia do `dev.py`, todos reprovados. Na abertura de verdade, as duas janelas mostraram "on the map"; fechando uma janela e depois o servidor, a outra mostrou "the connection to the test server was lost" e continuou respondendo.
 - As duas janelas do jogo abrem no mesmo lugar, e o comando avisa o dono para arrastar uma delas. Abrir cada janela num lugar exigiria uma opção nova no `demo_client`.
 - A T33 atualizou a documentação viva: arquitetura (como é agora, alvos, quadro, adaptador, gráficos e servidor de teste), glossário (nove termos novos), convenções (regra de não pedir memória no quadro e código de referência da fatia), itens provisórios (TD-0015 a TD-0020, as simplificações do plano que ainda não estavam registradas), `docs/setup/DEV.md` e o README.
-- As tarefas T28, T29 e T30 não passaram por uma rodada própria de defeitos colocados de propósito, como as anteriores. Vale fazer isso antes do `/revisar`, ou registrar o motivo de não fazer. A T31 cobriu uma parte: o teste de ponta a ponta reprovou os 7 defeitos colocados no servidor (não avisar a chegada a quem já estava, não mostrar ao recém-chegado quem já estava, não avisar a saída), no adaptador (ignorar a caminhada dos outros) e no jogo (sair sem encerrar, não enviar a caminhada, não mover ninguém).
+- A revisão terminou a rodada de defeitos colocados de propósito das tarefas T28, T29 e T30 (veja "Revisão"). Falta só a decisão do dono sobre as duas travas; depois vem o `/fechar`. Antes da revisão, a T31 já cobria uma parte: o teste de ponta a ponta reprovou os 7 defeitos colocados no servidor (não avisar a chegada a quem já estava, não mostrar ao recém-chegado quem já estava, não avisar a saída), no adaptador (ignorar a caminhada dos outros) e no jogo (sair sem encerrar, não enviar a caminhada, não mover ninguém).
 - O código da fatia ainda não rodou na CI do Linux, que só roda em PR e na `main`. O Clang de lá é mais rigoroso que o MSVC (veja a nota sobre funções sem uso abaixo).
 - Para compilar, use `py tools/dev.py build`: o `cmake --build` direto não encontra o ambiente do Visual Studio. O `py tools/dev.py format` só confere; para formatar, rode o `clang-format.exe -i` do Visual Studio (`VC/Tools/Llvm/x64/bin`) nos arquivos alterados.
 - As regras do servidor ficam na biblioteca `test_server_lib` (`Samples/DemoGame/Source/TestServer`), sem nenhuma conexão: `ServerWorld` recebe as mensagens de cada cliente (`receive`), a saída de um cliente (`remove`) e o tempo, e responde por um `ServerOutbox` (`send` e `disconnect`). O `ServerHost` (T28) escolhe os `ClientId`, lê os quadros com o `FrameReader` e envia o que o `ServerOutbox` receber.

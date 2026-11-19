@@ -104,7 +104,7 @@ A IA imita o código que já existe. Por isso, os melhores exemplos de cada padr
 | preencher a descrição da cena | `Samples/DemoGame/Source/Client/Private/GroundScene.cpp` |
 | testar o movimento com tempo injetado | `Frameworks/Classic/Tests/WorldMovementTest.cpp` |
 | testar um servidor que se comporta mal | `Frameworks/Classic/Tests/MisbehavingServerTest.cpp` |
-| testar com conexões de verdade, esperando por condição com limite | `Samples/DemoGame/Source/Client/Tests/TwoPlayersTest.cpp` |
+| testar com conexões de verdade, esperando por condição com limite | `Samples/DemoGame/Source/Client/Tests/RealMatch.hpp` e `TwoPlayersTest.cpp` |
 
 ## Testes
 

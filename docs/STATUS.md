@@ -13,7 +13,7 @@ atualizado-em: 2026-11-19
 
 ## Próxima ação
 
-Rodar `/revisar` na branch `fatia/0000-primeiros-passos`. O dono já decidiu que o tamanho do personagem, na CA-01, é medido dos pés à cabeça.
+A revisão foi feita, e os achados que não dependem de trava foram corrigidos. O dono decide se aprova mexer em duas travas: a checagem de camadas e o teste de alocação do quadro. Depois, rodar `/fechar` na branch `fatia/0000-primeiros-passos`.
 
 ## Bloqueios
 
