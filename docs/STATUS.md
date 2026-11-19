@@ -13,7 +13,7 @@ atualizado-em: 2026-11-18
 
 ## Próxima ação
 
-Abrir uma sessão nova na branch `fatia/0000-primeiros-passos` e rodar `/implementar` para continuar da tarefa T20, a grade e o cálculo de caminho, na etapa 4 (Contrato e mundo).
+Rodar `/implementar` na branch `fatia/0000-primeiros-passos` para continuar da tarefa T21, os eventos, pedidos e capacidades do contrato do adaptador, na etapa 4 (Contrato e mundo).
 
 ## Bloqueios
 
