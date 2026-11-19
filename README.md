@@ -14,7 +14,7 @@ A engine tem três camadas:
 
 ## Estado atual
 
-**Em preparação.** Ainda não há nada para rodar. Veja [docs/STATUS.md](docs/STATUS.md) e [docs/ROADMAP.md](docs/ROADMAP.md).
+**No começo.** A primeira fatia traz uma demonstração no Windows: um servidor de teste e duas janelas do jogo, com chão em blocos, câmera 3/4 e clicar para andar, em que cada jogador vê o outro. Para abrir, siga a preparação em [docs/setup/DEV.md](docs/setup/DEV.md) e rode `py tools/dev.py demo`. Veja [docs/STATUS.md](docs/STATUS.md) e [docs/ROADMAP.md](docs/ROADMAP.md).
 
 ## Documentação
 
