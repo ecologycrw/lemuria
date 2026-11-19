@@ -35,7 +35,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - [x] T18: Interface de conexões no Núcleo, com tipos de conexão e opções de entrega (CA-14, CA-16). Verificação: testes em `Engine/Source/Runtime/Core/Tests`.
 - [x] T19: Conexões TCP em segundo plano com o SDL3_net (CA-14, CA-16, CA-17). Verificação: testes em `Engine/Source/Runtime/PlatformSDL/Tests`.
 - [x] T20: Grade e cálculo de caminho no Classic (CA-03). Verificação: testes com a etiqueta `[0000-CA-03]`.
-- [ ] T21: Eventos, pedidos, capacidades e contrato do adaptador no Classic (CA-15, CA-16). Verificação: adaptador de teste compila e passa nos testes.
+- [x] T21: Eventos, pedidos, capacidades e contrato do adaptador no Classic (CA-15, CA-16). Verificação: adaptador de teste compila e passa nos testes.
 - [ ] T22: Sessão e entrada no mapa, com fila de retenção, época de mapa e prazos (CA-13, CA-14). Verificação: testes com as etiquetas `[0000-CA-13]` e `[0000-CA-14]`.
 - [ ] T23: Mundo e entidades, com números temporários (CA-12). Verificação: testes com a etiqueta `[0000-CA-12]`.
 - [ ] T24: Movimento, antecipação e correção (CA-04, CA-05, CA-06, CA-07). Verificação: testes com as etiquetas correspondentes, com tempo injetado.
@@ -135,7 +135,12 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T21. As etapas 1, 2 e 3 e as tarefas T18, T19 e T20 estão concluídas.
+- Próxima tarefa: T22. As etapas 1, 2 e 3 e as tarefas T18 a T21 estão concluídas.
+- O contrato do adaptador fica em `Lemuria/Classic/ProtocolAdapter.hpp`, com `GameEvent.hpp`, `GameRequest.hpp` e `AdapterCapabilities.hpp`. A sessão da T22 deve chamar `check_capabilities` antes de usar um adaptador.
+- Eventos e pedidos são valores simples, sem memória própria, então a fila de retenção da T22 pode guardá-los sem alocar. O limite de passos por evento ou pedido é `WalkSteps::kCapacity` (32).
+- O adaptador e a conexão de teste ficam em `Frameworks/Classic/Tests/AdapterTestSupport.hpp`, para as tarefas T22 a T25 reutilizarem.
+- A T21 prova só a parte do contrato de CA-15 e CA-16. A prova completa, com a sessão, o mundo e o movimento do Classic, vem na T25.
+- A T21 passou por 23 defeitos colocados de propósito numa cópia do código, e os testes reprovaram todos.
 - A grade fica em `lemuria::classic::TileGrid` e o cálculo de caminho em `lemuria::classic::PathFinder`. Chame `prepare_for` quando o mapa carregar, para a busca não alocar memória durante o quadro. A T32 precisa provar isso com o contador de alocações.
 - Cada jogo escolhe a regra de diagonal em `PathRules`. O servidor de teste não pode usar o Classic, então a T27 precisa conferir os passos com a mesma regra escolhida pelo cliente da demonstração.
 - O personagem pode sair de um bloco bloqueado, porque o servidor pode colocá-lo em qualquer lugar. Só o destino precisa estar livre.
