@@ -48,7 +48,7 @@ As três camadas ficam visíveis na raiz do repositório ([ADR 0014](adr/0014-or
 | `Samples/DemoGame/Source/TestServer/` | o servidor de teste | `test_server` | Jogo |
 | `Samples/DemoGame/Source/TestSupport/` | o que os testes da demonstração com conexões reais compartilham | `demo_test_support` | Jogo |
 | `tools/` | `dev.py` (o comando único) e `checks/` (as checagens) | — | Ferramentas |
-| `tests/` | `architecture/` (o framework de exemplo e os programas com erro proposital para os sanitizers) e `hooks/` (testes dos hooks) | — | Testes do repositório |
+| `tests/` | `architecture/` (o framework de exemplo, os programas com erro proposital para os sanitizers e o teste que conta a memória pedida pelo quadro) e `hooks/` (testes dos hooks) | — | Testes do repositório |
 | `cmake/`, `docs/`, `templates/` | regras de build, documentos e modelos | — | Infraestrutura |
 
 Todo módulo tem o mesmo formato:

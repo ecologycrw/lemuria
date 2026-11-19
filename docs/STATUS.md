@@ -9,11 +9,11 @@ atualizado-em: 2026-11-19
 
 ## Agora
 
-**Fatia 0 (Primeiros passos) em construção, com 31 de 34 tarefas concluídas.** As etapas 1 (Fundações), 2 (Desenho), 3 (Prova visual), 4 (Contrato e mundo) e 5 (Protocolo e servidor) estão concluídas, assim como as tarefas T29, T30 e T31 da etapa 6 (Jogo completo). O servidor de teste e dois clientes com janela já funcionam juntos: cada cliente vê o outro no mapa, e o título da janela mostra o estado da conexão. Um teste automático com conexões de verdade prova que cada jogador vê o outro chegar, andar até o destino e sumir ao sair. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
+**Fatia 0 (Primeiros passos) em construção, com 32 de 34 tarefas concluídas.** As etapas 1 (Fundações), 2 (Desenho), 3 (Prova visual), 4 (Contrato e mundo) e 5 (Protocolo e servidor) estão concluídas, assim como as tarefas T29 a T32 da etapa 6 (Jogo completo). O servidor de teste e dois clientes com janela já funcionam juntos: cada cliente vê o outro no mapa, e o título da janela mostra o estado da conexão. Testes automáticos com conexões de verdade provam que cada jogador vê o outro chegar, andar até o destino e sumir ao sair, e que o quadro aquecido não pede memória. O andamento fica nas [tarefas da fatia](../specs/0000-primeiros-passos/tasks.md).
 
 ## Próxima ação
 
-Rodar `/implementar` na branch `fatia/0000-primeiros-passos`, para continuar da tarefa T32 (teste do quadro sem alocação de memória), na etapa 6 (Jogo completo). Depois vêm a T33 (que muda o `tools/dev.py`, uma trava, e pede a confirmação do dono) e a T34.
+Rodar `/implementar` na branch `fatia/0000-primeiros-passos`, para continuar da tarefa T33 (comando `py tools/dev.py demo` e documentação viva), na etapa 6 (Jogo completo). A T33 muda o `tools/dev.py`, uma trava, e pede a confirmação do dono. Depois vem a T34.
 
 ## Bloqueios
 

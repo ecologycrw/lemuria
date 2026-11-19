@@ -6,6 +6,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <mutex>
+#include <optional>
 #include <span>
 #include <vector>
 
@@ -20,18 +21,40 @@ enum class TcpRequestKind : std::uint8_t { Open, Send, Close };
 struct TcpRequest {
     TcpRequestKind kind = TcpRequestKind::Open;
     core::ConnectionId connection;
-    core::ConnectionAddress address; // Only for `Open`.
-    std::size_t first_byte = 0;      // Only for `Send`: where its bytes start in the batch.
-    std::size_t byte_count = 0;      // Only for `Send`.
+
+    // Only for `Open`. The other requests carry no text at all, so sending asks for no memory (INV-13).
+    std::optional<core::ConnectionAddress> address;
+
+    std::size_t first_byte = 0; // Only for `Send`: where its bytes start in the batch.
+    std::size_t byte_count = 0; // Only for `Send`.
 };
 
+// The room each request batch has from the start. The game's thread writes its requests into whichever batch
+// the mailbox holds, and the two batches take turns, so both must be ready before the first frame: a frame
+// sends far less than this, and sending asks for no memory (INV-13). A bigger batch still works, and keeps
+// its memory.
+inline constexpr std::size_t kReservedRequestsPerBatch = 64;
+inline constexpr std::size_t kReservedRequestBytesPerBatch = std::size_t{64} * 1024;
+
+// The batches are traded with `swap`, member by member. Trading them with `std::swap` would move them through
+// a temporary batch, and some standard libraries ask for memory to move a container (INV-13).
 struct TcpRequestBatch {
     std::vector<TcpRequest> requests;
     std::vector<std::byte> bytes;
 
+    TcpRequestBatch() {
+        requests.reserve(kReservedRequestsPerBatch);
+        bytes.reserve(kReservedRequestBytesPerBatch);
+    }
+
     void clear() noexcept {
         requests.clear();
         bytes.clear();
+    }
+
+    void swap(TcpRequestBatch& other) noexcept {
+        requests.swap(other.requests);
+        bytes.swap(other.bytes);
     }
 };
 
@@ -53,6 +76,11 @@ struct TcpNoticeBatch {
     void clear() noexcept {
         notices.clear();
         bytes.clear();
+    }
+
+    void swap(TcpNoticeBatch& other) noexcept {
+        notices.swap(other.notices);
+        bytes.swap(other.bytes);
     }
 };
 

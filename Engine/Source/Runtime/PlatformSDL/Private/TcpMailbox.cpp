@@ -45,7 +45,7 @@ core::Result<void> TcpMailbox::post_send(core::ConnectionId connection, std::spa
         const std::size_t first_byte = requests_.bytes.size();
         requests_.bytes.insert(requests_.bytes.end(), bytes.begin(), bytes.end());
         requests_.requests.push_back(
-            TcpRequest{TcpRequestKind::Send, connection, {}, first_byte, bytes.size()});
+            TcpRequest{TcpRequestKind::Send, connection, std::nullopt, first_byte, bytes.size()});
     }
     requests_arrived_.notify_one();
     return {};
@@ -57,7 +57,7 @@ void TcpMailbox::post_close(core::ConnectionId connection) {
         if (SendBacklog* backlog = find_backlog(connection); backlog != nullptr) {
             *backlog = SendBacklog{};
         }
-        requests_.requests.push_back(TcpRequest{TcpRequestKind::Close, connection, {}, 0, 0});
+        requests_.requests.push_back(TcpRequest{TcpRequestKind::Close, connection, std::nullopt, 0, 0});
     }
     requests_arrived_.notify_one();
 }
@@ -72,7 +72,7 @@ void TcpMailbox::ask_to_stop() {
 
 void TcpMailbox::take_notices(TcpNoticeBatch& batch) {
     const std::scoped_lock lock(mutex_);
-    std::swap(batch, notices_);
+    batch.swap(notices_);
     for (const TcpNotice& notice : batch.notices) {
         if (notice.kind != TcpNoticeKind::Closed) {
             continue;
@@ -85,7 +85,7 @@ void TcpMailbox::take_notices(TcpNoticeBatch& batch) {
 
 bool TcpMailbox::take_requests(TcpRequestBatch& batch) {
     const std::scoped_lock lock(mutex_);
-    std::swap(batch, requests_);
+    batch.swap(requests_);
     return !stop_requested_;
 }
 

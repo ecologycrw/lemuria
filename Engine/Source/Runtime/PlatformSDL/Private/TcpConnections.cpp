@@ -115,8 +115,10 @@ private:
         const std::uint64_t now = monotonic_nanoseconds();
         for (const TcpRequest& request : requests_.requests) {
             if (request.kind == TcpRequestKind::Open) {
-                links_.push_back(
-                    std::make_unique<TcpLink>(request.connection, request.address, timeouts_, now, mailbox_));
+                if (request.address) {
+                    links_.push_back(std::make_unique<TcpLink>(request.connection, *request.address,
+                                                               timeouts_, now, mailbox_));
+                }
                 continue;
             }
             // The connection may have ended while the request was on its way.
