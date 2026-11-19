@@ -146,7 +146,7 @@ Nenhuma mudança.
 | Placas de vídeo diferentes geram imagens um pouco diferentes | A tolerância é medida entre Direct3D 12, Vulkan e o renderizador por software, e justificada no ADR 0021 |
 | O Windows da CI não tem placa de vídeo, e a SDL GPU não oferece um renderizador por software para o Direct3D 12 | A prova roda na CI do Linux e, no Windows, na máquina de desenvolvimento |
 | O contador de alocações pode entrar em conflito com os sanitizers | O teste roda na build normal. Se não puder rodar com sanitizers, o motivo fica registrado no ADR 0021 e no report |
-| Teste com rede real pode falhar de forma intermitente | Portas livres escolhidas pelo sistema, somente no próprio computador, e espera por condição com limite, sem pausas fixas |
+| Teste com rede real pode falhar de forma intermitente | Portas livres procuradas numa faixa reservada aos testes, porque o SDL3_net não informa a porta escolhida pelo sistema, somente no próprio computador, e espera por condição com limite |
 | A conexão de teste só imita o GNS e pode não revelar tudo o que a biblioteca real exige | O contrato cobre as diferenças conhecidas, e a integração real terá ADR e testes próprios ([P-0003](../../docs/PROPOSALS.md)) |
 | O contrato pode servir só para o servidor de teste | Os cenários "mal-educados" e os dois adaptadores com capacidades diferentes testam casos que o servidor de teste não produz. A prova final continua sendo a fatia 6 ([TD-0003](../../docs/TECH_DEBT.md)) |
 

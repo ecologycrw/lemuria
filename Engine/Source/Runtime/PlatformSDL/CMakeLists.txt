@@ -5,9 +5,13 @@ lemuria_add_library(lemuria_platform_sdl
         Private/MonotonicClock.cpp
         Private/PlatformInfo.cpp
         Private/Renderer.cpp
+        Private/TcpConnections.cpp
+        Private/TcpLink.cpp
+        Private/TcpListener.cpp
+        Private/TcpMailbox.cpp
         Private/Window.cpp
     PUBLIC_DEPS lemuria_core
-    PRIVATE_DEPS SDL3::SDL3)
+    PRIVATE_DEPS SDL3::SDL3 $<IF:$<TARGET_EXISTS:SDL3_net::SDL3_net>,SDL3_net::SDL3_net,SDL3_net::SDL3_net-static>)
 
 # Shaders are compiled while configuring, so the static analysis finds them without a full build
 # (docs/adr/0019-shaders-em-hlsl.md).

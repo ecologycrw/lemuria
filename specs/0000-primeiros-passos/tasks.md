@@ -33,7 +33,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Etapa 4: Contrato e mundo
 
 - [x] T18: Interface de conexões no Núcleo, com tipos de conexão e opções de entrega (CA-14, CA-16). Verificação: testes em `Engine/Source/Runtime/Core/Tests`.
-- [ ] T19: Conexões TCP em segundo plano com o SDL3_net (CA-14, CA-16, CA-17). Verificação: testes em `Engine/Source/Runtime/PlatformSDL/Tests`.
+- [x] T19: Conexões TCP em segundo plano com o SDL3_net (CA-14, CA-16, CA-17). Verificação: testes em `Engine/Source/Runtime/PlatformSDL/Tests`.
 - [ ] T20: Grade e cálculo de caminho no Classic (CA-03). Verificação: testes com a etiqueta `[0000-CA-03]`.
 - [ ] T21: Eventos, pedidos, capacidades e contrato do adaptador no Classic (CA-15, CA-16). Verificação: adaptador de teste compila e passa nos testes.
 - [ ] T22: Sessão e entrada no mapa, com fila de retenção, época de mapa e prazos (CA-13, CA-14). Verificação: testes com as etiquetas `[0000-CA-13]` e `[0000-CA-14]`.
@@ -135,7 +135,10 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 ## Notas para a próxima sessão
 
 - Shaders: o dono trocou o `directx-dxc` pelo `shaderc` em 2026-11-18, por causa dos termos da Microsoft no pacote de Windows daquela ferramenta. O SPIR-V sai do `glslc` (`shaderc`) e o DXIL sai do `dxc` do Windows SDK, que não gera SPIR-V. O Linux compila só SPIR-V. Um shader de exemplo com `[[vk::binding(0, 1)]]` e `register(b0, space1)` compilou nas duas ferramentas.
-- Próxima tarefa: T19. As etapas 1, 2 e 3 e a T18 estão concluídas.
+- Próxima tarefa: T20. As etapas 1, 2 e 3 e as tarefas T18 e T19 estão concluídas.
+- As conexões TCP ficam em `lemuria::platform::TcpConnections` (`Lemuria/Platform/TcpConnections.hpp`). Os sockets vivem numa thread própria, que só conversa com o quadro pela `TcpMailbox`. Limites: 64 KiB por envio, 1 MiB na fila de envio de cada conexão e 1 MiB de bytes recebidos esperando o `poll`. Neste computador, um envio levou 1,4 ms em média até chegar ao outro lado, e 3,2 ms no pior caso.
+- O servidor de teste (T28) deve usar `lemuria::platform::TcpListener` (`Lemuria/Platform/TcpListener.hpp`), que só aceita conexões do próprio computador. Ele escuta em `127.0.0.1`, então o cliente precisa conectar nesse endereço, e não em `localhost`, que pode virar IPv6.
+- A T19 passou por 18 defeitos colocados de propósito no código, e os testes reprovaram todos. A restrição do `TcpListener` ao próprio computador não tem teste automático, porque exigiria uma segunda interface de rede.
 - Cada tipo de conexão deriva de `lemuria::core::Connections` (`Lemuria/Core/Connections.hpp`) e implementa `traits`, `start_connecting`, `queue_bytes`, `stop_connection` e `collect_events`. A classe base já garante as regras comuns: números que não se repetem, limite de 8 conexões abertas, recusa de opções de envio não oferecidas e nenhum dado depois do fim da conexão. O `collect_events` roda na thread do quadro e não pode esperar pela rede.
 - A TD-0007 foi resolvida pelo comando `py tools/dev.py visual` e saiu de `docs/TECH_DEBT.md`. O report da fatia precisa registrar essa resolução.
 - A fluidez é medida com `demo_client --measure-frame-times [--graphics-api nome]`. O comando abre uma janela visível por alguns segundos e termina com código 1 se passar do limite de 16,6 ms. A CI do Linux não tem janela de verdade, então essa medição fica só no computador de desenvolvimento.
@@ -153,7 +156,7 @@ Legenda: `[ ]` pendente · `[~]` em andamento · `[x]` concluída · `[!]` bloqu
 - Mistura de blocos do mapa: 30% sombra profunda, 45% terra na sombra, 17% musgo, 5% folhagem e 3% pedra, além da faixa de trilha.
 - A medição de fluidez não pode ficar presa à sincronização vertical, ou todo quadro mediria cerca de 16,7 ms. Use o modo de apresentação sem espera.
 - Resposta antiga depois de uma correção: o evento de confirmação traz a origem do movimento, e o Classic só aceita a confirmação se essa origem for o início da caminhada atual.
-- Testes com rede real: use porta escolhida pelo sistema, só no próprio computador, e espera por condição com limite.
+- Testes com rede real: o SDL3_net não informa a porta escolhida pelo sistema, então cada teste procura uma porta livre na faixa de `TcpTestSupport.hpp`, só no próprio computador, e espera por condição com limite.
 - O hook `guard-bash` trata como escrita qualquer comando que cite um arquivo de trava e tenha `>`. Não redirecione a saída para arquivo nesses comandos.
 - O servidor de teste não pode usar o Classic. O adaptador da demonstração fica em `Samples/DemoGame/Source/Client`, porque `demo_protocol` também não pode usar o Classic.
 - `demo_client_starts` e `test_server_starts` hoje esperam que os programas imprimam a versão e terminem. Mantenha esse comportamento com um argumento `--version`, sem enfraquecer os testes.
